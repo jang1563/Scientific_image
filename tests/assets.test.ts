@@ -40,12 +40,12 @@ import { exportProject } from "../packages/export/src/index.ts";
 
 test("premium asset registry has growing complete curated assets", () => {
   const validation = validatePremiumAssetRegistry();
-  assert.equal(CURATED_ASSETS.length, 330);
+  assert.equal(CURATED_ASSETS.length, 361);
   assert.deepEqual(validation.issues, []);
 
   const ids = new Set(CURATED_ASSETS.map((asset) => asset.id));
-  assert.equal(ids.size, 330);
-  assert.equal(CURATED_ASSETS.filter((asset) => asset.category.startsWith("Biology /")).length, 250);
+  assert.equal(ids.size, 361);
+  assert.equal(CURATED_ASSETS.filter((asset) => asset.category.startsWith("Biology /")).length, 281);
   assert.equal(CURATED_ASSETS.filter((asset) => asset.category.startsWith("AI /")).length, 80);
 });
 
@@ -219,9 +219,9 @@ test("commercial signature and hero assets have v2 recipes and quality metadata"
   const premiumIds = new Set(premiumAssets.map((asset) => asset.id));
   const recipes = new Set(premiumAssets.map((asset) => asset.renderSpec.assetRecipe));
 
-  assert.equal(HERO_ASSET_IDS.length, 258);
-  assert.equal(premiumAssets.length, 258);
-  assert.equal(recipes.size, 258);
+  assert.equal(HERO_ASSET_IDS.length, 296);
+  assert.equal(premiumAssets.length, 296);
+  assert.equal(recipes.size, 296);
   assert.ok(CURATED_ASSETS.filter((asset) => asset.qualityTier === "signature").length >= 20);
   for (const assetId of HERO_ASSET_IDS) {
     const asset = getAsset(assetId);
@@ -301,6 +301,14 @@ test("commercial signature and hero assets have v2 recipes and quality metadata"
     assert.equal(asset.qualityTier, "signature");
     assert.equal(asset.renderSpec.assetRecipe, `hero-${assetId}`);
     assert.ok(asset.workflowPacks.includes("lab-automation"));
+    assert.match(renderPremiumAssetSvg(assetId, { styleProfile: "consulting-2p5d" }), new RegExp(`data-recipe="hero-${assetId}"`));
+    assert.doesNotMatch(renderPremiumAssetSvg(assetId, { styleProfile: "consulting-2p5d" }), /data-recipe="standard-/);
+  }
+  for (const assetId of ["anatomy-overview", "organ-axis-brain-lung-gut", "brain", "lung", "gut", "liver", "heart", "immune-system", "blood-brain-barrier", "kidney", "spleen", "pancreas", "skin", "bone-marrow", "lymph-node", "vasculature", "intestinal-villus", "renal-nephron", "hepatic-lobule", "organ-sample-flow", "tissue-biomarker-panel", "clinical-endpoint-card", "organ-system-network"]) {
+    const asset = getAsset(assetId);
+    assert.equal(asset.qualityTier, "signature");
+    assert.equal(asset.renderSpec.assetRecipe, `hero-${assetId}`);
+    assert.ok(asset.workflowPacks.includes("anatomy-organ-systems"));
     assert.match(renderPremiumAssetSvg(assetId, { styleProfile: "consulting-2p5d" }), new RegExp(`data-recipe="hero-${assetId}"`));
     assert.doesNotMatch(renderPremiumAssetSvg(assetId, { styleProfile: "consulting-2p5d" }), /data-recipe="standard-/);
   }
@@ -761,6 +769,36 @@ test("lab automation broad pack assets expose dedicated premium recipe markers",
   }
 });
 
+test("anatomy organ systems broad pack assets expose dedicated premium recipe markers", () => {
+  const expectedMarkers: Record<string, RegExp[]> = {
+    "anatomy-overview": [/asset-anatomy-overview/, /asset-anatomy-organ-card/, /asset-anatomy-axis-link/],
+    "organ-axis-brain-lung-gut": [/asset-organ-axis-brain-lung-gut/, /asset-organ-axis-node/, /asset-organ-axis-connector/],
+    kidney: [/asset-anatomy-kidney/, /asset-kidney-cortex/, /asset-kidney-vessel/],
+    spleen: [/asset-anatomy-spleen/, /asset-spleen-white-pulp/],
+    pancreas: [/asset-anatomy-pancreas/, /asset-pancreas-duct/],
+    skin: [/asset-anatomy-skin/, /asset-skin-layer/],
+    "bone-marrow": [/asset-anatomy-bone-marrow/, /asset-bone-marrow-cell/],
+    "lymph-node": [/asset-anatomy-lymph-node/, /asset-lymph-node-follicle/],
+    vasculature: [/asset-anatomy-vasculature/, /asset-vasculature-branch/],
+    "renal-nephron": [/asset-anatomy-renal-nephron/, /asset-nephron-loop/],
+    "hepatic-lobule": [/asset-anatomy-hepatic-lobule/, /asset-hepatic-lobule-sinusoid/],
+    "tissue-biomarker-panel": [/asset-anatomy-biomarker-panel/, /asset-biomarker-row/],
+    "clinical-endpoint-card": [/asset-anatomy-clinical-endpoint-card/, /asset-clinical-endpoint-row/],
+    "organ-system-network": [/asset-anatomy-organ-system-network/, /asset-organ-system-network-node/]
+  };
+
+  for (const [assetId, markers] of Object.entries(expectedMarkers)) {
+    const asset = getAsset(assetId);
+    const svg = renderPremiumAssetSvg(assetId, { styleProfile: "consulting-2p5d", width: 180, height: 140 });
+    assert.match(svg, /commercial-premium-asset/);
+    assert.match(svg, new RegExp(`data-recipe="hero-${assetId}"`));
+    assert.ok(asset.workflowPacks.includes("anatomy-organ-systems"));
+    assert.ok(asset.qualityTier === "signature" || asset.qualityTier === "hero");
+    assert.ok(svg.length > 1800, `${assetId} render is too small to be a premium anatomy asset`);
+    for (const marker of markers) assert.match(svg, marker);
+  }
+});
+
 test("spatial transcriptomics assets expose premium map and image-analysis markers", () => {
   const expectedMarkers: Record<string, RegExp[]> = {
     "visium-spot-array": [
@@ -859,7 +897,7 @@ test("spatial results template uses compact copy and roomier heatmap", () => {
 
 test("premium style profiles and workflow packs are queryable", () => {
   const packs = listWorkflowPacks();
-  assert.equal(packs.length, 14);
+  assert.equal(packs.length, 15);
   assert.ok(packs.every((pack) => pack.assetIds.length >= 20));
   assert.ok(packs.every((pack) => pack.templates.length >= 4));
   assert.ok(packs.every((pack) => pack.flagshipTemplateId));
@@ -870,6 +908,7 @@ test("premium style profiles and workflow packs are queryable", () => {
   assert.ok(packs.some((pack) => pack.id === "cell-therapy" && pack.templates.includes("cell-therapy-manufacturing-platform")));
   assert.ok(packs.some((pack) => pack.id === "microscopy-image-analysis" && pack.templates.includes("microscopy-image-analysis-pipeline")));
   assert.ok(packs.some((pack) => pack.id === "lab-automation" && pack.templates.includes("lab-automation-platform")));
+  assert.ok(packs.some((pack) => pack.id === "anatomy-organ-systems" && pack.templates.includes("anatomy-organ-system-overview")));
 
   const templates = listWorkflowTemplates();
   assert.ok(templates.length >= 25);
@@ -900,6 +939,9 @@ test("premium style profiles and workflow packs are queryable", () => {
   const labAutomationTemplates = listWorkflowTemplates({ workflowPack: "lab-automation" });
   assert.equal(labAutomationTemplates.length, 4);
   assert.ok(labAutomationTemplates.some((template) => template.id === "lab-automation-platform" && template.layout === "workflow"));
+  const anatomyTemplates = listWorkflowTemplates({ workflowPack: "anatomy-organ-systems" });
+  assert.equal(anatomyTemplates.length, 4);
+  assert.ok(anatomyTemplates.some((template) => template.id === "anatomy-organ-system-overview" && template.layout === "workflow"));
 
   const perturb = searchAssets({ workflowPack: "perturb-seq-crispr", styleProfile: "consulting-2p5d", limit: 10 });
   assert.ok(perturb.length >= 5);
@@ -940,6 +982,11 @@ test("premium style profiles and workflow packs are queryable", () => {
   assert.ok(labAutomation.length >= 8);
   assert.ok(labAutomation.every((result) => result.asset.workflowPacks.includes("lab-automation")));
   assert.ok(labAutomation.some((result) => result.asset.id === "automated-liquid-handler" || result.asset.id === "robotic-arm"));
+
+  const anatomy = searchAssets({ workflowPack: "anatomy-organ-systems", query: "anatomy organ system brain lung gut liver kidney tissue biomarker clinical endpoint", styleProfile: "consulting-2p5d", limit: 12 });
+  assert.ok(anatomy.length >= 8);
+  assert.ok(anatomy.every((result) => result.asset.workflowPacks.includes("anatomy-organ-systems")));
+  assert.ok(anatomy.some((result) => result.asset.id === "anatomy-overview" || result.asset.id === "kidney"));
 
   const lineSvg = renderPremiumAssetSvg("crispr-cas9", { styleProfile: "publication-line" });
   assert.match(lineSvg, /data-style-profile="publication-line"/);
@@ -1002,18 +1049,18 @@ test("workflow pack export snapshots summarize fallbacks and next actions", () =
 
 test("premium coverage roadmap exposes 12 month targets and ontology contracts", () => {
   const coverage = getAssetCoverageGapReport();
-  assert.equal(coverage.baseline.totalAssets, 330);
-  assert.equal(coverage.baseline.signatureHeroAssets, 258);
-  assert.equal(coverage.baseline.workflowPacks, 14);
-  assert.equal(coverage.baseline.templates, 61);
+  assert.equal(coverage.baseline.totalAssets, 361);
+  assert.equal(coverage.baseline.signatureHeroAssets, 296);
+  assert.equal(coverage.baseline.workflowPacks, 15);
+  assert.equal(coverage.baseline.templates, 65);
   assert.equal(coverage.productWedge, "asset-breadth-library");
   assert.equal(coverage.firstWave, "broad-biology-market");
   assert.equal(coverage.qualityGate, "pack-complete-premium");
   assert.deepEqual(coverage.broadMarketPackOrder.slice(0, 5), ["drug-discovery", "protein-engineering", "synthetic-biology", "microbiome-infectious-disease", "cell-therapy"]);
   assert.equal(coverage.packMinimumContract.minSignatureHeroAssets, 12);
   assert.equal(coverage.packMinimumContract.requiresAgentPath, true);
-  assert.ok(coverage.milestones.some((milestone) => milestone.targetAssets === 1200 && milestone.remainingAssets === 870));
-  assert.ok(coverage.milestones.some((milestone) => milestone.targetWorkflowPacks === 24 && milestone.remainingWorkflowPacks === 10));
+  assert.ok(coverage.milestones.some((milestone) => milestone.targetAssets === 1200 && milestone.remainingAssets === 839));
+  assert.ok(coverage.milestones.some((milestone) => milestone.targetWorkflowPacks === 24 && milestone.remainingWorkflowPacks === 9));
   assert.ok(coverage.plannedWorkflowPacks.some((pack) => pack.id === "bio-llm-benchmarks" && pack.wave === "jk-aligned"));
   assert.ok(coverage.plannedWorkflowPacks.some((pack) => pack.id === "drug-discovery" && pack.wave === "commercial-broad"));
   assert.equal(coverage.plannedWorkflowPacks.filter((pack) => pack.wave === "commercial-broad")[0].id, "drug-discovery");
@@ -1330,6 +1377,44 @@ test("agent-facing pack and asset-set recommendations are workflow aware", () =>
   for (const assetId of expectedLabAutomationCore) assert.ok(labAutomationInsertIds.includes(assetId), `${assetId} should be an insert-ready lab automation core anchor`);
   assert.ok(labAutomationSet.insertPlan.every((action) => action.tool === "insert_premium_asset" && action.args.styleProfile === "consulting-2p5d"));
 
+  const anatomyPackRecommendations = recommendWorkflowPack({
+    title: "Anatomy organ systems context and clinical endpoint slide",
+    narrative: "Brain, lung, gut, liver, kidney, tissue biomarker panel, organ sample flow, cohort evidence, and clinical endpoint review.",
+    limit: 3
+  });
+  assert.equal(anatomyPackRecommendations[0].pack.id, "anatomy-organ-systems");
+  assert.equal(anatomyPackRecommendations[0].recommendedTemplateId, "anatomy-organ-system-overview");
+
+  const anatomySet = recommendAssetSet({
+    title: "Anatomy organ system context slide",
+    sourceText: "Build an anatomy organ systems figure with brain lung gut liver kidney tissue biomarker clinical endpoint organ sample cohort evidence and cross-organ comparison.",
+    styleProfile: "consulting-2p5d",
+    limit: 30
+  });
+  const anatomyInsertIds = anatomySet.insertPlan.map((action) => action.args.assetId);
+  const expectedAnatomyCore = [
+    "anatomy-overview",
+    "organ-axis-brain-lung-gut",
+    "brain",
+    "lung",
+    "gut",
+    "immune-system",
+    "organ-sample-flow",
+    "tissue-biomarker-panel",
+    "organ-system-network",
+    "liver",
+    "kidney",
+    "heart",
+    "intestinal-villus",
+    "renal-nephron",
+    "hepatic-lobule",
+    "clinical-endpoint-card"
+  ];
+  assert.equal(anatomySet.workflowPack, "anatomy-organ-systems");
+  assert.equal(anatomySet.templateId, "anatomy-organ-system-overview");
+  for (const assetId of expectedAnatomyCore) assert.ok(anatomyInsertIds.includes(assetId), `${assetId} should be an insert-ready anatomy organ systems core anchor`);
+  assert.ok(anatomySet.insertPlan.every((action) => action.tool === "insert_premium_asset" && action.args.styleProfile === "consulting-2p5d"));
+
   const drugPackRecommendations = recommendWorkflowPack({
     title: "Drug discovery hit validation and lead optimization slide",
     narrative: "Target validation, compound library screen, hit triage, toxicity review, and candidate nomination.",
@@ -1600,6 +1685,18 @@ test("priority flagship templates generate commercial editable figure structures
   assert.ok(labAutomation.some((node) => node.kind === "symbol" && node.payload.layoutHint?.startsWith("lab-automation-platform:stage-")));
   assert.ok(labAutomation.every((node) => node.payload.workflowPack === "lab-automation" && node.payload.templateId === "lab-automation-platform"));
 
+  const anatomy = createWorkflowFigureNodes({ templateId: "anatomy-organ-system-overview", styleProfile: "consulting-2p5d" });
+  assert.ok(anatomy.length >= 80);
+  assert.ok(anatomy.some((node) => node.kind === "text" && node.payload.text?.includes("Anatomy organ system context map")));
+  assert.ok(anatomy.some((node) => node.kind === "text" && node.payload.text?.includes("Decision spine: organ context")));
+  assert.ok(anatomy.some((node) => node.kind === "text" && node.payload.text === "clinical-context-review"));
+  assert.ok(anatomy.some((node) => node.kind === "plot" && node.payload.spec.plotType === "line" && node.payload.spec.title === "Endpoint trend"));
+  for (const assetId of ["anatomy-overview", "organ-axis-brain-lung-gut", "organ-sample-flow", "tissue-biomarker-panel", "clinical-endpoint-card", "brain", "lung", "gut", "kidney", "heart", "intestinal-villus", "renal-nephron", "hepatic-lobule", "blood-vessel", "human-cohort", "patient-organ-cohort"]) {
+    assert.ok(anatomy.some((node) => node.kind === "symbol" && node.payload.assetId === assetId), `${assetId} should appear in anatomy organ systems flagship`);
+  }
+  assert.ok(anatomy.some((node) => node.kind === "symbol" && node.payload.layoutHint?.startsWith("anatomy-organ-system-overview:stage-")));
+  assert.ok(anatomy.every((node) => node.payload.workflowPack === "anatomy-organ-systems" && node.payload.templateId === "anatomy-organ-system-overview"));
+
   const hybridTemplate = getWorkflowTemplate("spatial-realistic-hybrid-panel");
   assert.equal(hybridTemplate.recommendedStyleProfile, "scientific-editorial-realism");
   assert.ok(hybridTemplate.previewAssetIds.includes("realistic-he-tissue-section"));
@@ -1695,16 +1792,16 @@ test("priority flagship templates generate commercial editable figure structures
 
 test("asset quality report captures benchmark-driven coverage gaps", () => {
   const report = getAssetQualityReport();
-  assert.equal(report.summary.totalAssets, 330);
-  assert.equal(report.summary.biologyAssets, 250);
+  assert.equal(report.summary.totalAssets, 361);
+  assert.equal(report.summary.biologyAssets, 281);
   assert.equal(report.summary.aiAssets, 80);
-  assert.equal(report.tierCounts.signature + report.tierCounts.hero, 258);
-  assert.equal(report.workflowCoverage.length, 14);
+  assert.equal(report.tierCounts.signature + report.tierCounts.hero, 296);
+  assert.equal(report.workflowCoverage.length, 15);
   assert.ok(report.workflowCoverage.every((pack) => pack.missingAssetIds.length === 0));
   assert.ok(report.workflowCoverage.every((pack) => pack.missingTemplateIds.length === 0));
   assert.ok(report.workflowCoverage.every((pack) => pack.templateCount >= 4));
   assert.ok(report.workflowCoverage.every((pack) => pack.flagshipTemplateId));
-  assert.ok(report.styleCoverage.every((style) => style.count === 330));
+  assert.ok(report.styleCoverage.every((style) => style.count === 361));
   assert.ok(report.benchmarks.some((benchmark) => benchmark.id === "biorender"));
   assert.ok(report.benchmarks.some((benchmark) => benchmark.id === "figma-components"));
   assert.ok(report.qualityRubric.some((item) => item.includes("Recognizable at 48px")));
@@ -1717,7 +1814,8 @@ test("asset quality report captures benchmark-driven coverage gaps", () => {
   assert.ok(report.workflowCoverage.some((pack) => pack.id === "cell-therapy" && pack.signatureOrHeroCount >= 12 && pack.qaStatus === "premium"));
   assert.ok(report.workflowCoverage.some((pack) => pack.id === "microscopy-image-analysis" && pack.signatureOrHeroCount >= 12 && pack.qaStatus === "premium"));
   assert.ok(report.workflowCoverage.some((pack) => pack.id === "lab-automation" && pack.signatureOrHeroCount >= 12 && pack.qaStatus === "premium"));
-  assert.deepEqual(report.recommendedNextPacks.slice(0, 3), ["anatomy-organ-systems", "methods-and-protocols", "grant-and-consulting-summary"]);
+  assert.ok(report.workflowCoverage.some((pack) => pack.id === "anatomy-organ-systems" && pack.signatureOrHeroCount >= 12 && pack.qaStatus === "premium"));
+  assert.deepEqual(report.recommendedNextPacks.slice(0, 3), ["methods-and-protocols", "grant-and-consulting-summary", "clinical-translational"]);
 });
 
 test("premium asset appearance overrides survive rendering and export", () => {

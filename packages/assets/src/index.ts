@@ -1078,6 +1078,16 @@ export const PREMIUM_WORKFLOW_PACKS: WorkflowPack[] = [
     agentUseHints: ["Use for automated assay execution, robotic plate movement, liquid handling, LIMS tracking, and lab operations slides.", "Keep deck setup, robotic execution, readout, sample tracking, and QC handoff as separate editable objects."]
   },
   {
+    id: "anatomy-organ-systems",
+    name: "Anatomy / organ systems",
+    priority: 3,
+    description: "Organ context maps, tissue modules, sample flow, clinical endpoint evidence, and cross-organ comparison figures.",
+    flagshipTemplateId: "anatomy-organ-system-overview",
+    assetIds: ["anatomy-overview", "organ-axis-brain-lung-gut", "brain", "lung", "gut", "liver", "heart", "immune-system", "blood-brain-barrier", "kidney", "spleen", "pancreas", "skin", "bone-marrow", "lymph-node", "vasculature", "respiratory-tract", "intestinal-villus", "renal-nephron", "hepatic-lobule", "cardiac-muscle", "neural-circuit", "blood-vessel", "lymphatic-vessel", "immune-organ-map", "organ-chip", "patient-organ-cohort", "disease-tissue-map", "organ-sample-flow", "tissue-biomarker-panel", "organ-risk-context", "clinical-endpoint-card", "anatomy-callout", "organ-scale-bar", "tissue-region-map", "organ-legend", "organ-system-network", "cross-organ-comparison", "human-cohort", "mouse-model", "organoid-model", "blood-sample", "tissue-section", "histology-section", "cell-immune", "cell-epithelial", "cell-neuron", "cell-hepatocyte", "cell-muscle", "dataset", "metric-card", "spatial-grid"],
+    templates: ["anatomy-organ-system-overview", "cross-organ-disease-context", "organ-to-sample-flow", "clinical-anatomy-summary"],
+    agentUseHints: ["Use for anatomy-aware study overviews, organ-to-sample workflows, tissue biomarker context, translational evidence, and clinical endpoint slides.", "Keep organ context, tissue region, sample flow, evidence panel, and clinical review as separate editable objects."]
+  },
+  {
     id: "space-biology-genelab",
     name: "Space biology / GeneLab",
     priority: 3,
@@ -1607,6 +1617,54 @@ export const PREMIUM_WORKFLOW_TEMPLATES: WorkflowTemplate[] = [
     qaChecklist: ["Run status is readable.", "Alerts are actionable.", "Operational metrics are marked synthetic or source-backed."]
   },
   {
+    id: "anatomy-organ-system-overview",
+    workflowPack: "anatomy-organ-systems",
+    name: "Anatomy organ system overview",
+    description: "Organ context map linking brain, lung, gut, liver, kidney, tissue modules, samples, biomarker evidence, and clinical review.",
+    layout: "workflow",
+    recommendedStyleProfile: "consulting-2p5d",
+    previewAssetIds: ["anatomy-overview", "organ-axis-brain-lung-gut", "organ-sample-flow", "tissue-biomarker-panel"],
+    nodeKinds: ["shape", "text", "symbol", "plot", "connector"],
+    agentUseHints: ["Use as the flagship anatomy slide from notes about organ systems, tissue context, clinical samples, biomarkers, or translational endpoint evidence.", "Keep organ map, tissue module, sample flow, evidence, and clinical endpoint review as separate editable objects."],
+    qaChecklist: ["Organ and tissue labels are anatomically plausible.", "Sample flow does not imply unsupported clinical conclusions.", "Clinical endpoint and biomarker claims stay reviewable before export."]
+  },
+  {
+    id: "cross-organ-disease-context",
+    workflowPack: "anatomy-organ-systems",
+    name: "Cross-organ disease context",
+    description: "Comparison panel for organ involvement, tissue regions, immune context, and endpoint evidence across multiple organs.",
+    layout: "multi-panel",
+    recommendedStyleProfile: "consulting-2p5d",
+    previewAssetIds: ["brain", "lung", "kidney", "cross-organ-comparison"],
+    nodeKinds: ["shape", "text", "symbol", "plot"],
+    agentUseHints: ["Use when the source compares disease signals across organs, systems, or tissues.", "Make organ labels explicit and keep evidence panels separate from interpretation callouts."],
+    qaChecklist: ["Cross-organ comparison labels fit.", "Evidence and interpretation are visually separated.", "Unsupported clinical language is flagged."]
+  },
+  {
+    id: "organ-to-sample-flow",
+    workflowPack: "anatomy-organ-systems",
+    name: "Organ-to-sample flow",
+    description: "Workflow from organ system context to tissue region, biospecimen, assay handoff, and evidence panel.",
+    layout: "workflow",
+    recommendedStyleProfile: "consulting-2p5d",
+    previewAssetIds: ["organ-axis-brain-lung-gut", "tissue-region-map", "organ-sample-flow", "blood-sample"],
+    nodeKinds: ["shape", "text", "symbol", "connector"],
+    agentUseHints: ["Use for sample collection, tissue-to-assay, translational study design, and organ context workflow slides.", "Keep biospecimen and clinical interpretation as separate objects."],
+    qaChecklist: ["Sample source is clear.", "Organ/tissue/sample directionality is visible.", "Assay and provenance labels are attached."]
+  },
+  {
+    id: "clinical-anatomy-summary",
+    workflowPack: "anatomy-organ-systems",
+    name: "Clinical anatomy summary",
+    description: "Consulting-style summary tying organ system context, biomarker panel, cohort evidence, endpoint status, and review caveats.",
+    layout: "results",
+    recommendedStyleProfile: "consulting-2p5d",
+    previewAssetIds: ["clinical-endpoint-card", "tissue-biomarker-panel", "human-cohort", "organ-risk-context"],
+    nodeKinds: ["shape", "text", "symbol", "plot"],
+    agentUseHints: ["Use for clinical/translational overview slides, grant summaries, or organ-context result summaries.", "Represent clinical interpretation as a reviewable evidence card instead of a decorative conclusion."],
+    qaChecklist: ["Endpoint status is source-backed or marked draft.", "Cohort/sample context is visible.", "PPTX fallback warnings name exact anatomy assets."]
+  },
+  {
     id: "spatial-workflow",
     workflowPack: "spatial-transcriptomics",
     name: "Spatial workflow",
@@ -1968,6 +2026,29 @@ const SIGNATURE_ASSET_IDS = new Set([
   "incubator-stack",
   "automated-microscope",
   "automation-orchestrator",
+  "anatomy-overview",
+  "organ-axis-brain-lung-gut",
+  "brain",
+  "lung",
+  "gut",
+  "liver",
+  "heart",
+  "immune-system",
+  "blood-brain-barrier",
+  "kidney",
+  "spleen",
+  "pancreas",
+  "skin",
+  "bone-marrow",
+  "lymph-node",
+  "vasculature",
+  "intestinal-villus",
+  "renal-nephron",
+  "hepatic-lobule",
+  "organ-sample-flow",
+  "tissue-biomarker-panel",
+  "clinical-endpoint-card",
+  "organ-system-network",
   "medicinal-chemistry-cycle",
   "efficacy-model",
   "ind-enabling-package",
@@ -2308,6 +2389,47 @@ const BIOLOGY_SEEDS: AssetSeed[] = [
     ["organoid-model", "Organoid model", "model organoid"],
     ["blood-brain-barrier", "Blood-brain barrier", "barrier brain vascular"]
   ], "#ec4899"),
+  ...biology("Anatomy organ systems", "organ", "context", [
+    ["kidney", "Kidney", "organ renal nephrology cortex medulla"],
+    ["spleen", "Spleen", "organ immune spleen lymphoid"],
+    ["pancreas", "Pancreas", "organ endocrine pancreas islet"],
+    ["skin", "Skin", "organ barrier dermis epidermis"],
+    ["bone-marrow", "Bone marrow", "hematopoiesis marrow immune niche"],
+    ["lymph-node", "Lymph node", "immune lymph node follicle"],
+    ["vasculature", "Vasculature", "vascular vessel network circulation"],
+    ["respiratory-tract", "Respiratory tract", "airway trachea bronchus lung"],
+    ["intestinal-villus", "Intestinal villus", "gut intestine villus epithelial"],
+    ["renal-nephron", "Renal nephron", "kidney nephron glomerulus loop"],
+    ["hepatic-lobule", "Hepatic lobule", "liver lobule sinusoid portal"],
+    ["cardiac-muscle", "Cardiac muscle", "heart myocardium muscle tissue"],
+    ["neural-circuit", "Neural circuit", "brain neural circuit synapse"],
+    ["blood-vessel", "Blood vessel", "vascular blood vessel capillary"],
+    ["lymphatic-vessel", "Lymphatic vessel", "lymphatic vessel drainage"]
+  ], "#ec4899"),
+  ...biology("Anatomy organ systems", "workflowBlock", "process", [
+    ["anatomy-overview", "Anatomy overview", "anatomy organ system overview map"],
+    ["organ-axis-brain-lung-gut", "Brain-lung-gut axis", "organ axis brain lung gut cross organ"],
+    ["immune-organ-map", "Immune organ map", "immune organ map lymphoid spleen marrow"],
+    ["organ-chip", "Organ-on-chip", "organ chip microphysiological system"],
+    ["patient-organ-cohort", "Patient organ cohort", "patient cohort organ stratification"],
+    ["disease-tissue-map", "Disease tissue map", "disease tissue organ region map"],
+    ["organ-sample-flow", "Organ sample flow", "organ tissue sample flow biospecimen"],
+    ["organ-system-network", "Organ system network", "organ system network cross organ communication"]
+  ], "#ec4899"),
+  ...biology("Anatomy organ systems", "metricPanel", "evaluation", [
+    ["tissue-biomarker-panel", "Tissue biomarker panel", "tissue biomarker panel clinical evidence"],
+    ["clinical-endpoint-card", "Clinical endpoint card", "clinical endpoint card patient outcome"],
+    ["cross-organ-comparison", "Cross-organ comparison", "cross organ comparison matrix summary"]
+  ], "#7c3aed"),
+  ...biology("Anatomy organ systems", "riskGate", "risk", [
+    ["organ-risk-context", "Organ risk context", "organ risk clinical caveat review"]
+  ], "#dc2626"),
+  ...biology("Anatomy organ systems", "workflowBlock", "annotation", [
+    ["anatomy-callout", "Anatomy callout", "anatomy callout label annotation"],
+    ["organ-scale-bar", "Organ scale bar", "organ tissue scale bar annotation"],
+    ["tissue-region-map", "Tissue region map", "tissue region map roi annotation"],
+    ["organ-legend", "Organ legend", "organ legend color key annotation"]
+  ], "#64748b"),
   ...biology("Pathogens and biosafety", "pathogen", "risk", [
     ["virus-particle", "Virus particle", "virus pathogen"],
     ["bacteria", "Bacterium", "bacteria pathogen"],
@@ -2617,11 +2739,11 @@ export function getAssetQualityReport(): AssetQualityReport {
     qualityRubric: [...ASSET_QUALITY_RUBRIC],
     priorityGaps: buildPriorityGaps(workflowCoverage, styleCoverage),
     recommendedNextPacks: [
-      "anatomy-organ-systems",
       "methods-and-protocols",
       "grant-and-consulting-summary",
       "clinical-translational",
-      "immunology-oncology"
+      "immunology-oncology",
+      "bio-llm-benchmarks"
     ]
   };
 }
@@ -2693,8 +2815,9 @@ export function getAssetCoverageGapReport(): AssetCoverageGapReport {
       "Use cell-therapy as the fifth active broad-market pack and audit CAR/TCR/NK, manufacturing, release QC, infusion, and monitoring visual QA.",
       "Use microscopy-image-analysis as the sixth active broad-market pack and audit field/channel/z-stack/segmentation/tracking/phenotyping/QC visual QA.",
       "Use lab-automation as the seventh active broad-market pack and audit liquid handling, robotics, plate logistics, LIMS, scheduling, and QC visual QA.",
+      "Use anatomy-organ-systems as the eighth active broad-market pack and audit organ maps, tissue modules, sample flow, biomarker evidence, and clinical endpoint review.",
       "Promote or add pack-specific signature assets for target validation, compound library, toxicity screen, ADMET, candidate nomination, and assay evidence.",
-      "Add the next broad packs in order: anatomy-organ-systems, methods-and-protocols.",
+      "Add the next broad packs in order: methods-and-protocols, grant-and-consulting-summary.",
       "Keep MCP/API recommendations pack-first so Codex or Claude can request workflowPack, templateId, assetId, styleProfile, semanticSlot, and appearance overrides."
     ]
   };
@@ -3008,6 +3131,44 @@ function premiumSeedTheme(seed: AssetSeed): Pick<AssetSeed, "accent" | "secondar
     "seal-peeler": "#f97316",
     "lab-sensor": "#16a34a",
     "automation-orchestrator": "#4f46e5",
+    "anatomy-overview": "#ec4899",
+    "organ-axis-brain-lung-gut": "#7c3aed",
+    brain: "#7c3aed",
+    lung: "#0ea5e9",
+    gut: "#059669",
+    liver: "#f97316",
+    heart: "#dc2626",
+    "immune-system": "#16a34a",
+    "blood-brain-barrier": "#2563eb",
+    kidney: "#0891b2",
+    spleen: "#be123c",
+    pancreas: "#f59e0b",
+    skin: "#ec4899",
+    "bone-marrow": "#dc2626",
+    "lymph-node": "#16a34a",
+    vasculature: "#2563eb",
+    "respiratory-tract": "#0ea5e9",
+    "intestinal-villus": "#059669",
+    "renal-nephron": "#0891b2",
+    "hepatic-lobule": "#f97316",
+    "cardiac-muscle": "#dc2626",
+    "neural-circuit": "#7c3aed",
+    "blood-vessel": "#2563eb",
+    "lymphatic-vessel": "#16a34a",
+    "immune-organ-map": "#16a34a",
+    "organ-chip": "#0f766e",
+    "patient-organ-cohort": "#0d9488",
+    "disease-tissue-map": "#b45309",
+    "organ-sample-flow": "#0891b2",
+    "tissue-biomarker-panel": "#7c3aed",
+    "organ-risk-context": "#dc2626",
+    "clinical-endpoint-card": "#be123c",
+    "anatomy-callout": "#64748b",
+    "organ-scale-bar": "#64748b",
+    "tissue-region-map": "#f59e0b",
+    "organ-legend": "#475569",
+    "organ-system-network": "#4f46e5",
+    "cross-organ-comparison": "#7c3aed",
     "pathway-node": "#c2410c",
     "signaling-cascade": "#9333ea",
     "activation-edge": "#16a34a",
@@ -4081,7 +4242,7 @@ export function recommendWorkflowPack(input: {
       if (pack.name.toLowerCase().includes(token)) score += 22;
       if (haystack.includes(token)) score += 8;
     }
-    if (inferredPack && pack.id === inferredPack) score += 36;
+    if (inferredPack && pack.id === inferredPack) score += 140;
     const quality = getWorkflowPackQuality(pack.id);
     score += Math.round(quality.signatureCoverage * 20);
     score += Math.min(12, pack.templates.length * 2);
@@ -4344,6 +4505,28 @@ const WORKFLOW_CORE_ASSET_IDS: Record<string, string[]> = {
     "lims-dashboard",
     "qc-gate-automation",
     "automation-orchestrator"
+  ],
+  "anatomy-organ-systems": [
+    "anatomy-overview",
+    "organ-axis-brain-lung-gut",
+    "brain",
+    "lung",
+    "gut",
+    "liver",
+    "kidney",
+    "heart",
+    "immune-system",
+    "blood-brain-barrier",
+    "intestinal-villus",
+    "renal-nephron",
+    "hepatic-lobule",
+    "organ-sample-flow",
+    "tissue-biomarker-panel",
+    "clinical-endpoint-card",
+    "organ-system-network",
+    "patient-organ-cohort",
+    "tissue-region-map",
+    "human-cohort"
   ]
 };
 
@@ -6240,6 +6423,7 @@ function createTemplateFigureNodes(pack: WorkflowPack, template: WorkflowTemplat
   if (template.id === "cell-therapy-manufacturing-platform") return createCellTherapyFlagshipTemplateNodes(template, input);
   if (template.id === "microscopy-image-analysis-pipeline") return createMicroscopyImageAnalysisFlagshipTemplateNodes(template, input);
   if (template.id === "lab-automation-platform") return createLabAutomationFlagshipTemplateNodes(template, input);
+  if (template.id === "anatomy-organ-system-overview") return createAnatomyOrganSystemsFlagshipTemplateNodes(template, input);
   if (template.id === "ai-biosecurity-pipeline") return createAiBiosecurityFlagshipTemplateNodes(template, input);
   if (template.id === "permissioning-ladder") return createPermissioningLadderTemplateNodes(template, input);
   if (template.id === "benchmark-dashboard") return createBenchmarkDashboardTemplateNodes(template, input);
@@ -8706,6 +8890,252 @@ function createLabAutomationFlagshipTemplateNodes(template: WorkflowTemplate, in
   return nodes.map((node, index) => ({ ...node, transform: { ...node.transform, z: index } }));
 }
 
+function createAnatomyOrganSystemsFlagshipTemplateNodes(template: WorkflowTemplate, input: {
+  styleProfile?: AssetStyleProfile;
+  x?: number;
+  y?: number;
+  width?: number;
+}): SceneNode[] {
+  const styleProfile = input.styleProfile ?? template.recommendedStyleProfile;
+  const x = input.x ?? 72;
+  const y = input.y ?? 104;
+  const width = input.width ?? 1064;
+  const theme = flagshipStyleTheme(styleProfile, "purple");
+  const source = curatedProvenance("Synthetic anatomy organ systems flagship demo data generated by Scientific Image", "Scientific Image anatomy-organ-systems workflow pack fixture");
+  const figureText = (text: string, transform: Transform, style: Style = {}): SceneNode => ({
+    ...createTextNode(text, transform, style),
+    claimStatus: "draft-visual"
+  });
+  const figureShape = (shape: "round-rect" | "ellipse" | "rect" | "diamond" | "line", label: string, transform: Transform, style: Style = {}): SceneNode => ({
+    ...createShapeNode(shape, label, transform, style),
+    claimStatus: "draft-visual"
+  });
+  const symbol = (
+    assetId: string,
+    label: string,
+    sx: number,
+    sy: number,
+    sw: number,
+    sh: number,
+    layoutHint: string,
+    appearance: SymbolAppearance = {},
+    profile: AssetStyleProfile = styleProfile
+  ): SceneNode => createCuratedSymbolNode({
+    assetId,
+    label,
+    x: sx,
+    y: sy,
+    width: sw,
+    height: sh,
+    styleProfile: profile,
+    semanticRole: "anatomy-organ-systems",
+    layoutHint,
+    appearance: { ...theme.symbolAppearance, ...appearance }
+  });
+  const nodes: SceneNode[] = [
+    figureShape("round-rect", "", createTransform(x - 18, y - 44, width + 36, 538), {
+      fill: theme.outerFill,
+      stroke: theme.outerStroke,
+      strokeWidth: 2,
+      depth: theme.outerDepth
+    }),
+    figureText("Anatomy organ system context map", createTransform(x, y - 32, 610, 30), {
+      fontSize: 22,
+      fontWeight: 900,
+      color: theme.heading
+    }),
+    figureText("Editable organ context, tissue regions, biospecimens, biomarker evidence, endpoint status, and review caveats stay separated for agent + human edits.", createTransform(x + 628, y - 34, width - 628, 44), {
+      fontSize: 11.2,
+      fontWeight: 650,
+      color: theme.muted
+    }),
+    figureShape("round-rect", "", createTransform(x + 4, y + 12, 238, 28), {
+      fill: theme.chipFill,
+      stroke: theme.chipStroke,
+      strokeWidth: 1,
+      depth: "surface"
+    }),
+    figureText("pack: anatomy-organ-systems", createTransform(x + 18, y + 17, 204, 18), {
+      fontSize: 10.2,
+      fontWeight: 850,
+      color: theme.accent
+    }),
+    figureShape("round-rect", "", createTransform(x + 256, y + 12, 338, 28), {
+      fill: theme.chipAltFill,
+      stroke: theme.isLine ? "#111827" : theme.isDark ? "#334155" : "#bbf7d0",
+      strokeWidth: 1,
+      depth: "surface"
+    }),
+    figureText("agent-ready organ -> evidence path", createTransform(x + 272, y + 17, 304, 18), {
+      fontSize: 10.2,
+      fontWeight: 850,
+      color: theme.accent2
+    })
+  ];
+
+  const stageY = y + 64;
+  const stageH = 164;
+  const stageW = Math.round((width - 64) / 5);
+  const stages: Array<{ assetId: string; label: string; kind: string; note: string; accent: string; profile?: AssetStyleProfile }> = [
+    { assetId: "anatomy-overview", label: "Organ map", kind: "context", note: "organ system scope", accent: theme.accent },
+    { assetId: "organ-axis-brain-lung-gut", label: "Axis", kind: "cross-organ", note: "brain + lung + gut", accent: "#7c3aed" },
+    { assetId: "organ-sample-flow", label: "Sample", kind: "biospecimen", note: "tissue + blood flow", accent: "#0891b2" },
+    { assetId: "tissue-biomarker-panel", label: "Evidence", kind: "biomarker", note: "region + marker panel", accent: theme.accent2 },
+    { assetId: "clinical-endpoint-card", label: "Review", kind: "endpoint", note: "clinical caveat", accent: theme.warningText, profile: theme.riskSymbolProfile }
+  ];
+  stages.forEach((stage, index) => {
+    const sx = x + index * (stageW + 16);
+    const reviewStage = index === stages.length - 1;
+    nodes.push(figureShape("round-rect", "", createTransform(sx, stageY, stageW, stageH), {
+      fill: reviewStage ? theme.warningFill : index % 2 ? theme.panelAltFill : theme.panelFill,
+      stroke: reviewStage ? theme.warningStroke : theme.panelStroke,
+      strokeWidth: 1.25,
+      depth: reviewStage ? theme.floatingDepth : theme.panelDepth
+    }));
+    nodes.push(figureShape("round-rect", "", createTransform(sx + 12, stageY + 12, 36, 20), {
+      fill: theme.isDark ? "#0f172a" : "#ffffff",
+      stroke: reviewStage ? theme.warningStroke : theme.panelStroke,
+      strokeWidth: 1,
+      depth: "surface"
+    }));
+    nodes.push(figureText(`0${index + 1}`, createTransform(sx + 21, stageY + 16, 18, 12), {
+      fontSize: 8.8,
+      fontWeight: 950,
+      color: reviewStage ? theme.warningText : stage.accent
+    }));
+    nodes.push(figureShape("round-rect", "", createTransform(sx + stageW - 94, stageY + 12, 80, 20), {
+      fill: reviewStage ? theme.warningFill : theme.chipFill,
+      stroke: reviewStage ? theme.warningStroke : theme.chipStroke,
+      strokeWidth: 1,
+      depth: "surface"
+    }));
+    nodes.push(figureText(stage.kind, createTransform(sx + stageW - 84, stageY + 16, 62, 12), {
+      fontSize: 7.4,
+      fontWeight: 850,
+      color: reviewStage ? theme.warningText : stage.accent
+    }));
+    nodes.push(symbol(stage.assetId, stage.label, sx + Math.round((stageW - 112) / 2), stageY + 34, 112, 86, `${template.id}:stage-${index + 1}`, { accent: stage.accent, stroke: stage.accent, labelVisible: false }, stage.profile ?? styleProfile));
+    nodes.push(figureText(stage.label, createTransform(sx + 14, stageY + 122, stageW - 28, 18), {
+      fontSize: 12,
+      fontWeight: 900,
+      color: reviewStage ? theme.warningText : theme.text
+    }));
+    nodes.push(figureText(stage.note, createTransform(sx + 14, stageY + 142, stageW - 28, 16), {
+      fontSize: 9.2,
+      fontWeight: 720,
+      color: theme.muted
+    }));
+    if (index > 0) {
+      nodes.push(createConnectorNode([
+        { x: sx - 16, y: stageY + 82 },
+        { x: sx - 2, y: stageY + 82 }
+      ], "", { stroke: theme.connector, strokeWidth: 2.3 }));
+    }
+  });
+  nodes.push(figureShape("round-rect", "", createTransform(x + 4, stageY + stageH + 14, width - 8, 28), {
+    fill: theme.isDark ? "#0f172a" : "#f8fafc",
+    stroke: theme.panelStroke,
+    strokeWidth: 1,
+    depth: "surface"
+  }));
+  nodes.push(figureText("Decision spine: organ context -> tissue region -> sample source -> biomarker evidence -> endpoint review", createTransform(x + 24, stageY + stageH + 20, width - 48, 16), {
+    fontSize: 9.5,
+    fontWeight: 820,
+    color: theme.muted
+  }));
+
+  const lowerY = y + 280;
+  const gap = 22;
+  const panelW = Math.round((width - gap * 2) / 3);
+  const endpointTable = {
+    id: createId("table"),
+    name: "Illustrative endpoint trend",
+    columns: ["visit", "score", "series"],
+    rows: [
+      { visit: 0, score: 0.22, series: "endpoint" },
+      { visit: 1, score: 0.34, series: "endpoint" },
+      { visit: 2, score: 0.48, series: "endpoint" },
+      { visit: 3, score: 0.57, series: "endpoint" }
+    ],
+    source
+  };
+  const addPanel = (tag: string, title: string, status: string, px: number, py: number, pw: number, fill = theme.panelFill, tone = theme.text) => {
+    const review = status === "review";
+    nodes.push(figureShape("round-rect", "", createTransform(px, py, pw, 204), {
+      fill,
+      stroke: review ? theme.warningStroke : theme.panelStroke,
+      strokeWidth: 1.25,
+      depth: theme.panelDepth
+    }));
+    nodes.push(figureShape("round-rect", "", createTransform(px + 14, py + 14, 28, 22), {
+      fill: theme.isDark ? "#0f172a" : "#ffffff",
+      stroke: review ? theme.warningStroke : theme.panelStroke,
+      strokeWidth: 1,
+      depth: "surface"
+    }));
+    nodes.push(figureText(tag, createTransform(px + 14, py + 17, 28, 16), {
+      fontSize: 12,
+      fontWeight: 920,
+      color: tone
+    }));
+    nodes.push(figureText(title, createTransform(px + 52, py + 16, pw - 142, 20), {
+      fontSize: 11.6,
+      fontWeight: 850,
+      color: tone
+    }));
+    nodes.push(figureShape("round-rect", "", createTransform(px + pw - 88, py + 14, 74, 22), {
+      fill: review ? theme.warningFill : theme.chipFill,
+      stroke: review ? theme.warningStroke : theme.chipStroke,
+      strokeWidth: 1,
+      depth: "surface"
+    }));
+    nodes.push(figureText(status, createTransform(px + pw - 76, py + 19, 52, 12), {
+      fontSize: 7.9,
+      fontWeight: 850,
+      color: review ? theme.warningText : tone
+    }));
+  };
+  addPanel("A", "Organ map", "context", x, lowerY, panelW, theme.panelFill, theme.accent);
+  addPanel("B", "Tissue module", "sample", x + panelW + gap, lowerY, panelW, theme.panelAltFill, theme.accent2);
+  addPanel("C", "Cohort evidence", "review", x + (panelW + gap) * 2, lowerY, width - (panelW + gap) * 2, theme.warningFill, theme.warningText);
+  nodes.push(
+    symbol("brain", "Brain", x + 20, lowerY + 52, 62, 72, `${template.id}:brain`, { accent: "#7c3aed", stroke: "#7c3aed", labelVisible: false }),
+    symbol("lung", "Lung", x + 88, lowerY + 52, 62, 72, `${template.id}:lung`, { accent: "#0ea5e9", stroke: "#0ea5e9", labelVisible: false }),
+    symbol("gut", "Gut", x + 156, lowerY + 52, 62, 72, `${template.id}:gut`, { accent: "#059669", stroke: "#059669", labelVisible: false }),
+    symbol("kidney", "Kidney", x + 224, lowerY + 52, 62, 72, `${template.id}:kidney`, { accent: "#0891b2", stroke: "#0891b2", labelVisible: false }),
+    symbol("heart", "Heart", x + 292, lowerY + 52, 58, 72, `${template.id}:heart`, { accent: "#dc2626", stroke: "#dc2626", labelVisible: false }),
+    figureText("Organ silhouettes are separately selectable for cross-organ summaries.", createTransform(x + 24, lowerY + 160, panelW - 48, 24), { fontSize: 10, fontWeight: 720, color: theme.muted }),
+    symbol("intestinal-villus", "Villus", x + panelW + gap + 22, lowerY + 52, 66, 76, `${template.id}:villus`, { accent: "#059669", stroke: "#059669", labelVisible: false }),
+    symbol("renal-nephron", "Nephron", x + panelW + gap + 94, lowerY + 52, 66, 76, `${template.id}:nephron`, { accent: "#0891b2", stroke: "#0891b2", labelVisible: false }),
+    symbol("hepatic-lobule", "Lobule", x + panelW + gap + 166, lowerY + 52, 66, 76, `${template.id}:lobule`, { accent: "#f97316", stroke: "#f97316", labelVisible: false }),
+    symbol("blood-vessel", "Vessel", x + panelW + gap + 238, lowerY + 52, 66, 76, `${template.id}:vessel`, { accent: "#2563eb", stroke: "#2563eb", labelVisible: false }),
+    figureText("Tissue units preserve scale, region, and sampling anchors for annotations.", createTransform(x + panelW + gap + 24, lowerY + 160, panelW - 48, 24), { fontSize: 10, fontWeight: 720, color: theme.muted }),
+    symbol("human-cohort", "Cohort", x + (panelW + gap) * 2 + 20, lowerY + 52, 66, 76, `${template.id}:cohort`, { accent: theme.warningText, stroke: theme.warningText, labelVisible: false }, theme.riskSymbolProfile),
+    symbol("patient-organ-cohort", "Patient organ", x + (panelW + gap) * 2 + 92, lowerY + 52, 66, 76, `${template.id}:patient`, { accent: theme.warningText, stroke: theme.warningText, labelVisible: false }, theme.riskSymbolProfile),
+    symbol("tissue-biomarker-panel", "Biomarker", x + (panelW + gap) * 2 + 164, lowerY + 52, 66, 76, `${template.id}:biomarker`, { accent: theme.warningText, stroke: theme.warningText, labelVisible: false }, theme.riskSymbolProfile),
+    createPlotNode({
+      id: createId("plot"),
+      plotType: "line",
+      title: "Endpoint trend",
+      table: endpointTable,
+      encodings: { x: "visit", y: "score", color: "series" },
+      style: theme.plotStyle
+    }, createTransform(x + (panelW + gap) * 2 + 242, lowerY + 50, 88, 88)),
+    figureShape("round-rect", "", createTransform(x + (panelW + gap) * 2 + 96, lowerY + 148, 218, 24), {
+      fill: theme.isDark ? "#111827" : "#ffffff",
+      stroke: theme.warningStroke,
+      strokeWidth: 1,
+      depth: "surface"
+    }),
+    figureText("clinical-context-review", createTransform(x + (panelW + gap) * 2 + 124, lowerY + 154, 166, 13), {
+      fontSize: 8.2,
+      fontWeight: 850,
+      color: theme.warningText
+    })
+  );
+  return nodes.map((node, index) => ({ ...node, transform: { ...node.transform, z: index } }));
+}
+
 function createSpatialResultsFlagshipTemplateNodes(template: WorkflowTemplate, input: {
   styleProfile?: AssetStyleProfile;
   x?: number;
@@ -10862,7 +11292,8 @@ function inferWorkflowPack(text: string): string | undefined {
   if (/protein engineering|protein design|directed evolution|affinity maturation|binding pocket|protein domain|variant library|enzyme kinetics|protein stability|developability|purification column|structure prediction|binder optimization|nanobody|scfv/.test(normalized)) return "protein-engineering";
   if (/lab automation|liquid handler|automated liquid handler|robotic arm|robotic gripper|plate handler|plate stack|plate reader|barcode scanner|lims|assay scheduler|sample tracker|automation qc|qc gate|incubator stack|automated microscope|acoustic dispenser|colony picker|deck layout|tip rack|reagent reservoir|automation orchestrator|robotic rail/.test(normalized)) return "lab-automation";
   if (/drug|compound|hit triage|lead|admet|toxicity|target validation|candidate nomination|pharma|potency|selectivity/.test(normalized)) return "drug-discovery";
-  if (/perturb|crispr|screen|guide|lentiviral/.test(normalized)) return "perturb-seq-crispr";
+  if (/(?:^|[^a-z0-9])(?:perturb(?:-seq)?|crispr|screens?|screening|guide rnas?|grnas?|lentiviral)(?:$|[^a-z0-9])/.test(normalized)) return "perturb-seq-crispr";
+  if (/(?:^|[^a-z0-9])(?:anatomy|organ systems?|cross[-\s]?organ|organ axis|brain[-\s]?lung[-\s]?gut|brain|lung|liver|kidney|heart|spleen|pancreas|skin|bone marrow|lymph node|vasculature|respiratory tract|intestinal villus|renal nephron|hepatic lobule|cardiac muscle|neural circuit|blood vessel|lymphatic vessel|organ sample|tissue biomarker|clinical endpoint)(?:$|[^a-z0-9])/.test(normalized)) return "anatomy-organ-systems";
   if (/publication|manuscript|paper|results?|figure panel|multi-panel|volcano|heatmap|result panel/.test(normalized)) return "publication-results-panels";
   if (/microscopy image analysis|image analysis|microscope field|fluorescence channel|z[-\s]?stack|tile stitching|illumination correction|focus quality|nuclei segmentation|membrane segmentation|instance mask|cell tracking|morphology embedding|phenotype feature|classifier heatmap|segmentation model|annotation brush|image qc|computer vision/.test(normalized)) return "microscopy-image-analysis";
   if (/spatial|visium|merfish|xenium|histology|segmentation|neighborhood/.test(normalized)) return "spatial-transcriptomics";
