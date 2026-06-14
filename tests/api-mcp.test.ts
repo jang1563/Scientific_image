@@ -112,12 +112,13 @@ test("local API exposes premium asset search, render, and recommendations", asyn
 
   try {
     const packs = await fetch(`${base}/assets/workflow-packs`).then((response) => response.json());
-    assert.equal(packs.workflowPacks.length, 12);
+    assert.equal(packs.workflowPacks.length, 13);
     assert.ok(packs.workflowPacks.some((pack: { id: string; flagshipTemplateId?: string }) => pack.id === "drug-discovery" && pack.flagshipTemplateId === "drug-discovery-funnel"));
     assert.ok(packs.workflowPacks.some((pack: { id: string; flagshipTemplateId?: string }) => pack.id === "protein-engineering" && pack.flagshipTemplateId === "protein-engineering-platform"));
     assert.ok(packs.workflowPacks.some((pack: { id: string; flagshipTemplateId?: string }) => pack.id === "synthetic-biology" && pack.flagshipTemplateId === "synthetic-biology-platform"));
     assert.ok(packs.workflowPacks.some((pack: { id: string; flagshipTemplateId?: string }) => pack.id === "microbiome-infectious-disease" && pack.flagshipTemplateId === "microbiome-infectious-disease-platform"));
     assert.ok(packs.workflowPacks.some((pack: { id: string; flagshipTemplateId?: string }) => pack.id === "cell-therapy" && pack.flagshipTemplateId === "cell-therapy-manufacturing-platform"));
+    assert.ok(packs.workflowPacks.some((pack: { id: string; flagshipTemplateId?: string }) => pack.id === "microscopy-image-analysis" && pack.flagshipTemplateId === "microscopy-image-analysis-pipeline"));
 
     const gallery = await fetch(`${base}/assets/workflow-packs/ai-biosecurity-eval/gallery?styleProfile=risk-warning`).then((response) => response.json());
     assert.equal(gallery.gallery.pack.id, "ai-biosecurity-eval");
@@ -151,12 +152,12 @@ test("local API exposes premium asset search, render, and recommendations", asyn
     assert.ok(templateQa.qa.actionItems.some((item: { title: string }) => item.title === "Resolve claim citations"));
 
     const report = await fetch(`${base}/assets/quality-report`).then((response) => response.json());
-    assert.equal(report.report.summary.totalAssets, 286);
+    assert.equal(report.report.summary.totalAssets, 304);
     assert.ok(report.report.benchmarks.some((benchmark: { id: string }) => benchmark.id === "biorender"));
     assert.ok(report.report.priorityGaps.some((gap: string) => gap.includes("Office editability")));
 
     const coverage = await fetch(`${base}/assets/coverage-gap-report`).then((response) => response.json());
-    assert.equal(coverage.report.baseline.totalAssets, 286);
+    assert.equal(coverage.report.baseline.totalAssets, 304);
     assert.equal(coverage.report.productWedge, "asset-breadth-library");
     assert.deepEqual(coverage.report.broadMarketPackOrder.slice(0, 3), ["drug-discovery", "protein-engineering", "synthetic-biology"]);
     assert.ok(coverage.report.milestones.some((milestone: { targetAssets: number }) => milestone.targetAssets === 1200));
@@ -232,7 +233,7 @@ test("local API exposes premium asset search, render, and recommendations", asyn
     const searched = await fetch(`${base}/assets?query=spatial%20transcriptomics&workflowPack=spatial-transcriptomics&styleProfile=consulting-2p5d&limit=5`).then((response) => response.json());
     assert.ok(searched.assets.some((asset: { id: string }) => asset.id === "spatial-grid" || asset.id === "visium-spot-array"));
     assert.ok(searched.results.every((result: { asset: { workflowPacks: string[] } }) => result.asset.workflowPacks.includes("spatial-transcriptomics")));
-    assert.equal(searched.count, 316);
+    assert.equal(searched.count, 334);
 
     const drugDiscoverySearch = await fetch(`${base}/assets?query=lead%20toxicity%20dose%20selectivity%20pk%20sar&workflowPack=drug-discovery&styleProfile=consulting-2p5d&limit=12`).then((response) => response.json());
     const drugDiscoveryIds = drugDiscoverySearch.assets.map((asset: { id: string }) => asset.id);
@@ -271,6 +272,13 @@ test("local API exposes premium asset search, render, and recommendations", asyn
     assert.ok(cellTherapyIds.includes("car-t-cell"));
     assert.ok(cellTherapyIds.includes("leukapheresis"));
     assert.ok(cellTherapyIds.includes("release-testing"));
+
+    const microscopySearch = await fetch(`${base}/assets?query=microscopy%20image%20analysis%20field%20channel%20segmentation%20tracking%20morphology%20embedding%20qc&workflowPack=microscopy-image-analysis&styleProfile=consulting-2p5d&limit=12`).then((response) => response.json());
+    const microscopyIds = microscopySearch.assets.map((asset: { id: string }) => asset.id);
+    assert.ok(microscopySearch.results.every((result: { asset: { workflowPacks: string[] } }) => result.asset.workflowPacks.includes("microscopy-image-analysis")));
+    assert.ok(microscopyIds.includes("nuclei-segmentation"));
+    assert.ok(microscopyIds.includes("microscope-field"));
+    assert.ok(microscopyIds.includes("image-qc-dashboard"));
 
     const asset = await fetch(`${base}/assets/risk-gate`).then((response) => response.json());
     assert.equal(asset.asset.family, "riskGate");
@@ -705,7 +713,7 @@ test("MCP tools expose premium asset search, preview, recommendation, and insert
     params: { name: "get_asset_quality_report", arguments: {} }
   });
   const qualityPayload = JSON.parse((quality.result as { content: { text: string }[] }).content[0].text);
-  assert.equal(qualityPayload.report.summary.totalAssets, 286);
+  assert.equal(qualityPayload.report.summary.totalAssets, 304);
   assert.ok(qualityPayload.report.benchmarks.some((benchmark: { id: string }) => benchmark.id === "figma-components"));
   assert.ok(qualityPayload.report.workflowCoverage.some((pack: { id: string }) => pack.id === "publication-results-panels"));
 

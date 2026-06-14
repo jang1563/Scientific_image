@@ -40,12 +40,12 @@ import { exportProject } from "../packages/export/src/index.ts";
 
 test("premium asset registry has growing complete curated assets", () => {
   const validation = validatePremiumAssetRegistry();
-  assert.equal(CURATED_ASSETS.length, 286);
+  assert.equal(CURATED_ASSETS.length, 304);
   assert.deepEqual(validation.issues, []);
 
   const ids = new Set(CURATED_ASSETS.map((asset) => asset.id));
-  assert.equal(ids.size, 286);
-  assert.equal(CURATED_ASSETS.filter((asset) => asset.category.startsWith("Biology /")).length, 206);
+  assert.equal(ids.size, 304);
+  assert.equal(CURATED_ASSETS.filter((asset) => asset.category.startsWith("Biology /")).length, 224);
   assert.equal(CURATED_ASSETS.filter((asset) => asset.category.startsWith("AI /")).length, 80);
 });
 
@@ -219,9 +219,9 @@ test("commercial signature and hero assets have v2 recipes and quality metadata"
   const premiumIds = new Set(premiumAssets.map((asset) => asset.id));
   const recipes = new Set(premiumAssets.map((asset) => asset.renderSpec.assetRecipe));
 
-  assert.equal(HERO_ASSET_IDS.length, 213);
-  assert.equal(premiumAssets.length, 213);
-  assert.equal(recipes.size, 213);
+  assert.equal(HERO_ASSET_IDS.length, 231);
+  assert.equal(premiumAssets.length, 231);
+  assert.equal(recipes.size, 231);
   assert.ok(CURATED_ASSETS.filter((asset) => asset.qualityTier === "signature").length >= 20);
   for (const assetId of HERO_ASSET_IDS) {
     const asset = getAsset(assetId);
@@ -285,6 +285,14 @@ test("commercial signature and hero assets have v2 recipes and quality metadata"
     assert.equal(asset.qualityTier, "signature");
     assert.equal(asset.renderSpec.assetRecipe, `hero-${assetId}`);
     assert.ok(asset.workflowPacks.includes("cell-therapy"));
+    assert.match(renderPremiumAssetSvg(assetId, { styleProfile: "consulting-2p5d" }), new RegExp(`data-recipe="hero-${assetId}"`));
+    assert.doesNotMatch(renderPremiumAssetSvg(assetId, { styleProfile: "consulting-2p5d" }), /data-recipe="standard-/);
+  }
+  for (const assetId of ["image-analysis-pipeline", "microscope-field", "fluorescence-channel", "z-stack", "tile-stitching", "nuclei-segmentation", "membrane-segmentation", "instance-mask", "cell-tracking", "phenotype-feature-vector", "morphology-embedding", "segmentation-model"]) {
+    const asset = getAsset(assetId);
+    assert.equal(asset.qualityTier, "signature");
+    assert.equal(asset.renderSpec.assetRecipe, `hero-${assetId}`);
+    assert.ok(asset.workflowPacks.includes("microscopy-image-analysis"));
     assert.match(renderPremiumAssetSvg(assetId, { styleProfile: "consulting-2p5d" }), new RegExp(`data-recipe="hero-${assetId}"`));
     assert.doesNotMatch(renderPremiumAssetSvg(assetId, { styleProfile: "consulting-2p5d" }), /data-recipe="standard-/);
   }
@@ -693,6 +701,32 @@ test("cell therapy broad pack assets expose dedicated premium recipe markers", (
   }
 });
 
+test("microscopy image analysis broad pack assets expose dedicated premium recipe markers", () => {
+  const expectedMarkers: Record<string, RegExp[]> = {
+    "image-analysis-pipeline": [/asset-microscopy-analysis-pipeline/, /asset-image-analysis-raw-tile/, /asset-image-analysis-pipeline-arrow/],
+    "microscope-field": [/asset-microscopy-analysis-field/, /asset-microscope-field-fov/, /asset-microscope-field-scale-bar/],
+    "fluorescence-channel": [/asset-microscopy-analysis-channel/, /asset-fluorescence-channel-stack/, /asset-fluorescence-channel-merge/],
+    "z-stack": [/asset-microscopy-analysis-z-stack/, /asset-z-stack-volume/, /asset-z-stack-depth-arrow/],
+    "tile-stitching": [/asset-microscopy-analysis-tile-stitching/, /asset-microscopy-tile/, /asset-tile-stitching-seam/],
+    "nuclei-segmentation": [/asset-microscopy-analysis-nuclei-segmentation/, /asset-nuclei-segmentation-mask/, /asset-nuclei-segmentation-contour/],
+    "membrane-segmentation": [/asset-microscopy-analysis-membrane-segmentation/, /asset-membrane-segmentation-tile/, /asset-membrane-segmentation-contour/],
+    "instance-mask": [/asset-microscopy-analysis-instance-mask/, /asset-instance-mask-region/, /asset-instance-mask-id-badges/],
+    "cell-tracking": [/asset-microscopy-analysis-cell-tracking/, /asset-cell-tracking-trajectory/, /asset-cell-tracking-timepoint/],
+    "segmentation-model": [/asset-microscopy-analysis-segmentation-model/, /asset-segmentation-model-network/, /asset-segmentation-model-output-mask/]
+  };
+
+  for (const [assetId, markers] of Object.entries(expectedMarkers)) {
+    const asset = getAsset(assetId);
+    const svg = renderPremiumAssetSvg(assetId, { styleProfile: "consulting-2p5d", width: 180, height: 140 });
+    assert.match(svg, /commercial-premium-asset/);
+    assert.match(svg, new RegExp(`data-recipe="hero-${assetId}"`));
+    assert.ok(asset.workflowPacks.includes("microscopy-image-analysis"));
+    assert.ok(asset.qualityTier === "signature" || asset.qualityTier === "hero");
+    assert.ok(svg.length > 2500, `${assetId} render is too small to be a premium microscopy image-analysis asset`);
+    for (const marker of markers) assert.match(svg, marker);
+  }
+});
+
 test("spatial transcriptomics assets expose premium map and image-analysis markers", () => {
   const expectedMarkers: Record<string, RegExp[]> = {
     "visium-spot-array": [
@@ -791,7 +825,7 @@ test("spatial results template uses compact copy and roomier heatmap", () => {
 
 test("premium style profiles and workflow packs are queryable", () => {
   const packs = listWorkflowPacks();
-  assert.equal(packs.length, 12);
+  assert.equal(packs.length, 13);
   assert.ok(packs.every((pack) => pack.assetIds.length >= 20));
   assert.ok(packs.every((pack) => pack.templates.length >= 4));
   assert.ok(packs.every((pack) => pack.flagshipTemplateId));
@@ -800,6 +834,7 @@ test("premium style profiles and workflow packs are queryable", () => {
   assert.ok(packs.some((pack) => pack.id === "synthetic-biology" && pack.templates.includes("synthetic-biology-platform")));
   assert.ok(packs.some((pack) => pack.id === "microbiome-infectious-disease" && pack.templates.includes("microbiome-infectious-disease-platform")));
   assert.ok(packs.some((pack) => pack.id === "cell-therapy" && pack.templates.includes("cell-therapy-manufacturing-platform")));
+  assert.ok(packs.some((pack) => pack.id === "microscopy-image-analysis" && pack.templates.includes("microscopy-image-analysis-pipeline")));
 
   const templates = listWorkflowTemplates();
   assert.ok(templates.length >= 25);
@@ -824,6 +859,9 @@ test("premium style profiles and workflow packs are queryable", () => {
   const cellTherapyTemplates = listWorkflowTemplates({ workflowPack: "cell-therapy" });
   assert.equal(cellTherapyTemplates.length, 4);
   assert.ok(cellTherapyTemplates.some((template) => template.id === "cell-therapy-manufacturing-platform" && template.layout === "workflow"));
+  const microscopyTemplates = listWorkflowTemplates({ workflowPack: "microscopy-image-analysis" });
+  assert.equal(microscopyTemplates.length, 4);
+  assert.ok(microscopyTemplates.some((template) => template.id === "microscopy-image-analysis-pipeline" && template.layout === "workflow"));
 
   const perturb = searchAssets({ workflowPack: "perturb-seq-crispr", styleProfile: "consulting-2p5d", limit: 10 });
   assert.ok(perturb.length >= 5);
@@ -854,6 +892,11 @@ test("premium style profiles and workflow packs are queryable", () => {
   assert.ok(cellTherapy.length >= 8);
   assert.ok(cellTherapy.every((result) => result.asset.workflowPacks.includes("cell-therapy")));
   assert.ok(cellTherapy.some((result) => result.asset.id === "car-t-cell" || result.asset.id === "leukapheresis"));
+
+  const microscopy = searchAssets({ workflowPack: "microscopy-image-analysis", query: "microscopy image analysis segmentation tracking morphology embedding qc", styleProfile: "consulting-2p5d", limit: 12 });
+  assert.ok(microscopy.length >= 8);
+  assert.ok(microscopy.every((result) => result.asset.workflowPacks.includes("microscopy-image-analysis")));
+  assert.ok(microscopy.some((result) => result.asset.id === "nuclei-segmentation" || result.asset.id === "microscope-field"));
 
   const lineSvg = renderPremiumAssetSvg("crispr-cas9", { styleProfile: "publication-line" });
   assert.match(lineSvg, /data-style-profile="publication-line"/);
@@ -916,18 +959,18 @@ test("workflow pack export snapshots summarize fallbacks and next actions", () =
 
 test("premium coverage roadmap exposes 12 month targets and ontology contracts", () => {
   const coverage = getAssetCoverageGapReport();
-  assert.equal(coverage.baseline.totalAssets, 286);
-  assert.equal(coverage.baseline.signatureHeroAssets, 213);
-  assert.equal(coverage.baseline.workflowPacks, 12);
-  assert.equal(coverage.baseline.templates, 53);
+  assert.equal(coverage.baseline.totalAssets, 304);
+  assert.equal(coverage.baseline.signatureHeroAssets, 231);
+  assert.equal(coverage.baseline.workflowPacks, 13);
+  assert.equal(coverage.baseline.templates, 57);
   assert.equal(coverage.productWedge, "asset-breadth-library");
   assert.equal(coverage.firstWave, "broad-biology-market");
   assert.equal(coverage.qualityGate, "pack-complete-premium");
   assert.deepEqual(coverage.broadMarketPackOrder.slice(0, 5), ["drug-discovery", "protein-engineering", "synthetic-biology", "microbiome-infectious-disease", "cell-therapy"]);
   assert.equal(coverage.packMinimumContract.minSignatureHeroAssets, 12);
   assert.equal(coverage.packMinimumContract.requiresAgentPath, true);
-  assert.ok(coverage.milestones.some((milestone) => milestone.targetAssets === 1200 && milestone.remainingAssets === 914));
-  assert.ok(coverage.milestones.some((milestone) => milestone.targetWorkflowPacks === 24 && milestone.remainingWorkflowPacks === 12));
+  assert.ok(coverage.milestones.some((milestone) => milestone.targetAssets === 1200 && milestone.remainingAssets === 896));
+  assert.ok(coverage.milestones.some((milestone) => milestone.targetWorkflowPacks === 24 && milestone.remainingWorkflowPacks === 11));
   assert.ok(coverage.plannedWorkflowPacks.some((pack) => pack.id === "bio-llm-benchmarks" && pack.wave === "jk-aligned"));
   assert.ok(coverage.plannedWorkflowPacks.some((pack) => pack.id === "drug-discovery" && pack.wave === "commercial-broad"));
   assert.equal(coverage.plannedWorkflowPacks.filter((pack) => pack.wave === "commercial-broad")[0].id, "drug-discovery");
@@ -1162,6 +1205,45 @@ test("agent-facing pack and asset-set recommendations are workflow aware", () =>
   assert.equal(cellTherapySet.templateId, "cell-therapy-manufacturing-platform");
   for (const assetId of expectedCellTherapyCore) assert.ok(cellTherapyInsertIds.includes(assetId), `${assetId} should be an insert-ready cell-therapy core anchor`);
   assert.ok(cellTherapySet.insertPlan.every((action) => action.tool === "insert_premium_asset" && action.args.styleProfile === "consulting-2p5d"));
+
+  const microscopyPackRecommendations = recommendWorkflowPack({
+    title: "Microscopy image analysis segmentation and phenotyping slide",
+    narrative: "Fluorescence channels, z-stack acquisition, tile stitching, illumination correction, nuclei and membrane segmentation, cell tracking, morphology embedding, classifier heatmap, image QC, and annotation review.",
+    limit: 3
+  });
+  assert.equal(microscopyPackRecommendations[0].pack.id, "microscopy-image-analysis");
+  assert.equal(microscopyPackRecommendations[0].recommendedTemplateId, "microscopy-image-analysis-pipeline");
+
+  const microscopySet = recommendAssetSet({
+    title: "Microscopy image analysis pipeline slide",
+    sourceText: "Acquire fluorescence microscopy fields and z-stacks, stitch tiles, correct illumination, run nuclei and membrane segmentation, generate instance masks, track cells, extract morphology features, embed phenotypes, classify heatmaps, and route image QC to annotation review.",
+    styleProfile: "consulting-2p5d",
+    limit: 24
+  });
+  const microscopyInsertIds = microscopySet.insertPlan.map((action) => action.args.assetId);
+  const expectedMicroscopyCore = [
+    "microscope-field",
+    "fluorescence-channel",
+    "z-stack",
+    "tile-stitching",
+    "illumination-correction",
+    "focus-quality",
+    "nuclei-segmentation",
+    "membrane-segmentation",
+    "organelle-segmentation",
+    "instance-mask",
+    "segmentation-model",
+    "cell-tracking",
+    "phenotype-feature-vector",
+    "morphology-embedding",
+    "classifier-heatmap",
+    "image-qc-dashboard",
+    "annotation-brush"
+  ];
+  assert.equal(microscopySet.workflowPack, "microscopy-image-analysis");
+  assert.equal(microscopySet.templateId, "microscopy-image-analysis-pipeline");
+  for (const assetId of expectedMicroscopyCore) assert.ok(microscopyInsertIds.includes(assetId), `${assetId} should be an insert-ready microscopy image-analysis core anchor`);
+  assert.ok(microscopySet.insertPlan.every((action) => action.tool === "insert_premium_asset" && action.args.styleProfile === "consulting-2p5d"));
 
   const drugPackRecommendations = recommendWorkflowPack({
     title: "Drug discovery hit validation and lead optimization slide",
@@ -1408,6 +1490,19 @@ test("priority flagship templates generate commercial editable figure structures
   assert.ok(cellTherapy.some((node) => node.kind === "symbol" && node.payload.layoutHint?.startsWith("cell-therapy-manufacturing-platform:stage-")));
   assert.ok(cellTherapy.every((node) => node.payload.workflowPack === "cell-therapy" && node.payload.templateId === "cell-therapy-manufacturing-platform"));
 
+  const microscopy = createWorkflowFigureNodes({ templateId: "microscopy-image-analysis-pipeline", styleProfile: "consulting-2p5d" });
+  assert.ok(microscopy.length >= 80);
+  assert.ok(microscopy.some((node) => node.kind === "text" && node.payload.text?.includes("Microscopy image analysis to phenotype workflow")));
+  assert.ok(microscopy.some((node) => node.kind === "text" && node.payload.text?.includes("Decision spine: image evidence")));
+  assert.ok(microscopy.some((node) => node.kind === "text" && node.payload.text === "model-and-annotation-review"));
+  assert.ok(microscopy.some((node) => node.kind === "plot" && node.payload.spec.plotType === "line" && node.payload.spec.title === "Focus QC"));
+  assert.ok(microscopy.some((node) => node.kind === "plot" && node.payload.spec.plotType === "bar" && node.payload.spec.title === "Mask QC"));
+  for (const assetId of ["microscope-field", "tile-stitching", "nuclei-segmentation", "phenotype-feature-vector", "image-qc-dashboard", "fluorescence-channel", "z-stack", "membrane-segmentation", "instance-mask", "segmentation-model", "morphology-embedding", "classifier-heatmap", "cell-tracking", "annotation-brush"]) {
+    assert.ok(microscopy.some((node) => node.kind === "symbol" && node.payload.assetId === assetId), `${assetId} should appear in microscopy image-analysis flagship`);
+  }
+  assert.ok(microscopy.some((node) => node.kind === "symbol" && node.payload.layoutHint?.startsWith("microscopy-image-analysis-pipeline:stage-")));
+  assert.ok(microscopy.every((node) => node.payload.workflowPack === "microscopy-image-analysis" && node.payload.templateId === "microscopy-image-analysis-pipeline"));
+
   const hybridTemplate = getWorkflowTemplate("spatial-realistic-hybrid-panel");
   assert.equal(hybridTemplate.recommendedStyleProfile, "scientific-editorial-realism");
   assert.ok(hybridTemplate.previewAssetIds.includes("realistic-he-tissue-section"));
@@ -1503,16 +1598,16 @@ test("priority flagship templates generate commercial editable figure structures
 
 test("asset quality report captures benchmark-driven coverage gaps", () => {
   const report = getAssetQualityReport();
-  assert.equal(report.summary.totalAssets, 286);
-  assert.equal(report.summary.biologyAssets, 206);
+  assert.equal(report.summary.totalAssets, 304);
+  assert.equal(report.summary.biologyAssets, 224);
   assert.equal(report.summary.aiAssets, 80);
-  assert.equal(report.tierCounts.signature + report.tierCounts.hero, 213);
-  assert.equal(report.workflowCoverage.length, 12);
+  assert.equal(report.tierCounts.signature + report.tierCounts.hero, 231);
+  assert.equal(report.workflowCoverage.length, 13);
   assert.ok(report.workflowCoverage.every((pack) => pack.missingAssetIds.length === 0));
   assert.ok(report.workflowCoverage.every((pack) => pack.missingTemplateIds.length === 0));
   assert.ok(report.workflowCoverage.every((pack) => pack.templateCount >= 4));
   assert.ok(report.workflowCoverage.every((pack) => pack.flagshipTemplateId));
-  assert.ok(report.styleCoverage.every((style) => style.count === 286));
+  assert.ok(report.styleCoverage.every((style) => style.count === 304));
   assert.ok(report.benchmarks.some((benchmark) => benchmark.id === "biorender"));
   assert.ok(report.benchmarks.some((benchmark) => benchmark.id === "figma-components"));
   assert.ok(report.qualityRubric.some((item) => item.includes("Recognizable at 48px")));
@@ -1523,7 +1618,8 @@ test("asset quality report captures benchmark-driven coverage gaps", () => {
   assert.ok(report.workflowCoverage.some((pack) => pack.id === "synthetic-biology" && pack.signatureOrHeroCount >= 12 && pack.qaStatus === "premium"));
   assert.ok(report.workflowCoverage.some((pack) => pack.id === "microbiome-infectious-disease" && pack.signatureOrHeroCount >= 12 && pack.qaStatus === "premium"));
   assert.ok(report.workflowCoverage.some((pack) => pack.id === "cell-therapy" && pack.signatureOrHeroCount >= 12 && pack.qaStatus === "premium"));
-  assert.deepEqual(report.recommendedNextPacks.slice(0, 3), ["microscopy-image-analysis", "lab-automation", "anatomy-organ-systems"]);
+  assert.ok(report.workflowCoverage.some((pack) => pack.id === "microscopy-image-analysis" && pack.signatureOrHeroCount >= 12 && pack.qaStatus === "premium"));
+  assert.deepEqual(report.recommendedNextPacks.slice(0, 3), ["lab-automation", "anatomy-organ-systems", "methods-and-protocols"]);
 });
 
 test("premium asset appearance overrides survive rendering and export", () => {

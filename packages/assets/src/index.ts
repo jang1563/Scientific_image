@@ -1058,6 +1058,16 @@ export const PREMIUM_WORKFLOW_PACKS: WorkflowPack[] = [
     agentUseHints: ["Use for cell therapy platform, CAR-T/TCR/NK mechanism, manufacturing, release testing, and clinical monitoring slides.", "Keep patient sample, engineering/manufacturing, potency/release evidence, infusion, and toxicity monitoring as separate editable objects."]
   },
   {
+    id: "microscopy-image-analysis",
+    name: "Microscopy image analysis",
+    priority: 3,
+    description: "Microscopy fields, channel/z-stack preprocessing, segmentation, tracking, phenotyping, QC, and model-assisted annotation workflows.",
+    flagshipTemplateId: "microscopy-image-analysis-pipeline",
+    assetIds: ["image-analysis-pipeline", "microscope-field", "fluorescence-channel", "z-stack", "tile-stitching", "illumination-correction", "focus-quality", "nuclei-segmentation", "membrane-segmentation", "organelle-segmentation", "instance-mask", "cell-tracking", "phenotype-feature-vector", "morphology-embedding", "classifier-heatmap", "image-qc-dashboard", "annotation-brush", "segmentation-model", "microscope", "confocal-microscope", "microscopy-tile", "segmentation-mask", "cell-boundary", "image-registration", "morphology-feature", "spatial-grid", "histology-section", "tissue-region", "neighborhood-graph", "dataset", "metric-card", "classifier", "calibration", "error-analysis", "embedding-space", "cell-neighborhood"],
+    templates: ["microscopy-image-analysis-pipeline", "segmentation-qc-panel", "phenotyping-results-dashboard", "model-assisted-annotation-workflow"],
+    agentUseHints: ["Use for microscopy computer-vision pipelines, segmentation, tracking, morphology phenotyping, and image QC slides.", "Keep raw image evidence, preprocessing, segmentation masks, feature extraction, model outputs, and review/QC as separate editable objects."]
+  },
+  {
     id: "space-biology-genelab",
     name: "Space biology / GeneLab",
     priority: 3,
@@ -1491,6 +1501,54 @@ export const PREMIUM_WORKFLOW_TEMPLATES: WorkflowTemplate[] = [
     qaChecklist: ["Clinical safety language is cited or marked draft.", "Monitoring timepoints are readable.", "PPTX warnings name premium fallback assets."]
   },
   {
+    id: "microscopy-image-analysis-pipeline",
+    workflowPack: "microscopy-image-analysis",
+    name: "Microscopy image analysis pipeline",
+    description: "Image-to-phenotype workflow linking raw microscopy fields, channel/z-stack preprocessing, segmentation, feature extraction, model review, and QC output.",
+    layout: "workflow",
+    recommendedStyleProfile: "consulting-2p5d",
+    previewAssetIds: ["microscope-field", "tile-stitching", "nuclei-segmentation", "phenotype-feature-vector"],
+    nodeKinds: ["shape", "text", "symbol", "plot", "connector"],
+    agentUseHints: ["Use as the flagship microscopy image-analysis slide from notes about segmentation, tracking, phenotyping, QC, or model-assisted annotation.", "Keep raw image evidence, preprocessing, segmentation, features, model output, and QC review as separate editable objects."],
+    qaChecklist: ["Image/source provenance is visible.", "Segmentation masks are distinguishable from raw microscopy evidence.", "QC/model claims are source-backed or marked reviewable.", "PPTX warnings name layered microscopy fallback assets."]
+  },
+  {
+    id: "segmentation-qc-panel",
+    workflowPack: "microscopy-image-analysis",
+    name: "Segmentation QC panel",
+    description: "Nuclei, membrane, instance mask, focus quality, and annotation review panel for image-analysis QA.",
+    layout: "results",
+    recommendedStyleProfile: "consulting-2p5d",
+    previewAssetIds: ["nuclei-segmentation", "membrane-segmentation", "instance-mask", "focus-quality"],
+    nodeKinds: ["shape", "text", "symbol", "plot"],
+    agentUseHints: ["Use when source notes mention segmentation quality, mask review, focus/illumination QC, or annotation correction.", "Separate algorithmic mask output from human review or ground truth labels."],
+    qaChecklist: ["Mask boundaries remain readable at slide size.", "QC metrics have labels or source tables.", "Manual review state is visible before export."]
+  },
+  {
+    id: "phenotyping-results-dashboard",
+    workflowPack: "microscopy-image-analysis",
+    name: "Phenotyping results dashboard",
+    description: "Morphology feature vector, embedding, classifier heatmap, tracking summary, and evidence/QC cards for result slides.",
+    layout: "results",
+    recommendedStyleProfile: "consulting-2p5d",
+    previewAssetIds: ["phenotype-feature-vector", "morphology-embedding", "classifier-heatmap", "cell-tracking"],
+    nodeKinds: ["shape", "text", "symbol", "plot"],
+    agentUseHints: ["Use for morphology phenotyping, classifier result, cellular imaging screen, and CV benchmark summary slides.", "Keep embeddings and classifier confidence separate from biological interpretation claims."],
+    qaChecklist: ["Class labels are not implied by color alone.", "Feature/embedding claims are marked illustrative unless source data is imported.", "Export warnings name premium fallback assets."]
+  },
+  {
+    id: "model-assisted-annotation-workflow",
+    workflowPack: "microscopy-image-analysis",
+    name: "Model-assisted annotation workflow",
+    description: "Human-in-the-loop annotation, segmentation model, review brush, error analysis, and final QC path.",
+    layout: "workflow",
+    recommendedStyleProfile: "consulting-2p5d",
+    previewAssetIds: ["segmentation-model", "annotation-brush", "image-qc-dashboard", "error-analysis"],
+    nodeKinds: ["shape", "text", "symbol", "connector"],
+    agentUseHints: ["Use when a slide brief mentions manual annotation, model-assisted labeling, human review, or active learning for microscopy.", "Represent model output, human correction, and QC signoff as explicit editable review steps."],
+    qaChecklist: ["Human review is visually distinct from model output.", "Annotation state is not treated as final ground truth without source confirmation.", "PPTX export warnings name fallback assets."]
+  },
+  {
     id: "spatial-workflow",
     workflowPack: "spatial-transcriptomics",
     name: "Spatial workflow",
@@ -1823,6 +1881,18 @@ const SIGNATURE_ASSET_IDS = new Set([
   "potency-assay",
   "infusion-bag",
   "release-testing",
+  "image-analysis-pipeline",
+  "microscope-field",
+  "fluorescence-channel",
+  "z-stack",
+  "tile-stitching",
+  "nuclei-segmentation",
+  "membrane-segmentation",
+  "instance-mask",
+  "cell-tracking",
+  "phenotype-feature-vector",
+  "morphology-embedding",
+  "segmentation-model",
   "medicinal-chemistry-cycle",
   "efficacy-model",
   "ind-enabling-package",
@@ -2093,6 +2163,32 @@ const BIOLOGY_SEEDS: AssetSeed[] = [
     ["cytokine-release", "Cytokine release", "cytokine release crs il6 toxicity monitoring"],
     ["release-testing", "Release testing", "release testing qa qc sterility viability potency"]
   ], "#7c3aed"),
+  ...biology("Microscopy image analysis", "workflowBlock", "process", [
+    ["image-analysis-pipeline", "Image analysis pipeline", "microscopy image analysis pipeline preprocessing segmentation features qc"],
+    ["tile-stitching", "Tile stitching", "microscopy tile stitching montage image registration"],
+    ["illumination-correction", "Illumination correction", "flat field illumination correction microscopy preprocessing"],
+    ["cell-tracking", "Cell tracking", "live cell tracking trajectory microscopy time lapse"],
+    ["annotation-brush", "Annotation brush", "manual annotation brush ground truth microscopy labels"]
+  ], "#0ea5e9"),
+  ...biology("Microscopy image analysis", "spatial", "assay", [
+    ["microscope-field", "Microscope field", "microscope field of view fluorescence cells image"],
+    ["fluorescence-channel", "Fluorescence channel", "fluorescence channel merge dapi fitc cy3 microscopy"],
+    ["z-stack", "Z-stack", "z stack confocal optical section microscopy volume"],
+    ["nuclei-segmentation", "Nuclei segmentation", "nuclei segmentation dapi mask image analysis"],
+    ["membrane-segmentation", "Membrane segmentation", "membrane segmentation cell boundary microscopy"],
+    ["organelle-segmentation", "Organelle segmentation", "organelle segmentation mitochondria puncta microscopy"],
+    ["instance-mask", "Instance mask", "instance mask cell segmentation object labels"]
+  ], "#7c3aed"),
+  ...biology("Microscopy image analysis", "metricPanel", "evaluation", [
+    ["focus-quality", "Focus quality", "focus quality sharpness microscopy qc metric"],
+    ["phenotype-feature-vector", "Phenotype feature vector", "morphology phenotype feature vector image features"],
+    ["morphology-embedding", "Morphology embedding", "morphology embedding umap image phenotyping"],
+    ["classifier-heatmap", "Classifier heatmap", "classifier heatmap saliency image model confidence"],
+    ["image-qc-dashboard", "Image QC dashboard", "image qc dashboard focus illumination segmentation quality"]
+  ], "#2563eb"),
+  ...biology("Microscopy image analysis", "modelSystem", "process", [
+    ["segmentation-model", "Segmentation model", "segmentation model neural network microscopy mask prediction"]
+  ], "#4f46e5"),
   ...biology("Organ systems and model contexts", "organ", "context", [
     ["brain", "Brain", "organ brain neuroscience"],
     ["lung", "Lung", "organ respiratory"],
@@ -2414,11 +2510,11 @@ export function getAssetQualityReport(): AssetQualityReport {
     qualityRubric: [...ASSET_QUALITY_RUBRIC],
     priorityGaps: buildPriorityGaps(workflowCoverage, styleCoverage),
     recommendedNextPacks: [
-      "microscopy-image-analysis",
       "lab-automation",
       "anatomy-organ-systems",
       "methods-and-protocols",
-      "grant-and-consulting-summary"
+      "grant-and-consulting-summary",
+      "clinical-translational"
     ]
   };
 }
@@ -2488,8 +2584,9 @@ export function getAssetCoverageGapReport(): AssetCoverageGapReport {
       "Use synthetic-biology as the third active broad-market pack and audit DBTL/circuit/chassis/biosensor/containment visual QA.",
       "Use microbiome-infectious-disease as the fourth active broad-market pack and audit community/barrier/metagenomic/AMR/outbreak visual QA.",
       "Use cell-therapy as the fifth active broad-market pack and audit CAR/TCR/NK, manufacturing, release QC, infusion, and monitoring visual QA.",
+      "Use microscopy-image-analysis as the sixth active broad-market pack and audit field/channel/z-stack/segmentation/tracking/phenotyping/QC visual QA.",
       "Promote or add pack-specific signature assets for target validation, compound library, toxicity screen, ADMET, candidate nomination, and assay evidence.",
-      "Add the next broad packs in order: microscopy-image-analysis, lab-automation, anatomy-organ-systems.",
+      "Add the next broad packs in order: lab-automation, anatomy-organ-systems.",
       "Keep MCP/API recommendations pack-first so Codex or Claude can request workflowPack, templateId, assetId, styleProfile, semanticSlot, and appearance overrides."
     ]
   };
@@ -2759,6 +2856,24 @@ function premiumSeedTheme(seed: AssetSeed): Pick<AssetSeed, "accent" | "secondar
     "manufacturing-batch": "#0f766e",
     "release-testing": "#f97316",
     cryopreservation: "#2563eb",
+    "image-analysis-pipeline": "#0ea5e9",
+    "microscope-field": "#38bdf8",
+    "fluorescence-channel": "#ec4899",
+    "z-stack": "#7c3aed",
+    "tile-stitching": "#0891b2",
+    "illumination-correction": "#f59e0b",
+    "focus-quality": "#2563eb",
+    "nuclei-segmentation": "#7c3aed",
+    "membrane-segmentation": "#16a34a",
+    "organelle-segmentation": "#0d9488",
+    "instance-mask": "#9333ea",
+    "cell-tracking": "#f97316",
+    "phenotype-feature-vector": "#0369a1",
+    "morphology-embedding": "#4f46e5",
+    "classifier-heatmap": "#dc2626",
+    "image-qc-dashboard": "#0f766e",
+    "annotation-brush": "#b45309",
+    "segmentation-model": "#4f46e5",
     "pathway-node": "#c2410c",
     "signaling-cascade": "#9333ea",
     "activation-edge": "#16a34a",
@@ -4051,6 +4166,28 @@ const WORKFLOW_CORE_ASSET_IDS: Record<string, string[]> = {
     "cytokine-release",
     "flow-cytometry",
     "cell-sorter"
+  ],
+  "microscopy-image-analysis": [
+    "microscope-field",
+    "fluorescence-channel",
+    "z-stack",
+    "tile-stitching",
+    "illumination-correction",
+    "focus-quality",
+    "nuclei-segmentation",
+    "membrane-segmentation",
+    "organelle-segmentation",
+    "instance-mask",
+    "segmentation-model",
+    "cell-tracking",
+    "phenotype-feature-vector",
+    "morphology-embedding",
+    "classifier-heatmap",
+    "image-qc-dashboard",
+    "annotation-brush",
+    "microscope",
+    "confocal-microscope",
+    "cell-boundary"
   ]
 };
 
@@ -5945,6 +6082,7 @@ function createTemplateFigureNodes(pack: WorkflowPack, template: WorkflowTemplat
   if (template.id === "synthetic-biology-platform") return createSyntheticBiologyFlagshipTemplateNodes(template, input);
   if (template.id === "microbiome-infectious-disease-platform") return createMicrobiomeInfectiousDiseaseFlagshipTemplateNodes(template, input);
   if (template.id === "cell-therapy-manufacturing-platform") return createCellTherapyFlagshipTemplateNodes(template, input);
+  if (template.id === "microscopy-image-analysis-pipeline") return createMicroscopyImageAnalysisFlagshipTemplateNodes(template, input);
   if (template.id === "ai-biosecurity-pipeline") return createAiBiosecurityFlagshipTemplateNodes(template, input);
   if (template.id === "permissioning-ladder") return createPermissioningLadderTemplateNodes(template, input);
   if (template.id === "benchmark-dashboard") return createBenchmarkDashboardTemplateNodes(template, input);
@@ -7895,6 +8033,268 @@ function createCellTherapyFlagshipTemplateNodes(template: WorkflowTemplate, inpu
       depth: "surface"
     }),
     figureText("toxicity-and-followup-review", createTransform(x + (panelW + gap) * 2 + 182, lowerY + 146, 178, 13), {
+      fontSize: 9.2,
+      fontWeight: 850,
+      color: theme.warningText
+    })
+  );
+  return nodes.map((node, index) => ({ ...node, transform: { ...node.transform, z: index } }));
+}
+
+function createMicroscopyImageAnalysisFlagshipTemplateNodes(template: WorkflowTemplate, input: {
+  styleProfile?: AssetStyleProfile;
+  x?: number;
+  y?: number;
+  width?: number;
+}): SceneNode[] {
+  const styleProfile = input.styleProfile ?? template.recommendedStyleProfile;
+  const x = input.x ?? 72;
+  const y = input.y ?? 104;
+  const width = input.width ?? 1064;
+  const theme = flagshipStyleTheme(styleProfile, "blue");
+  const source = curatedProvenance("Synthetic microscopy image-analysis flagship demo data generated by Scientific Image", "Scientific Image microscopy-image-analysis workflow pack fixture");
+  const figureText = (text: string, transform: Transform, style: Style = {}): SceneNode => ({
+    ...createTextNode(text, transform, style),
+    claimStatus: "draft-visual"
+  });
+  const figureShape = (shape: "round-rect" | "ellipse" | "rect" | "diamond" | "line", label: string, transform: Transform, style: Style = {}): SceneNode => ({
+    ...createShapeNode(shape, label, transform, style),
+    claimStatus: "draft-visual"
+  });
+  const symbol = (
+    assetId: string,
+    label: string,
+    sx: number,
+    sy: number,
+    sw: number,
+    sh: number,
+    layoutHint: string,
+    appearance: SymbolAppearance = {},
+    profile: AssetStyleProfile = styleProfile
+  ): SceneNode => createCuratedSymbolNode({
+    assetId,
+    label,
+    x: sx,
+    y: sy,
+    width: sw,
+    height: sh,
+    styleProfile: profile,
+    semanticRole: "microscopy-image-analysis",
+    layoutHint,
+    appearance: { ...theme.symbolAppearance, ...appearance }
+  });
+  const nodes: SceneNode[] = [
+    figureShape("round-rect", "", createTransform(x - 18, y - 44, width + 36, 530), {
+      fill: theme.outerFill,
+      stroke: theme.outerStroke,
+      strokeWidth: 2,
+      depth: theme.outerDepth
+    }),
+    figureText("Microscopy image analysis to phenotype workflow", createTransform(x, y - 32, 690, 30), {
+      fontSize: 22,
+      fontWeight: 900,
+      color: theme.heading
+    }),
+    figureText("Editable pack separates image evidence, preprocessing, segmentation, features, model output, and QA review.", createTransform(x + 668, y - 34, width - 668, 44), {
+      fontSize: 11.2,
+      fontWeight: 650,
+      color: theme.muted
+    }),
+    figureShape("round-rect", "", createTransform(x + 4, y + 12, 238, 28), {
+      fill: theme.chipFill,
+      stroke: theme.chipStroke,
+      strokeWidth: 1,
+      depth: "surface"
+    }),
+    figureText("pack: microscopy-image-analysis", createTransform(x + 18, y + 17, 210, 18), {
+      fontSize: 10.2,
+      fontWeight: 850,
+      color: theme.accent
+    }),
+    figureShape("round-rect", "", createTransform(x + 256, y + 12, 302, 28), {
+      fill: theme.chipAltFill,
+      stroke: theme.isLine ? "#111827" : theme.isDark ? "#334155" : "#bbf7d0",
+      strokeWidth: 1,
+      depth: "surface"
+    }),
+    figureText("agent-ready image -> mask -> phenotype path", createTransform(x + 272, y + 17, 266, 18), {
+      fontSize: 10.2,
+      fontWeight: 850,
+      color: theme.accent2
+    })
+  ];
+
+  const stageY = y + 64;
+  const stageH = 164;
+  const stageW = Math.round((width - 64) / 5);
+  const stages: Array<{ assetId: string; label: string; kind: string; note: string; accent: string; profile?: AssetStyleProfile }> = [
+    { assetId: "microscope-field", label: "Acquire", kind: "image", note: "field + channels", accent: theme.accent },
+    { assetId: "tile-stitching", label: "Preprocess", kind: "pre-QC", note: "tiles + z-stack", accent: theme.accent },
+    { assetId: "nuclei-segmentation", label: "Segment", kind: "mask", note: "nuclei + membrane", accent: theme.accent2 },
+    { assetId: "phenotype-feature-vector", label: "Extract", kind: "features", note: "morphology vector", accent: theme.accent2 },
+    { assetId: "image-qc-dashboard", label: "Review", kind: "QA", note: "model + human check", accent: theme.isLine ? "#111827" : theme.isDark ? "#fdba74" : "#dc2626", profile: theme.riskSymbolProfile }
+  ];
+  stages.forEach((stage, index) => {
+    const sx = x + index * (stageW + 16);
+    const reviewStage = index === stages.length - 1;
+    nodes.push(figureShape("round-rect", "", createTransform(sx, stageY, stageW, stageH), {
+      fill: reviewStage ? theme.warningFill : index % 2 ? theme.panelAltFill : theme.panelFill,
+      stroke: reviewStage ? theme.warningStroke : theme.panelStroke,
+      strokeWidth: 1.25,
+      depth: reviewStage ? theme.floatingDepth : theme.panelDepth
+    }));
+    nodes.push(figureShape("round-rect", "", createTransform(sx + 12, stageY + 12, 36, 20), {
+      fill: theme.isDark ? "#0f172a" : "#ffffff",
+      stroke: reviewStage ? theme.warningStroke : theme.panelStroke,
+      strokeWidth: 1,
+      depth: "surface"
+    }));
+    nodes.push(figureText(`0${index + 1}`, createTransform(sx + 21, stageY + 16, 18, 12), {
+      fontSize: 8.8,
+      fontWeight: 950,
+      color: reviewStage ? theme.warningText : stage.accent
+    }));
+    nodes.push(figureShape("round-rect", "", createTransform(sx + stageW - 88, stageY + 12, 74, 20), {
+      fill: reviewStage ? theme.warningFill : theme.chipFill,
+      stroke: reviewStage ? theme.warningStroke : theme.chipStroke,
+      strokeWidth: 1,
+      depth: "surface"
+    }));
+    nodes.push(figureText(stage.kind, createTransform(sx + stageW - 76, stageY + 16, 54, 12), {
+      fontSize: 7.6,
+      fontWeight: 850,
+      color: reviewStage ? theme.warningText : stage.accent
+    }));
+    nodes.push(symbol(stage.assetId, stage.label, sx + Math.round((stageW - 112) / 2), stageY + 34, 112, 86, `${template.id}:stage-${index + 1}`, { accent: stage.accent, stroke: stage.accent, labelVisible: false }, stage.profile ?? styleProfile));
+    nodes.push(figureText(stage.label, createTransform(sx + 14, stageY + 122, stageW - 28, 18), {
+      fontSize: 12,
+      fontWeight: 900,
+      color: reviewStage ? theme.warningText : theme.text
+    }));
+    nodes.push(figureText(stage.note, createTransform(sx + 14, stageY + 142, stageW - 28, 16), {
+      fontSize: 9.2,
+      fontWeight: 720,
+      color: theme.muted
+    }));
+    if (index > 0) {
+      nodes.push(createConnectorNode([
+        { x: sx - 16, y: stageY + 82 },
+        { x: sx - 2, y: stageY + 82 }
+      ], "", { stroke: theme.connector, strokeWidth: 2.3 }));
+    }
+  });
+  nodes.push(figureShape("round-rect", "", createTransform(x + 4, stageY + stageH + 14, width - 8, 28), {
+    fill: theme.isDark ? "#0f172a" : "#f8fafc",
+    stroke: theme.panelStroke,
+    strokeWidth: 1,
+    depth: "surface"
+  }));
+  nodes.push(figureText("Decision spine: image evidence -> preprocessing QC -> segmentation -> phenotype features -> model and human review", createTransform(x + 24, stageY + stageH + 20, width - 48, 16), {
+    fontSize: 9.5,
+    fontWeight: 820,
+    color: theme.muted
+  }));
+
+  const lowerY = y + 280;
+  const gap = 22;
+  const panelW = Math.round((width - gap * 2) / 3);
+  const focusTable = {
+    id: createId("table"),
+    name: "Illustrative microscopy focus QC",
+    columns: ["tile", "score", "series"],
+    rows: [
+      { tile: 1, score: 0.64, series: "sharpness" },
+      { tile: 2, score: 0.81, series: "sharpness" },
+      { tile: 3, score: 0.73, series: "sharpness" },
+      { tile: 4, score: 0.88, series: "sharpness" }
+    ],
+    source
+  };
+  const maskTable = {
+    id: createId("table"),
+    name: "Illustrative segmentation QC",
+	    columns: ["metric", "score", "class"],
+	    rows: [
+	      { metric: "IoU", score: 84, class: "mask" },
+	      { metric: "Edge", score: 76, class: "boundary" }
+	    ],
+	    source
+	  };
+  const addPanel = (tag: string, title: string, status: string, px: number, py: number, pw: number, fill = theme.panelFill, tone = theme.text) => {
+    const review = status === "review";
+    nodes.push(figureShape("round-rect", "", createTransform(px, py, pw, 196), {
+      fill,
+      stroke: review ? theme.warningStroke : theme.panelStroke,
+      strokeWidth: 1.25,
+      depth: theme.panelDepth
+    }));
+    nodes.push(figureShape("round-rect", "", createTransform(px + 14, py + 14, 28, 22), {
+      fill: theme.isDark ? "#0f172a" : "#ffffff",
+      stroke: review ? theme.warningStroke : theme.panelStroke,
+      strokeWidth: 1,
+      depth: "surface"
+    }));
+    nodes.push(figureText(tag, createTransform(px + 14, py + 17, 28, 16), {
+      fontSize: 12,
+      fontWeight: 920,
+      color: tone
+    }));
+    nodes.push(figureText(title, createTransform(px + 52, py + 16, pw - 142, 20), {
+      fontSize: 11.6,
+      fontWeight: 850,
+      color: tone
+    }));
+    nodes.push(figureShape("round-rect", "", createTransform(px + pw - 88, py + 14, 74, 22), {
+      fill: review ? theme.warningFill : theme.chipFill,
+      stroke: review ? theme.warningStroke : theme.chipStroke,
+      strokeWidth: 1,
+      depth: "surface"
+    }));
+    nodes.push(figureText(status, createTransform(px + pw - 76, py + 19, 52, 12), {
+      fontSize: 7.9,
+      fontWeight: 850,
+      color: review ? theme.warningText : tone
+    }));
+  };
+  addPanel("A", "Image evidence", "source", x, lowerY, panelW, theme.panelFill, theme.accent);
+  addPanel("B", "Segmentation QC", "editable", x + panelW + gap, lowerY, panelW, theme.panelAltFill, theme.accent2);
+  addPanel("C", "Phenotyping review", "review", x + (panelW + gap) * 2, lowerY, width - (panelW + gap) * 2, theme.warningFill, theme.warningText);
+  nodes.push(
+    symbol("fluorescence-channel", "Channels", x + 20, lowerY + 52, 74, 76, `${template.id}:channels`, { accent: theme.accent, stroke: theme.accent, labelVisible: false }),
+    symbol("z-stack", "Z-stack", x + 100, lowerY + 52, 70, 76, `${template.id}:zstack`, { accent: theme.accent, stroke: theme.accent, labelVisible: false }),
+    symbol("illumination-correction", "Flat field", x + 176, lowerY + 54, 66, 74, `${template.id}:illumination`, { accent: "#f59e0b", stroke: "#f59e0b", labelVisible: false }),
+    createPlotNode({
+      id: createId("plot"),
+      plotType: "line",
+      title: "Focus QC",
+      table: focusTable,
+      encodings: { x: "tile", y: "score", color: "series" },
+      style: theme.plotStyle
+    }, createTransform(x + 250, lowerY + 52, 92, 88)),
+    figureText("Raw evidence and preprocessing stay separate.", createTransform(x + 24, lowerY + 154, panelW - 48, 24), { fontSize: 10, fontWeight: 720, color: theme.muted }),
+	    symbol("membrane-segmentation", "Membrane", x + panelW + gap + 20, lowerY + 54, 58, 68, `${template.id}:membrane`, { accent: theme.accent2, stroke: theme.accent2, labelVisible: false }),
+	    symbol("instance-mask", "Instances", x + panelW + gap + 84, lowerY + 54, 58, 68, `${template.id}:instances`, { accent: "#7c3aed", stroke: "#7c3aed", labelVisible: false }),
+	    symbol("segmentation-model", "Model", x + panelW + gap + 148, lowerY + 54, 58, 68, `${template.id}:model`, { accent: "#4f46e5", stroke: "#4f46e5", labelVisible: false }),
+	    createPlotNode({
+	      id: createId("plot"),
+	      plotType: "bar",
+	      title: "Mask QC",
+	      table: maskTable,
+	      encodings: { x: "metric", y: "score", color: "class" },
+	      style: theme.plotStyle
+	    }, createTransform(x + panelW + gap + 218, lowerY + 48, 112, 96)),
+    figureText("Mask quality remains reviewable before interpretation.", createTransform(x + panelW + gap + 24, lowerY + 154, panelW - 48, 24), { fontSize: 10, fontWeight: 720, color: theme.muted }),
+    symbol("morphology-embedding", "Embedding", x + (panelW + gap) * 2 + 20, lowerY + 52, 76, 78, `${template.id}:embedding`, { accent: theme.warningText, stroke: theme.warningText, labelVisible: false }, theme.riskSymbolProfile),
+    symbol("classifier-heatmap", "Classifier", x + (panelW + gap) * 2 + 104, lowerY + 52, 72, 78, `${template.id}:classifier`, { accent: theme.warningText, stroke: theme.warningText, labelVisible: false }, theme.riskSymbolProfile),
+    symbol("cell-tracking", "Tracking", x + (panelW + gap) * 2 + 184, lowerY + 52, 72, 78, `${template.id}:tracking`, { accent: theme.warningText, stroke: theme.warningText, labelVisible: false }, theme.riskSymbolProfile),
+    symbol("annotation-brush", "Review", x + (panelW + gap) * 2 + 264, lowerY + 52, 72, 78, `${template.id}:annotation`, { accent: theme.warningText, stroke: theme.warningText, labelVisible: false }, theme.riskSymbolProfile),
+    figureShape("round-rect", "", createTransform(x + (panelW + gap) * 2 + 142, lowerY + 140, 214, 24), {
+      fill: theme.isDark ? "#111827" : "#ffffff",
+      stroke: theme.warningStroke,
+      strokeWidth: 1,
+      depth: "surface"
+    }),
+    figureText("model-and-annotation-review", createTransform(x + (panelW + gap) * 2 + 160, lowerY + 146, 178, 13), {
       fontSize: 9.2,
       fontWeight: 850,
       color: theme.warningText
@@ -10060,6 +10460,7 @@ function inferWorkflowPack(text: string): string | undefined {
   if (/drug|compound|hit triage|lead|admet|toxicity|target validation|candidate nomination|pharma|potency|selectivity/.test(normalized)) return "drug-discovery";
   if (/perturb|crispr|screen|guide|lentiviral/.test(normalized)) return "perturb-seq-crispr";
   if (/publication|manuscript|paper|results?|figure panel|multi-panel|volcano|heatmap|result panel/.test(normalized)) return "publication-results-panels";
+  if (/microscopy image analysis|image analysis|microscope field|fluorescence channel|z[-\s]?stack|tile stitching|illumination correction|focus quality|nuclei segmentation|membrane segmentation|instance mask|cell tracking|morphology embedding|phenotype feature|classifier heatmap|segmentation model|annotation brush|image qc|computer vision/.test(normalized)) return "microscopy-image-analysis";
   if (/spatial|visium|merfish|xenium|histology|segmentation|neighborhood/.test(normalized)) return "spatial-transcriptomics";
   if (/single-cell|scrna|multiomic|barcode|umi|embedding|trajectory/.test(normalized)) return "single-cell-multiomics";
   if (/biosecurity|durc|permission|biosafety|dual-use|risk|review/.test(normalized)) return "ai-biosecurity-eval";

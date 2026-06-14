@@ -152,6 +152,24 @@ export const HERO_ASSET_IDS = Object.freeze([
   "manufacturing-batch",
   "release-testing",
   "cryopreservation",
+  "image-analysis-pipeline",
+  "microscope-field",
+  "fluorescence-channel",
+  "z-stack",
+  "tile-stitching",
+  "illumination-correction",
+  "focus-quality",
+  "nuclei-segmentation",
+  "membrane-segmentation",
+  "organelle-segmentation",
+  "instance-mask",
+  "cell-tracking",
+  "phenotype-feature-vector",
+  "morphology-embedding",
+  "classifier-heatmap",
+  "image-qc-dashboard",
+  "annotation-brush",
+  "segmentation-model",
   "pathway-node",
   "signaling-cascade",
   "virus-particle",
@@ -609,6 +627,42 @@ function renderRecipe(asset, width, height, palette) {
       return cellTherapyAsset(cx, cy, s, palette, "release-testing");
     case "cryopreservation":
       return cellTherapyAsset(cx, cy, s, palette, "cryopreservation");
+    case "image-analysis-pipeline":
+      return microscopyImageAnalysisAsset(cx, cy, s, palette, "pipeline");
+    case "microscope-field":
+      return microscopyImageAnalysisAsset(cx, cy, s, palette, "field");
+    case "fluorescence-channel":
+      return microscopyImageAnalysisAsset(cx, cy, s, palette, "channel");
+    case "z-stack":
+      return microscopyImageAnalysisAsset(cx, cy, s, palette, "z-stack");
+    case "tile-stitching":
+      return microscopyImageAnalysisAsset(cx, cy, s, palette, "tile-stitching");
+    case "illumination-correction":
+      return microscopyImageAnalysisAsset(cx, cy, s, palette, "illumination");
+    case "focus-quality":
+      return microscopyImageAnalysisAsset(cx, cy, s, palette, "focus-quality");
+    case "nuclei-segmentation":
+      return microscopyImageAnalysisAsset(cx, cy, s, palette, "nuclei-segmentation");
+    case "membrane-segmentation":
+      return microscopyImageAnalysisAsset(cx, cy, s, palette, "membrane-segmentation");
+    case "organelle-segmentation":
+      return microscopyImageAnalysisAsset(cx, cy, s, palette, "organelle-segmentation");
+    case "instance-mask":
+      return microscopyImageAnalysisAsset(cx, cy, s, palette, "instance-mask");
+    case "cell-tracking":
+      return microscopyImageAnalysisAsset(cx, cy, s, palette, "cell-tracking");
+    case "phenotype-feature-vector":
+      return microscopyImageAnalysisAsset(cx, cy, s, palette, "feature-vector");
+    case "morphology-embedding":
+      return microscopyImageAnalysisAsset(cx, cy, s, palette, "morphology-embedding");
+    case "classifier-heatmap":
+      return microscopyImageAnalysisAsset(cx, cy, s, palette, "classifier-heatmap");
+    case "image-qc-dashboard":
+      return microscopyImageAnalysisAsset(cx, cy, s, palette, "qc-dashboard");
+    case "annotation-brush":
+      return microscopyImageAnalysisAsset(cx, cy, s, palette, "annotation-brush");
+    case "segmentation-model":
+      return microscopyImageAnalysisAsset(cx, cy, s, palette, "segmentation-model");
     case "pathway-node":
       return pathwayNodeAsset(cx, cy, s, palette);
     case "signaling-cascade":
@@ -2283,6 +2337,77 @@ function cellTherapyAsset(cx, cy, s, palette, mode) {
     body = `${panel}${cell(-12, 0, 24, "therapy")}${cell(28, 10, 14, "support")}`;
   }
   return `${baseLayer(cx, cy, s, palette, ["leukapheresis", "cell-expansion", "potency-assay", "cytokine-release", "manufacturing-batch", "release-testing", "cryopreservation", "antigen-presentation", "viral-vector"].includes(mode) ? "panel" : "oval")}<g class="asset-cell-therapy asset-cell-therapy-${escapeXml(mode)}" filter="url(#asset-soft-shadow)">${body}</g>`;
+}
+
+function microscopyImageAnalysisAsset(cx, cy, s, palette, mode) {
+  const panel = `<rect class="asset-microscopy-panel" x="${fmt(cx - 53 * s)}" y="${fmt(cy - 38 * s)}" width="${fmt(106 * s)}" height="${fmt(76 * s)}" rx="${fmt(15 * s)}" fill="${palette.fill}" stroke="${palette.stroke}" stroke-width="${fmt(2 * s)}"/>`;
+  const screen = `<rect class="asset-microscopy-screen" x="${fmt(cx - 46 * s)}" y="${fmt(cy - 32 * s)}" width="${fmt(92 * s)}" height="${fmt(62 * s)}" rx="${fmt(13 * s)}" fill="#ffffff" stroke="${palette.stroke}" stroke-width="${fmt(1.8 * s)}"/>`;
+  const axes = `<path class="asset-microscopy-axes" d="M${fmt(cx - 32 * s)},${fmt(cy + 20 * s)} H${fmt(cx + 33 * s)} M${fmt(cx - 32 * s)},${fmt(cy + 20 * s)} V${fmt(cy - 22 * s)}" fill="none" stroke="${palette.stroke}" stroke-width="${fmt(1.1 * s)}" opacity="0.58" stroke-linecap="round"/>`;
+  const cell = (x, y, r, klass = "cell") => `<path class="asset-microscopy-cell asset-${escapeXml(klass)}" d="${organicPath(cx + x * s, cy + y * s, s * (r / 30), 8, 0.92)}" fill="${palette.secondary}" stroke="${palette.accent}" stroke-width="${fmt(1.1 * s)}" opacity="0.86"/>`;
+  const nuclei = [[-25, -11], [-4, -18], [18, -9], [-17, 12], [8, 10], [31, 16]].map(([x, y], index) => `<circle class="asset-microscopy-nucleus" cx="${fmt(cx + x * s)}" cy="${fmt(cy + y * s)}" r="${fmt((index % 2 ? 4.5 : 5.8) * s)}" fill="${index === 2 ? palette.accent : palette.secondary}" stroke="${palette.accent}" stroke-width="${fmt(0.75 * s)}" opacity="${index === 2 ? 0.9 : 0.72}"/>`).join("");
+  const tile = (x, y, klass = "tile") => `<rect class="asset-microscopy-tile asset-${escapeXml(klass)}" x="${fmt(cx + x * s)}" y="${fmt(cy + y * s)}" width="${fmt(30 * s)}" height="${fmt(22 * s)}" rx="${fmt(6 * s)}" fill="${klass === "active" ? palette.secondary : "#ffffff"}" stroke="${palette.accent}" stroke-width="${fmt(1.1 * s)}" opacity="${klass === "ghost" ? 0.58 : 0.9}"/>`;
+  const heatCells = Array.from({ length: 16 }, (_, index) => {
+    const col = index % 4;
+    const row = Math.floor(index / 4);
+    const opacity = 0.22 + ((index * 7) % 9) / 12;
+    return `<rect class="asset-microscopy-heatmap-cell" x="${fmt(cx + (-26 + col * 17) * s)}" y="${fmt(cy + (-24 + row * 13) * s)}" width="${fmt(13 * s)}" height="${fmt(9 * s)}" rx="${fmt(3 * s)}" fill="${index % 3 === 0 ? palette.accent : palette.secondary}" opacity="${fmt(opacity)}"/>`;
+  }).join("");
+  let body = "";
+  if (mode === "pipeline") {
+    const steps = [
+      ["asset-image-analysis-raw-tile", -37, -5],
+      ["asset-image-analysis-segmentation-step", -8, -5],
+      ["asset-image-analysis-feature-step", 21, -5]
+    ].map(([klass, x, y], index) => `<g class="${klass}">${tile(Number(x), Number(y), index === 1 ? "active" : "tile")}<circle cx="${fmt(cx + (Number(x) + 15) * s)}" cy="${fmt(cy + (Number(y) + 11) * s)}" r="${fmt((index === 1 ? 6 : 4) * s)}" fill="${index === 1 ? palette.accent : palette.secondary}" opacity="0.82"/></g>`).join("");
+    body = `${panel}${steps}<path class="asset-image-analysis-pipeline-arrow" d="M${fmt(cx - 8 * s)},${fmt(cy + 30 * s)} H${fmt(cx + 41 * s)} M${fmt(cx + 33 * s)},${fmt(cy + 22 * s)} l${fmt(9 * s)},${fmt(8 * s)} l${fmt(-9 * s)},${fmt(8 * s)}" fill="none" stroke="${palette.accent}" stroke-width="${fmt(2 * s)}" stroke-linecap="round" stroke-linejoin="round"/>`;
+  } else if (mode === "field") {
+    body = `${screen}<rect class="asset-microscope-field-fov" x="${fmt(cx - 38 * s)}" y="${fmt(cy - 25 * s)}" width="${fmt(76 * s)}" height="${fmt(48 * s)}" rx="${fmt(11 * s)}" fill="${palette.secondary}" opacity="0.46"/>${cell(-22, -9, 15, "field-cell")}${cell(8, -14, 13, "field-cell")}${cell(25, 12, 16, "field-cell")}${cell(-7, 15, 12, "field-cell")}<path class="asset-microscope-field-scale-bar" d="M${fmt(cx + 9 * s)},${fmt(cy + 21 * s)} h${fmt(26 * s)}" stroke="${palette.stroke}" stroke-width="${fmt(2.3 * s)}" stroke-linecap="round"/>`;
+  } else if (mode === "channel") {
+    const channels = ["#38bdf8", "#f472b6", "#22c55e"].map((fill, index) => `<circle class="asset-fluorescence-channel-dot" cx="${fmt(cx + (-24 + index * 24) * s)}" cy="${fmt(cy - 14 * s)}" r="${fmt(12 * s)}" fill="${fill}" opacity="0.72" stroke="#ffffff" stroke-width="${fmt(1.5 * s)}"/>`).join("");
+    body = `${screen}<g class="asset-fluorescence-channel-stack">${channels}</g><path class="asset-fluorescence-channel-merge" d="M${fmt(cx - 32 * s)},${fmt(cy + 17 * s)} C${fmt(cx - 12 * s)},${fmt(cy + 4 * s)} ${fmt(cx + 13 * s)},${fmt(cy + 28 * s)} ${fmt(cx + 34 * s)},${fmt(cy + 7 * s)}" fill="none" stroke="${palette.accent}" stroke-width="${fmt(2.5 * s)}" stroke-linecap="round"/>`;
+  } else if (mode === "z-stack") {
+    const layers = [-24, -10, 4, 18].map((y, index) => `<rect class="asset-z-stack-plane" x="${fmt(cx + (-36 + index * 5) * s)}" y="${fmt(cy + y * s)}" width="${fmt(72 * s)}" height="${fmt(20 * s)}" rx="${fmt(7 * s)}" fill="${index === 2 ? palette.secondary : "#ffffff"}" stroke="${palette.accent}" stroke-width="${fmt(1.1 * s)}" opacity="${fmt(0.6 + index * 0.08)}"/>`).join("");
+    body = `${panel}<g class="asset-z-stack-volume">${layers}</g><path class="asset-z-stack-depth-arrow" d="M${fmt(cx + 38 * s)},${fmt(cy - 24 * s)} v${fmt(54 * s)} M${fmt(cx + 32 * s)},${fmt(cy + 23 * s)} l${fmt(6 * s)},${fmt(8 * s)} l${fmt(6 * s)},${fmt(-8 * s)}" fill="none" stroke="${palette.stroke}" stroke-width="${fmt(1.8 * s)}" stroke-linecap="round" stroke-linejoin="round"/>`;
+  } else if (mode === "tile-stitching") {
+    body = `${panel}${tile(-41, -23, "tile")}${tile(-12, -23, "active")}${tile(17, -23, "tile")}${tile(-33, -3, "ghost")}${tile(-4, -3, "active")}${tile(25, -3, "tile")}<path class="asset-tile-stitching-seam" d="M${fmt(cx - 23 * s)},${fmt(cy - 24 * s)} v${fmt(47 * s)} M${fmt(cx + 6 * s)},${fmt(cy - 24 * s)} v${fmt(47 * s)} M${fmt(cx - 41 * s)},${fmt(cy - 3 * s)} h${fmt(96 * s)}" stroke="${palette.accent}" stroke-width="${fmt(1.4 * s)}" stroke-dasharray="${fmt(4 * s)} ${fmt(3 * s)}" opacity="0.66"/>`;
+  } else if (mode === "illumination") {
+    body = `${screen}<rect class="asset-illumination-correction-gradient" x="${fmt(cx - 35 * s)}" y="${fmt(cy - 23 * s)}" width="${fmt(70 * s)}" height="${fmt(46 * s)}" rx="${fmt(12 * s)}" fill="${palette.secondary}" opacity="0.62"/><circle class="asset-illumination-hotspot" cx="${fmt(cx - 16 * s)}" cy="${fmt(cy - 10 * s)}" r="${fmt(18 * s)}" fill="#ffffff" opacity="0.7"/><path class="asset-illumination-correction-curve" d="M${fmt(cx - 37 * s)},${fmt(cy + 28 * s)} C${fmt(cx - 12 * s)},${fmt(cy + 10 * s)} ${fmt(cx + 17 * s)},${fmt(cy + 35 * s)} ${fmt(cx + 38 * s)},${fmt(cy + 12 * s)}" fill="none" stroke="${palette.accent}" stroke-width="${fmt(2.4 * s)}" stroke-linecap="round"/>`;
+  } else if (mode === "focus-quality") {
+    body = `${screen}${axes}<path class="asset-focus-quality-curve" d="M${fmt(cx - 28 * s)},${fmt(cy + 11 * s)} C${fmt(cx - 17 * s)},${fmt(cy - 15 * s)} ${fmt(cx - 4 * s)},${fmt(cy - 23 * s)} ${fmt(cx + 10 * s)},${fmt(cy - 17 * s)} C${fmt(cx + 24 * s)},${fmt(cy - 11 * s)} ${fmt(cx + 26 * s)},${fmt(cy + 4 * s)} ${fmt(cx + 35 * s)},${fmt(cy + 12 * s)}" fill="none" stroke="${palette.accent}" stroke-width="${fmt(3 * s)}" stroke-linecap="round"/><g class="asset-focus-quality-sharpness-badge"><circle cx="${fmt(cx + 27 * s)}" cy="${fmt(cy - 22 * s)}" r="${fmt(9 * s)}" fill="${palette.secondary}" stroke="${palette.accent}" stroke-width="${fmt(1.1 * s)}"/><path d="M${fmt(cx + 23 * s)},${fmt(cy - 22 * s)} l${fmt(3 * s)},${fmt(4 * s)} l${fmt(6 * s)},${fmt(-8 * s)}" fill="none" stroke="${palette.accent}" stroke-width="${fmt(1.5 * s)}" stroke-linecap="round" stroke-linejoin="round"/></g>`;
+  } else if (mode === "nuclei-segmentation") {
+    body = `${screen}<g class="asset-nuclei-segmentation-mask">${nuclei}</g><path class="asset-nuclei-segmentation-contour" d="${organicPath(cx - 3 * s, cy + 1 * s, s * 0.95, 10, 0.9)}" fill="none" stroke="${palette.accent}" stroke-width="${fmt(1.7 * s)}" stroke-dasharray="${fmt(5 * s)} ${fmt(3 * s)}" opacity="0.7"/>`;
+  } else if (mode === "membrane-segmentation") {
+    const contours = [[-22, -7, 18], [14, -11, 17], [7, 17, 18], [-24, 18, 14]].map(([x, y, r]) => `<path class="asset-membrane-segmentation-contour" d="${organicPath(cx + x * s, cy + y * s, s * (r / 30), 9, 0.9)}" fill="none" stroke="${palette.accent}" stroke-width="${fmt(1.8 * s)}"/>`).join("");
+    body = `${screen}<rect class="asset-membrane-segmentation-tile" x="${fmt(cx - 36 * s)}" y="${fmt(cy - 24 * s)}" width="${fmt(72 * s)}" height="${fmt(50 * s)}" rx="${fmt(11 * s)}" fill="${palette.secondary}" opacity="0.3"/>${contours}<circle cx="${fmt(cx + 23 * s)}" cy="${fmt(cy + 14 * s)}" r="${fmt(4 * s)}" fill="${palette.accent}"/>`;
+  } else if (mode === "organelle-segmentation") {
+    body = `${screen}<g class="asset-organelle-segmentation-cell">${cell(-3, 2, 29, "organelle-cell")}</g><ellipse class="asset-organelle-segmentation-mito" cx="${fmt(cx - 14 * s)}" cy="${fmt(cy + 4 * s)}" rx="${fmt(13 * s)}" ry="${fmt(5 * s)}" fill="#ffffff" stroke="${palette.accent}" stroke-width="${fmt(1.2 * s)}" transform="rotate(-18 ${fmt(cx - 14 * s)} ${fmt(cy + 4 * s)})"/><circle class="asset-organelle-segmentation-spot" cx="${fmt(cx + 17 * s)}" cy="${fmt(cy - 8 * s)}" r="${fmt(6 * s)}" fill="${palette.accent}" opacity="0.72"/><path d="M${fmt(cx - 23 * s)},${fmt(cy + 21 * s)} C${fmt(cx - 3 * s)},${fmt(cy + 30 * s)} ${fmt(cx + 17 * s)},${fmt(cy + 26 * s)} ${fmt(cx + 31 * s)},${fmt(cy + 15 * s)}" fill="none" stroke="${palette.accent}" stroke-width="${fmt(1.5 * s)}" opacity="0.62"/>`;
+  } else if (mode === "instance-mask") {
+    const masks = [[-26, -13, "#ffffff"], [-2, -6, palette.secondary], [22, -14, "#ffffff"], [-16, 15, palette.fill], [18, 16, palette.secondary]].map(([x, y, fill], index) => `<path class="asset-instance-mask-region" data-instance="${index + 1}" d="${organicPath(cx + Number(x) * s, cy + Number(y) * s, s * 0.3, 8, 0.86)}" fill="${fill}" stroke="${palette.accent}" stroke-width="${fmt(1.2 * s)}" opacity="0.82"/>`).join("");
+    body = `${screen}${masks}<g class="asset-instance-mask-id-badges">${[1, 2, 3].map((value, index) => `<circle cx="${fmt(cx + (-32 + index * 31) * s)}" cy="${fmt(cy + 29 * s)}" r="${fmt(6 * s)}" fill="${palette.accent}" opacity="0.78"/><text x="${fmt(cx + (-32 + index * 31) * s)}" y="${fmt(cy + 31.5 * s)}" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="${fmt(6 * s)}" font-weight="950" fill="#ffffff">${value}</text>`).join("")}</g>`;
+  } else if (mode === "cell-tracking") {
+    const points = [[-31, 15], [-12, 2], [8, -9], [29, -18]];
+    const path = `M${points.map(([x, y]) => `${fmt(cx + x * s)},${fmt(cy + y * s)}`).join(" L")}`;
+    const dots = points.map(([x, y], index) => `<circle class="asset-cell-tracking-timepoint" cx="${fmt(cx + x * s)}" cy="${fmt(cy + y * s)}" r="${fmt((index === points.length - 1 ? 7 : 5) * s)}" fill="${index === points.length - 1 ? palette.accent : palette.secondary}" stroke="${palette.accent}" stroke-width="${fmt(1 * s)}"/>`).join("");
+    body = `${screen}<path class="asset-cell-tracking-trajectory" d="${path}" fill="none" stroke="${palette.accent}" stroke-width="${fmt(2.4 * s)}" stroke-linecap="round" stroke-linejoin="round"/>${dots}<path d="M${fmt(cx + 21 * s)},${fmt(cy - 22 * s)} l${fmt(9 * s)},${fmt(4 * s)} l${fmt(-7 * s)},${fmt(7 * s)}" fill="none" stroke="${palette.accent}" stroke-width="${fmt(1.8 * s)}" stroke-linecap="round" stroke-linejoin="round"/>`;
+  } else if (mode === "feature-vector") {
+    const bars = [-28, -16, -4, 8, 20, 32].map((x, index) => `<rect class="asset-phenotype-feature-bar" x="${fmt(cx + x * s)}" y="${fmt(cy + (20 - (index + 2) * 6) * s)}" width="${fmt(8 * s)}" height="${fmt(((index + 2) * 6) * s)}" rx="${fmt(3 * s)}" fill="${index % 2 ? palette.secondary : palette.accent}" stroke="${palette.accent}" stroke-width="${fmt(0.8 * s)}" opacity="0.84"/>`).join("");
+    body = `${screen}${axes}<g class="asset-phenotype-feature-vector">${bars}</g><path class="asset-phenotype-feature-link" d="M${fmt(cx - 37 * s)},${fmt(cy - 23 * s)} h${fmt(22 * s)} m${fmt(7 * s)},0 h${fmt(18 * s)}" stroke="${palette.accent}" stroke-width="${fmt(1.6 * s)}" stroke-linecap="round"/>`;
+  } else if (mode === "morphology-embedding") {
+    const clusterA = [[-26, -7], [-17, 4], [-34, 13], [-9, -15]].map(([x, y]) => `<circle class="asset-morphology-embedding-point" cx="${fmt(cx + x * s)}" cy="${fmt(cy + y * s)}" r="${fmt(4 * s)}" fill="${palette.secondary}" stroke="${palette.accent}" stroke-width="${fmt(0.8 * s)}"/>`).join("");
+    const clusterB = [[13, -15], [26, -5], [19, 12], [35, 14]].map(([x, y]) => `<circle class="asset-morphology-embedding-point" cx="${fmt(cx + x * s)}" cy="${fmt(cy + y * s)}" r="${fmt(4 * s)}" fill="${palette.accent}" opacity="0.82" stroke="${palette.accent}" stroke-width="${fmt(0.8 * s)}"/>`).join("");
+    body = `${screen}${axes}<ellipse class="asset-morphology-embedding-cluster" cx="${fmt(cx - 23 * s)}" cy="${fmt(cy + 2 * s)}" rx="${fmt(22 * s)}" ry="${fmt(18 * s)}" fill="${palette.secondary}" opacity="0.16" stroke="${palette.accent}" stroke-width="${fmt(1 * s)}" stroke-dasharray="${fmt(4 * s)} ${fmt(3 * s)}"/>${clusterA}${clusterB}`;
+  } else if (mode === "classifier-heatmap") {
+    body = `${screen}<g class="asset-classifier-heatmap-grid">${heatCells}</g><path class="asset-classifier-heatmap-threshold" d="M${fmt(cx + 28 * s)},${fmt(cy - 29 * s)} v${fmt(54 * s)}" stroke="${palette.stroke}" stroke-width="${fmt(1.4 * s)}" stroke-dasharray="${fmt(4 * s)} ${fmt(3 * s)}"/><circle class="asset-classifier-heatmap-alert" cx="${fmt(cx + 37 * s)}" cy="${fmt(cy - 23 * s)}" r="${fmt(7 * s)}" fill="${palette.accent}" opacity="0.84"/>`;
+  } else if (mode === "qc-dashboard") {
+    body = `${screen}${axes}<path class="asset-image-qc-dashboard-trend" d="M${fmt(cx - 28 * s)},${fmt(cy + 10 * s)} L${fmt(cx - 12 * s)},${fmt(cy - 5 * s)} L${fmt(cx + 3 * s)},${fmt(cy + 2 * s)} L${fmt(cx + 19 * s)},${fmt(cy - 17 * s)} L${fmt(cx + 34 * s)},${fmt(cy - 8 * s)}" fill="none" stroke="${palette.accent}" stroke-width="${fmt(2.4 * s)}" stroke-linecap="round" stroke-linejoin="round"/><g class="asset-image-qc-dashboard-badges"><rect x="${fmt(cx - 36 * s)}" y="${fmt(cy - 29 * s)}" width="${fmt(25 * s)}" height="${fmt(12 * s)}" rx="${fmt(5 * s)}" fill="${palette.secondary}" stroke="${palette.accent}" stroke-width="${fmt(0.8 * s)}"/><rect x="${fmt(cx + 10 * s)}" y="${fmt(cy + 17 * s)}" width="${fmt(28 * s)}" height="${fmt(12 * s)}" rx="${fmt(5 * s)}" fill="#ffffff" stroke="${palette.accent}" stroke-width="${fmt(0.8 * s)}"/></g>`;
+  } else if (mode === "annotation-brush") {
+    body = `${screen}<path class="asset-annotation-brush-stroke" d="${organicPath(cx - 10 * s, cy + 2 * s, s * 0.88, 10, 0.9)}" fill="${palette.secondary}" stroke="${palette.accent}" stroke-width="${fmt(1.6 * s)}" opacity="0.56"/><path class="asset-annotation-brush-tool" d="M${fmt(cx + 15 * s)},${fmt(cy - 30 * s)} l${fmt(33 * s)},${fmt(33 * s)} l${fmt(-9 * s)},${fmt(9 * s)} l${fmt(-33 * s)},${fmt(-33 * s)} Z" fill="#ffffff" stroke="${palette.stroke}" stroke-width="${fmt(1.6 * s)}"/><path d="M${fmt(cx + 2 * s)},${fmt(cy + 17 * s)} C${fmt(cx - 11 * s)},${fmt(cy + 31 * s)} ${fmt(cx - 30 * s)},${fmt(cy + 20 * s)} ${fmt(cx - 34 * s)},${fmt(cy + 32 * s)}" fill="none" stroke="${palette.accent}" stroke-width="${fmt(4 * s)}" stroke-linecap="round"/>`;
+  } else if (mode === "segmentation-model") {
+    body = `${panel}<g class="asset-segmentation-model-network">${[-30, -8, 14].map((x, i) => `<rect class="asset-segmentation-model-layer" x="${fmt(cx + x * s)}" y="${fmt(cy + (-25 + i * 7) * s)}" width="${fmt(24 * s)}" height="${fmt(38 * s)}" rx="${fmt(8 * s)}" fill="${i === 1 ? palette.secondary : "#ffffff"}" stroke="${palette.accent}" stroke-width="${fmt(1.2 * s)}"/>`).join("")}</g><path class="asset-segmentation-model-output-mask" d="${organicPath(cx + 34 * s, cy + 16 * s, s * 0.34, 8, 0.88)}" fill="${palette.secondary}" stroke="${palette.accent}" stroke-width="${fmt(1.5 * s)}"/><path class="asset-segmentation-model-flow" d="M${fmt(cx - 6 * s)},${fmt(cy - 4 * s)} C${fmt(cx + 10 * s)},${fmt(cy - 20 * s)} ${fmt(cx + 21 * s)},${fmt(cy - 5 * s)} ${fmt(cx + 29 * s)},${fmt(cy + 8 * s)}" fill="none" stroke="${palette.stroke}" stroke-width="${fmt(1.9 * s)}" stroke-linecap="round"/>`;
+  } else {
+    body = `${screen}${nuclei}`;
+  }
+  return `${baseLayer(cx, cy, s, palette, ["pipeline", "z-stack", "tile-stitching", "segmentation-model"].includes(mode) ? "panel" : "oval")}<g class="asset-microscopy-analysis asset-microscopy-analysis-${escapeXml(mode)}" filter="url(#asset-soft-shadow)">${body}</g>`;
 }
 
 function pathogenSampleAsset(cx, cy, s, palette) {
