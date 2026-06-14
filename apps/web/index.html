@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Scientific Image Deck Workspace</title>
+    <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="%232563eb"/><path d="M18 18h28v6H18zm0 11h20v6H18zm0 11h28v6H18z" fill="white"/></svg>' />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-mark">SI</div>
+          <div>
+            <h1>Scientific Image</h1>
+            <p id="projectMeta">Premium deck workspace</p>
+          </div>
+        </div>
+        <div class="toolbar" role="toolbar" aria-label="Project actions">
+          <button id="newProject" title="Create a new local deck">New</button>
+          <button id="saveProject" title="Save deck to browser storage">Save</button>
+          <button id="loadProject" title="Load deck from browser storage">Load</button>
+          <button id="exportJson" title="Export structured scene JSON">JSON</button>
+          <button id="exportDeckSvg" title="Export all slides as one SVG contact sheet">Deck SVG</button>
+          <button id="exportPng" title="Export current slide as PNG">PNG</button>
+        </div>
+      </header>
+
+      <aside class="left-panel">
+        <section>
+          <div class="panel-heading">
+            <h2>Slides</h2>
+            <button id="addSlide" title="Add slide">+</button>
+          </div>
+          <div id="slideList" class="slide-list"></div>
+        </section>
+
+        <section>
+          <h2>Agent Workflow</h2>
+          <textarea id="sourceText" rows="6" placeholder="# Paste notes, paper summary, or extracted PDF text"></textarea>
+          <div class="button-grid">
+            <button id="importSource">Import Source</button>
+            <button id="createOutline">Draft Outline</button>
+            <button id="approveGenerate" class="primary">Approve + Generate</button>
+            <button id="refreshReview">Review</button>
+          </div>
+          <div id="outlineList" class="outline-list"></div>
+        </section>
+
+        <section>
+          <h2>Source Library</h2>
+          <div id="sourceList" class="source-list"></div>
+        </section>
+      </aside>
+
+      <main class="workspace">
+        <div class="canvas-frame">
+          <svg id="canvas" role="img" aria-label="Scientific deck slide canvas"></svg>
+        </div>
+        <div class="notes-panel">
+          <label for="speakerNotes">Speaker notes</label>
+          <textarea id="speakerNotes" rows="4"></textarea>
+        </div>
+      </main>
+
+      <aside class="right-panel">
+        <section>
+          <h2>Inspector</h2>
+          <div id="inspector" class="inspector-empty">Select an object</div>
+        </section>
+
+        <section>
+          <div class="panel-heading">
+            <h2>Review Queue</h2>
+            <span id="reviewCount" class="count">0</span>
+          </div>
+          <div id="reviewSummary" class="review-summary"></div>
+          <div id="reviewList" class="review-list"></div>
+        </section>
+
+        <section>
+          <div class="panel-heading">
+            <h2>Delivery</h2>
+            <span id="deliveryStatus" class="count">0</span>
+          </div>
+          <div id="deliveryPanel" class="delivery-panel"></div>
+        </section>
+
+        <section>
+          <div class="panel-heading">
+            <h2>Visual QA</h2>
+            <span id="visualQaCount" class="count">0</span>
+          </div>
+          <div id="visualQaList" class="visual-qa-list"></div>
+        </section>
+
+        <section>
+          <h2>Insert</h2>
+          <input id="assetSearch" type="search" placeholder="Search biology / AI symbols" />
+          <div class="asset-style-controls">
+            <label>
+              Style
+              <select id="assetStyleProfile">
+                <option value="consulting-2p5d">Consulting 2.5D</option>
+                <option value="publication-line">Publication line</option>
+                <option value="minimal-flat">Minimal flat</option>
+                <option value="dark-talk">Dark talk</option>
+                <option value="risk-warning">Risk warning</option>
+                <option value="scientific-editorial-realism">Editorial realism</option>
+              </select>
+            </label>
+            <label>
+              Pack
+              <select id="assetWorkflowPack">
+                <option value="">All packs</option>
+                <option value="perturb-seq-crispr">Perturb-seq</option>
+                <option value="publication-results-panels">Results panels</option>
+                <option value="spatial-transcriptomics">Spatial</option>
+                <option value="single-cell-multiomics">Single-cell</option>
+                <option value="ai-biosecurity-eval">AI biosecurity</option>
+                <option value="agentic-ai-mcp-rag">Agentic AI</option>
+                <option value="space-biology-genelab">Space biology</option>
+                <option value="realistic-spatial-microscopy">Realistic spatial</option>
+                <option value="realistic-wetlab-context">Realistic wetlab</option>
+                <option value="realistic-cellular-textures">Realistic cells</option>
+                <option value="realistic-space-biology">Realistic space</option>
+              </select>
+            </label>
+          </div>
+          <div id="packTabs" class="pack-tabs" aria-label="Workflow pack tabs"></div>
+          <div id="packQualitySummary" class="pack-quality-summary"></div>
+          <div class="workflow-template-controls">
+            <label>
+              Figure
+              <select id="workflowTemplate">
+                <option value="publication-results-panels">Results panels</option>
+                <option value="perturb-seq-crispr">Perturb-seq</option>
+                <option value="ai-biosecurity-eval">AI biosecurity</option>
+                <option value="spatial-transcriptomics">Spatial</option>
+                <option value="realistic-spatial-microscopy">Realistic spatial</option>
+                <option value="realistic-wetlab-context">Realistic wetlab</option>
+                <option value="realistic-cellular-textures">Realistic cells</option>
+                <option value="realistic-space-biology">Realistic space</option>
+                <option value="single-cell-multiomics">Single-cell</option>
+                <option value="agentic-ai-mcp-rag">Agentic AI</option>
+                <option value="space-biology-genelab">Space biology</option>
+              </select>
+            </label>
+            <button id="insertWorkflowFigure" class="primary">Insert</button>
+          </div>
+          <button id="insertFlagshipDemo" class="flagship-demo-button" type="button">Flagship Pack Demo</button>
+          <div id="selectedTemplateSummary" class="selected-template-summary"></div>
+          <div id="templateGallery" class="template-gallery"></div>
+          <div id="assetQualityFilters" class="asset-quality-filters" aria-label="Asset quality filters">
+            <button class="active" data-quality-filter="all">All quality</button>
+            <button data-quality-filter="premium">Premium</button>
+            <button data-quality-filter="needs-polish">Needs polish</button>
+            <button data-quality-filter="export-risk">Export fallback</button>
+          </div>
+          <div id="assetFilters" class="asset-filters" aria-label="Asset filters">
+            <button class="active" data-filter="featured">Featured</button>
+            <button data-filter="biology">Biology</button>
+            <button data-filter="ai">AI</button>
+            <button data-filter="realistic">Realistic</button>
+            <button data-filter="all">All</button>
+          </div>
+          <div id="assetList" class="asset-list"></div>
+          <div class="button-grid">
+            <button id="addText">Text</button>
+            <button id="addConnector">Connector</button>
+            <button id="addVolcano">Plot</button>
+            <label class="upload-button">
+              Image
+              <input id="uploadImage" type="file" accept="image/*" />
+            </label>
+          </div>
+        </section>
+
+        <section>
+          <h2>Agent Activity</h2>
+          <div id="agentLog" class="agent-log"></div>
+        </section>
+      </aside>
+    </div>
+
+    <script type="module" src="./src/app.js"></script>
+  </body>
+</html>

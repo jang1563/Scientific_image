@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+.next/
+out/
+coverage/
+
+# Local/generated artifacts
+output/
+.scientific-image/
+.playwright-cli/
+
+# Logs and runtime files
+*.log
+*.pid
+*.seed
+*.tmp
+.DS_Store
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Editor state
+.vscode/
+.idea/

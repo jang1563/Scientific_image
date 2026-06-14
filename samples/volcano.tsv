@@ -1,0 +1,9 @@
+gene	log2fc	padj	score	group
+TP53	1.8	0.0008	9.1	DNA damage
+MYC	-1.2	0.004	7.5	Oncogene
+CDKN1A	2.4	0.0002	11.2	Cell cycle
+GAPDH	0.1	0.81	0.2	Housekeeping
+STAT1	1.1	0.03	4.1	Interferon
+CXCL10	2.8	0.00001	14.0	Interferon
+RPLP0	-0.05	0.92	0.1	Ribosome
+ISG15	2.1	0.0004	10.0	Interferon
