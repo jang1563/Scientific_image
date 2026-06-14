@@ -59,6 +59,33 @@ export const HERO_ASSET_IDS = Object.freeze([
   "plate-96",
   "plate-384",
   "pipette",
+  "liquid-handler",
+  "lab-automation-platform",
+  "robotic-arm",
+  "automated-liquid-handler",
+  "plate-handler",
+  "plate-stack",
+  "barcode-scanner",
+  "plate-reader",
+  "reagent-reservoir",
+  "tip-rack",
+  "robotic-gripper",
+  "lims-dashboard",
+  "assay-scheduler",
+  "sample-tracker",
+  "qc-gate-automation",
+  "incubator-stack",
+  "automated-microscope",
+  "acoustic-dispenser",
+  "colony-picker",
+  "tube-rack",
+  "sample-tube-array",
+  "robotic-rail",
+  "deck-layout",
+  "waste-chute",
+  "seal-peeler",
+  "lab-sensor",
+  "automation-orchestrator",
   "biosafety-cabinet",
   "spatial-grid",
   "visium-spot-array",
@@ -445,6 +472,58 @@ function renderRecipe(asset, width, height, palette) {
       return massSpectrometerAsset(cx, cy, s, palette);
     case "liquid-handler":
       return liquidHandlerAsset(cx, cy, s, palette);
+    case "lab-automation-platform":
+      return labAutomationAsset(cx, cy, s, palette, "platform");
+    case "robotic-arm":
+      return labAutomationAsset(cx, cy, s, palette, "robotic-arm");
+    case "automated-liquid-handler":
+      return labAutomationAsset(cx, cy, s, palette, "liquid-handler");
+    case "plate-handler":
+      return labAutomationAsset(cx, cy, s, palette, "plate-handler");
+    case "plate-stack":
+      return labAutomationAsset(cx, cy, s, palette, "plate-stack");
+    case "barcode-scanner":
+      return labAutomationAsset(cx, cy, s, palette, "barcode-scanner");
+    case "plate-reader":
+      return labAutomationAsset(cx, cy, s, palette, "plate-reader");
+    case "reagent-reservoir":
+      return labAutomationAsset(cx, cy, s, palette, "reagent-reservoir");
+    case "tip-rack":
+      return labAutomationAsset(cx, cy, s, palette, "tip-rack");
+    case "robotic-gripper":
+      return labAutomationAsset(cx, cy, s, palette, "robotic-gripper");
+    case "lims-dashboard":
+      return labAutomationAsset(cx, cy, s, palette, "lims-dashboard");
+    case "assay-scheduler":
+      return labAutomationAsset(cx, cy, s, palette, "assay-scheduler");
+    case "sample-tracker":
+      return labAutomationAsset(cx, cy, s, palette, "sample-tracker");
+    case "qc-gate-automation":
+      return labAutomationAsset(cx, cy, s, palette, "qc-gate");
+    case "incubator-stack":
+      return labAutomationAsset(cx, cy, s, palette, "incubator-stack");
+    case "automated-microscope":
+      return labAutomationAsset(cx, cy, s, palette, "automated-microscope");
+    case "acoustic-dispenser":
+      return labAutomationAsset(cx, cy, s, palette, "acoustic-dispenser");
+    case "colony-picker":
+      return labAutomationAsset(cx, cy, s, palette, "colony-picker");
+    case "tube-rack":
+      return labAutomationAsset(cx, cy, s, palette, "tube-rack");
+    case "sample-tube-array":
+      return labAutomationAsset(cx, cy, s, palette, "sample-tube-array");
+    case "robotic-rail":
+      return labAutomationAsset(cx, cy, s, palette, "robotic-rail");
+    case "deck-layout":
+      return labAutomationAsset(cx, cy, s, palette, "deck-layout");
+    case "waste-chute":
+      return labAutomationAsset(cx, cy, s, palette, "waste-chute");
+    case "seal-peeler":
+      return labAutomationAsset(cx, cy, s, palette, "seal-peeler");
+    case "lab-sensor":
+      return labAutomationAsset(cx, cy, s, palette, "lab-sensor");
+    case "automation-orchestrator":
+      return labAutomationAsset(cx, cy, s, palette, "orchestrator");
     case "biosafety-cabinet":
       return biosafetyCabinet(cx, cy, s, palette);
     case "spatial-grid":
@@ -1778,6 +1857,49 @@ function liquidHandlerAsset(cx, cy, s, palette) {
   const gantry = `<path d="M${fmt(cx - 48 * s)},${fmt(cy - 27 * s)} H${fmt(cx + 48 * s)} M${fmt(cx - 39 * s)},${fmt(cy - 27 * s)} V${fmt(cy + 6 * s)} M${fmt(cx + 39 * s)},${fmt(cy - 27 * s)} V${fmt(cy + 6 * s)}" stroke="${palette.stroke}" stroke-width="${fmt(4.2 * s)}" stroke-linecap="round"/><rect x="${fmt(cx - 15 * s)}" y="${fmt(cy - 38 * s)}" width="${fmt(30 * s)}" height="${fmt(22 * s)}" rx="${fmt(7 * s)}" fill="${palette.secondary}" stroke="${palette.accent}" stroke-width="${fmt(1.5 * s)}"/><path d="M${fmt(cx - 8 * s)},${fmt(cy - 16 * s)} v${fmt(24 * s)} M${fmt(cx)},${fmt(cy - 16 * s)} v${fmt(24 * s)} M${fmt(cx + 8 * s)},${fmt(cy - 16 * s)} v${fmt(24 * s)}" stroke="${palette.accent}" stroke-width="${fmt(1.6 * s)}" stroke-linecap="round"/>`;
   const drops = [[-8, 11], [0, 13], [8, 11]].map(([x, y]) => `<circle cx="${fmt(cx + x * s)}" cy="${fmt(cy + y * s)}" r="${fmt(2.3 * s)}" fill="${palette.accent}" opacity="0.7"/>`).join("");
   return `${baseLayer(cx, cy, s, palette, "panel")}<g filter="url(#asset-soft-shadow)"><rect x="${fmt(cx - 51 * s)}" y="${fmt(cy - 39 * s)}" width="${fmt(102 * s)}" height="${fmt(78 * s)}" rx="${fmt(15 * s)}" fill="#ffffff" stroke="${palette.stroke}" stroke-width="${fmt(2 * s)}" opacity="0.96"/>${gantry}${plate}${drops}<path d="M${fmt(cx - 43 * s)},${fmt(cy - 34 * s)} h${fmt(25 * s)}" stroke="${palette.accent}" stroke-width="${fmt(1.9 * s)}" stroke-linecap="round" opacity="0.7"/></g>`;
+}
+
+function labAutomationAsset(cx, cy, s, palette, mode) {
+  const shell = `<rect class="asset-lab-automation-shell" x="${fmt(cx - 52 * s)}" y="${fmt(cy - 38 * s)}" width="${fmt(104 * s)}" height="${fmt(76 * s)}" rx="${fmt(17 * s)}" fill="${palette.fill}" stroke="${palette.stroke}" stroke-width="${fmt(2.1 * s)}"/><path class="asset-lab-automation-rim" d="M${fmt(cx - 43 * s)},${fmt(cy - 31 * s)} h${fmt(86 * s)}" stroke="#ffffff" stroke-width="${fmt(1.75 * s)}" opacity="0.56" stroke-linecap="round"/>`;
+  const miniPlate = (x, y, klass = "asset-lab-automation-plate", cols = 6, rows = 3) => `<g class="${klass}"><rect x="${fmt(cx + x * s)}" y="${fmt(cy + y * s)}" width="${fmt(52 * s)}" height="${fmt(25 * s)}" rx="${fmt(6 * s)}" fill="#ffffff" stroke="${palette.accent}" stroke-width="${fmt(1.25 * s)}"/><g>${Array.from({ length: cols * rows }, (_, i) => `<circle cx="${fmt(cx + (x + 7 + (i % cols) * 7.6) * s)}" cy="${fmt(cy + (y + 6 + Math.floor(i / cols) * 6.4) * s)}" r="${fmt(1.55 * s)}" fill="${i === 8 || i === 13 ? palette.accent : palette.secondary}" opacity="${i === 8 || i === 13 ? 0.9 : 0.58}"/>`).join("")}</g></g>`;
+  const deckMap = `<g class="asset-lab-automation-deck-map">${miniPlate(-45, 3, "asset-deck-layout-plate-a", 4, 3)}${miniPlate(1, 3, "asset-deck-layout-plate-b", 4, 3)}<rect x="${fmt(cx - 43 * s)}" y="${fmt(cy - 24 * s)}" width="${fmt(25 * s)}" height="${fmt(19 * s)}" rx="${fmt(5 * s)}" fill="${palette.secondary}" stroke="${palette.accent}" stroke-width="${fmt(1 * s)}"/><rect x="${fmt(cx + 19 * s)}" y="${fmt(cy - 24 * s)}" width="${fmt(24 * s)}" height="${fmt(19 * s)}" rx="${fmt(5 * s)}" fill="${palette.secondary}" stroke="${palette.accent}" stroke-width="${fmt(1 * s)}"/></g>`;
+  const robotArm = (klass = "asset-robotic-arm") => `<g class="${klass}"><circle class="asset-robotic-arm-joint" cx="${fmt(cx - 34 * s)}" cy="${fmt(cy + 20 * s)}" r="${fmt(9 * s)}" fill="${palette.secondary}" stroke="${palette.stroke}" stroke-width="${fmt(1.7 * s)}"/><path d="M${fmt(cx - 29 * s)},${fmt(cy + 14 * s)} L${fmt(cx - 7 * s)},${fmt(cy - 9 * s)} L${fmt(cx + 25 * s)},${fmt(cy - 4 * s)}" fill="none" stroke="${palette.stroke}" stroke-width="${fmt(7 * s)}" stroke-linecap="round" stroke-linejoin="round"/><circle class="asset-robotic-arm-joint" cx="${fmt(cx - 7 * s)}" cy="${fmt(cy - 9 * s)}" r="${fmt(8 * s)}" fill="#ffffff" stroke="${palette.accent}" stroke-width="${fmt(1.5 * s)}"/><circle class="asset-robotic-arm-joint" cx="${fmt(cx + 25 * s)}" cy="${fmt(cy - 4 * s)}" r="${fmt(6.5 * s)}" fill="${palette.secondary}" stroke="${palette.accent}" stroke-width="${fmt(1.4 * s)}"/><path class="asset-robotic-arm-gripper" d="M${fmt(cx + 31 * s)},${fmt(cy - 4 * s)} l${fmt(16 * s)},${fmt(-8 * s)} M${fmt(cx + 31 * s)},${fmt(cy - 4 * s)} l${fmt(16 * s)},${fmt(8 * s)}" stroke="${palette.accent}" stroke-width="${fmt(2.2 * s)}" stroke-linecap="round"/></g>`;
+  const barcode = (x = 24, y = -25) => `<g class="asset-barcode-label"><rect x="${fmt(cx + x * s)}" y="${fmt(cy + y * s)}" width="${fmt(31 * s)}" height="${fmt(18 * s)}" rx="${fmt(5 * s)}" fill="#ffffff" stroke="${palette.accent}" stroke-width="${fmt(1.1 * s)}"/><path d="M${fmt(cx + (x + 7) * s)},${fmt(cy + (y + 4) * s)} v${fmt(10 * s)} M${fmt(cx + (x + 12) * s)},${fmt(cy + (y + 4) * s)} v${fmt(10 * s)} M${fmt(cx + (x + 19) * s)},${fmt(cy + (y + 4) * s)} v${fmt(10 * s)} M${fmt(cx + (x + 24) * s)},${fmt(cy + (y + 4) * s)} v${fmt(10 * s)}" stroke="${palette.accent}" stroke-width="${fmt(0.95 * s)}"/></g>`;
+  const screen = (klass = "asset-lab-automation-screen") => `<g class="${klass}"><rect x="${fmt(cx - 41 * s)}" y="${fmt(cy - 28 * s)}" width="${fmt(82 * s)}" height="${fmt(54 * s)}" rx="${fmt(10 * s)}" fill="#ffffff" stroke="${palette.stroke}" stroke-width="${fmt(1.7 * s)}"/><path d="M${fmt(cx - 31 * s)},${fmt(cy - 11 * s)} h${fmt(62 * s)} M${fmt(cx - 31 * s)},${fmt(cy + 4 * s)} h${fmt(62 * s)} M${fmt(cx - 31 * s)},${fmt(cy + 19 * s)} h${fmt(44 * s)}" stroke="${palette.stroke}" stroke-width="${fmt(1 * s)}" opacity="0.34"/><circle cx="${fmt(cx + 31 * s)}" cy="${fmt(cy - 19 * s)}" r="${fmt(4 * s)}" fill="${palette.accent}"/></g>`;
+  const timeline = `<g class="asset-assay-scheduler-timeline">${[-33, -11, 11, 33].map((x, i) => `<rect class="asset-assay-scheduler-lane" x="${fmt(cx + (x - 9) * s)}" y="${fmt(cy + (-19 + i * 11) * s)}" width="${fmt((24 + i * 5) * s)}" height="${fmt(7 * s)}" rx="${fmt(3.5 * s)}" fill="${i === 2 ? palette.accent : palette.secondary}" stroke="${palette.accent}" stroke-width="${fmt(0.85 * s)}" opacity="${i === 2 ? 0.9 : 0.68}"/>`).join("")}</g>`;
+  let body = shell;
+  if (mode === "platform") {
+    body += `<g class="asset-lab-automation-platform">${deckMap}${robotArm("asset-lab-automation-robotic-arm")}<g class="asset-lab-automation-scheduler-card">${screen("asset-lab-automation-scheduler-screen")}</g></g>`;
+  } else if (mode === "robotic-arm") {
+    body += `<g class="asset-lab-automation-robotic-arm">${robotArm("asset-robotic-arm")}${miniPlate(0, 15, "asset-robotic-arm-target-plate", 5, 2)}</g>`;
+  } else if (mode === "liquid-handler") {
+    body += `<g class="asset-lab-automation-automated-liquid-handler"><path class="asset-liquid-handler-gantry" d="M${fmt(cx - 44 * s)},${fmt(cy - 23 * s)} H${fmt(cx + 44 * s)} M${fmt(cx - 36 * s)},${fmt(cy - 23 * s)} V${fmt(cy + 15 * s)} M${fmt(cx + 36 * s)},${fmt(cy - 23 * s)} V${fmt(cy + 15 * s)}" stroke="${palette.stroke}" stroke-width="${fmt(4 * s)}" stroke-linecap="round"/><rect class="asset-liquid-handler-head" x="${fmt(cx - 17 * s)}" y="${fmt(cy - 34 * s)}" width="${fmt(34 * s)}" height="${fmt(23 * s)}" rx="${fmt(7 * s)}" fill="${palette.secondary}" stroke="${palette.accent}" stroke-width="${fmt(1.4 * s)}"/><path d="M${fmt(cx - 10 * s)},${fmt(cy - 11 * s)} v${fmt(21 * s)} M${fmt(cx)},${fmt(cy - 11 * s)} v${fmt(21 * s)} M${fmt(cx + 10 * s)},${fmt(cy - 11 * s)} v${fmt(21 * s)}" stroke="${palette.accent}" stroke-width="${fmt(1.5 * s)}" stroke-linecap="round"/><g class="asset-liquid-handler-deck">${miniPlate(-35, 12, "asset-liquid-handler-deck-plate", 6, 2)}<rect x="${fmt(cx + 22 * s)}" y="${fmt(cy + 13 * s)}" width="${fmt(21 * s)}" height="${fmt(23 * s)}" rx="${fmt(5 * s)}" fill="${palette.secondary}" stroke="${palette.accent}" stroke-width="${fmt(1 * s)}"/></g></g>`;
+  } else if (mode === "plate-handler") {
+    body += `<g class="asset-lab-automation-plate-handler"><path class="asset-plate-handler-shuttle" d="M${fmt(cx - 43 * s)},${fmt(cy + 11 * s)} H${fmt(cx + 43 * s)}" stroke="${palette.stroke}" stroke-width="${fmt(5 * s)}" stroke-linecap="round"/><rect x="${fmt(cx - 36 * s)}" y="${fmt(cy - 24 * s)}" width="${fmt(28 * s)}" height="${fmt(52 * s)}" rx="${fmt(9 * s)}" fill="${palette.secondary}" stroke="${palette.accent}" stroke-width="${fmt(1.3 * s)}"/><g class="asset-plate-handler-plate">${miniPlate(-5, -2, "asset-plate-handler-plate", 6, 2)}</g><path d="M${fmt(cx + 40 * s)},${fmt(cy - 5 * s)} l${fmt(10 * s)},${fmt(16 * s)} l${fmt(-10 * s)},${fmt(16 * s)}" fill="none" stroke="${palette.accent}" stroke-width="${fmt(2.2 * s)}" stroke-linecap="round"/></g>`;
+  } else if (mode === "plate-stack") {
+    body += `<g class="asset-lab-automation-plate-stack"><g class="asset-plate-stack-layer">${[-24, -12, 0, 12, 24].map((y, i) => `<rect x="${fmt(cx - 35 * s)}" y="${fmt(cy + y * s)}" width="${fmt(70 * s)}" height="${fmt(11 * s)}" rx="${fmt(4 * s)}" fill="${i === 2 ? palette.accent : "#ffffff"}" stroke="${palette.stroke}" stroke-width="${fmt(1 * s)}" opacity="${i === 2 ? 0.84 : 0.82}"/>`).join("")}</g><path class="asset-plate-stack-loader" d="M${fmt(cx + 44 * s)},${fmt(cy - 28 * s)} v${fmt(60 * s)} M${fmt(cx + 35 * s)},${fmt(cy)} h${fmt(18 * s)}" stroke="${palette.accent}" stroke-width="${fmt(2.4 * s)}" stroke-linecap="round"/></g>`;
+  } else if (mode === "barcode-scanner") {
+    body += `<g class="asset-lab-automation-barcode-scanner"><rect x="${fmt(cx - 36 * s)}" y="${fmt(cy - 28 * s)}" width="${fmt(32 * s)}" height="${fmt(38 * s)}" rx="${fmt(8 * s)}" fill="${palette.secondary}" stroke="${palette.stroke}" stroke-width="${fmt(1.7 * s)}"/><path class="asset-barcode-scanner-beam" d="M${fmt(cx - 2 * s)},${fmt(cy - 3 * s)} L${fmt(cx + 34 * s)},${fmt(cy - 21 * s)} M${fmt(cx - 2 * s)},${fmt(cy + 5 * s)} L${fmt(cx + 34 * s)},${fmt(cy + 21 * s)}" stroke="${palette.accent}" stroke-width="${fmt(2 * s)}" opacity="0.76" stroke-linecap="round"/>${barcode(13, -10)}${miniPlate(-8, 18, "asset-barcode-scanner-plate", 5, 1)}</g>`;
+  } else if (mode === "plate-reader") {
+    body += `<g class="asset-lab-automation-plate-reader"><rect x="${fmt(cx - 44 * s)}" y="${fmt(cy - 27 * s)}" width="${fmt(88 * s)}" height="${fmt(54 * s)}" rx="${fmt(12 * s)}" fill="#ffffff" stroke="${palette.stroke}" stroke-width="${fmt(1.8 * s)}"/><rect x="${fmt(cx - 34 * s)}" y="${fmt(cy - 17 * s)}" width="${fmt(42 * s)}" height="${fmt(34 * s)}" rx="${fmt(7 * s)}" fill="${palette.secondary}" stroke="${palette.accent}" stroke-width="${fmt(1.15 * s)}"/><g class="asset-plate-reader-optics">${[-20, -7, 6].map((x) => `<circle cx="${fmt(cx + x * s)}" cy="${fmt(cy - 1 * s)}" r="${fmt(4 * s)}" fill="${palette.accent}" opacity="0.8"/>`).join("")}</g><path class="asset-plate-reader-signal" d="M${fmt(cx + 17 * s)},${fmt(cy + 14 * s)} V${fmt(cy - 15 * s)} M${fmt(cx + 17 * s)},${fmt(cy + 14 * s)} H${fmt(cx + 38 * s)} M${fmt(cx + 20 * s)},${fmt(cy + 8 * s)} C${fmt(cx + 26 * s)},${fmt(cy - 8 * s)} ${fmt(cx + 32 * s)},${fmt(cy + 2 * s)} ${fmt(cx + 38 * s)},${fmt(cy - 12 * s)}" fill="none" stroke="${palette.accent}" stroke-width="${fmt(2 * s)}"/></g>`;
+  } else if (mode === "lims-dashboard") {
+    body += `<g class="asset-lab-automation-lims-dashboard">${screen("asset-lims-dashboard-table")}<g class="asset-lims-dashboard-status">${[-23, 0, 23].map((x, i) => `<circle cx="${fmt(cx + x * s)}" cy="${fmt(cy + 26 * s)}" r="${fmt(4.2 * s)}" fill="${i === 1 ? palette.accent : palette.secondary}" stroke="${palette.accent}" stroke-width="${fmt(0.9 * s)}"/>`).join("")}</g>${barcode(24, -34)}</g>`;
+  } else if (mode === "assay-scheduler") {
+    body += `<g class="asset-lab-automation-assay-scheduler">${screen("asset-assay-scheduler-screen")}${timeline}</g>`;
+  } else if (mode === "sample-tracker") {
+    body += `<g class="asset-lab-automation-sample-tracker">${miniPlate(-35, -5, "asset-sample-tracker-plate", 5, 3)}${barcode(18, -16)}<path class="asset-sample-tracker-route" d="M${fmt(cx - 7 * s)},${fmt(cy + 20 * s)} C${fmt(cx + 9 * s)},${fmt(cy + 34 * s)} ${fmt(cx + 29 * s)},${fmt(cy + 25 * s)} ${fmt(cx + 37 * s)},${fmt(cy + 10 * s)}" fill="none" stroke="${palette.accent}" stroke-width="${fmt(2.2 * s)}" stroke-dasharray="${fmt(4 * s)} ${fmt(3 * s)}"/></g>`;
+  } else if (mode === "qc-gate") {
+    body += `<g class="asset-lab-automation-qc-gate"><path class="asset-automation-qc-gate" d="M${fmt(cx - 36 * s)},${fmt(cy - 24 * s)} h${fmt(72 * s)} v${fmt(48 * s)} h${fmt(-72 * s)} Z" fill="#ffffff" stroke="${palette.stroke}" stroke-width="${fmt(1.8 * s)}"/><path d="M${fmt(cx - 21 * s)},${fmt(cy + 4 * s)} l${fmt(11 * s)},${fmt(11 * s)} l${fmt(27 * s)},${fmt(-30 * s)}" fill="none" stroke="${palette.accent}" stroke-width="${fmt(4 * s)}" stroke-linecap="round" stroke-linejoin="round"/><path class="asset-automation-qc-threshold" d="M${fmt(cx - 30 * s)},${fmt(cy - 8 * s)} H${fmt(cx + 30 * s)}" stroke="${palette.accent}" stroke-width="${fmt(1.8 * s)}" stroke-dasharray="${fmt(4 * s)} ${fmt(3 * s)}"/></g>`;
+  } else if (mode === "incubator-stack") {
+    body += `<g class="asset-lab-automation-incubator-stack">${[-25, -4, 17].map((y, i) => `<rect x="${fmt(cx - 39 * s)}" y="${fmt(cy + y * s)}" width="${fmt(78 * s)}" height="${fmt(18 * s)}" rx="${fmt(6 * s)}" fill="${i === 1 ? palette.secondary : "#ffffff"}" stroke="${palette.stroke}" stroke-width="${fmt(1.15 * s)}"/><circle cx="${fmt(cx + 30 * s)}" cy="${fmt(cy + (y + 9) * s)}" r="${fmt(3 * s)}" fill="${palette.accent}"/>`).join("")}<path d="M${fmt(cx - 46 * s)},${fmt(cy - 32 * s)} v${fmt(68 * s)} M${fmt(cx + 46 * s)},${fmt(cy - 32 * s)} v${fmt(68 * s)}" stroke="${palette.accent}" stroke-width="${fmt(2 * s)}" stroke-linecap="round"/></g>`;
+  } else if (mode === "automated-microscope") {
+    body += `<g class="asset-lab-automation-automated-microscope"><path d="M${fmt(cx - 32 * s)},${fmt(cy + 26 * s)} h${fmt(62 * s)} M${fmt(cx - 20 * s)},${fmt(cy + 26 * s)} v${fmt(-45 * s)} h${fmt(30 * s)}" stroke="${palette.stroke}" stroke-width="${fmt(5 * s)}" stroke-linecap="round"/><circle cx="${fmt(cx + 18 * s)}" cy="${fmt(cy - 20 * s)}" r="${fmt(11 * s)}" fill="${palette.secondary}" stroke="${palette.accent}" stroke-width="${fmt(1.5 * s)}"/><g class="asset-automated-microscope-stage">${miniPlate(-24, 10, "asset-automated-microscope-slide", 4, 1)}</g><path d="M${fmt(cx + 37 * s)},${fmt(cy - 7 * s)} C${fmt(cx + 49 * s)},${fmt(cy + 4 * s)} ${fmt(cx + 47 * s)},${fmt(cy + 23 * s)} ${fmt(cx + 30 * s)},${fmt(cy + 31 * s)}" fill="none" stroke="${palette.accent}" stroke-width="${fmt(2.2 * s)}"/></g>`;
+  } else if (mode === "orchestrator") {
+    body += `<g class="asset-lab-automation-orchestrator">${screen("asset-automation-orchestrator-screen")}<path class="asset-automation-orchestrator-flow" d="M${fmt(cx - 28 * s)},${fmt(cy + 28 * s)} C${fmt(cx - 4 * s)},${fmt(cy + 42 * s)} ${fmt(cx + 22 * s)},${fmt(cy + 32 * s)} ${fmt(cx + 34 * s)},${fmt(cy + 12 * s)}" fill="none" stroke="${palette.accent}" stroke-width="${fmt(2.2 * s)}" stroke-dasharray="${fmt(5 * s)} ${fmt(4 * s)}"/></g>`;
+  } else {
+    body += `<g class="asset-lab-automation-${escapeXml(mode)}">${deckMap}${mode.includes("rack") || mode.includes("array") ? barcode(20, -33) : ""}<circle class="asset-lab-automation-status-dot" cx="${fmt(cx + 39 * s)}" cy="${fmt(cy - 28 * s)}" r="${fmt(5 * s)}" fill="${palette.accent}"/></g>`;
+  }
+  return `${baseLayer(cx, cy, s, palette, ["robotic-arm", "plate-handler", "plate-stack", "qc-gate"].includes(mode) ? "oval" : "panel")}<g class="asset-lab-automation asset-lab-automation-${escapeXml(mode)}" filter="url(#asset-soft-shadow)">${body}</g>`;
 }
 
 function biosafetyCabinet(cx, cy, s, palette) {

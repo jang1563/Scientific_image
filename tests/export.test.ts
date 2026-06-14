@@ -144,7 +144,7 @@ test("publication results template exports line and dark style plot themes", () 
 });
 
 test("priority flagship templates honor publication-line and dark-talk style themes", () => {
-  const templateIds = ["perturb-seq-workflow", "spatial-results-panel", "ai-biosecurity-pipeline", "drug-discovery-funnel", "protein-engineering-platform", "synthetic-biology-platform", "microbiome-infectious-disease-platform", "cell-therapy-manufacturing-platform", "microscopy-image-analysis-pipeline"];
+  const templateIds = ["perturb-seq-workflow", "spatial-results-panel", "ai-biosecurity-pipeline", "drug-discovery-funnel", "protein-engineering-platform", "synthetic-biology-platform", "microbiome-infectious-disease-platform", "cell-therapy-manufacturing-platform", "microscopy-image-analysis-pipeline", "lab-automation-platform"];
 
   for (const templateId of templateIds) {
     let lineProject = createProject(`${templateId} line fixture`);

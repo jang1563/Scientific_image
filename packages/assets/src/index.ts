@@ -1068,6 +1068,16 @@ export const PREMIUM_WORKFLOW_PACKS: WorkflowPack[] = [
     agentUseHints: ["Use for microscopy computer-vision pipelines, segmentation, tracking, morphology phenotyping, and image QC slides.", "Keep raw image evidence, preprocessing, segmentation masks, feature extraction, model outputs, and review/QC as separate editable objects."]
   },
   {
+    id: "lab-automation",
+    name: "Lab automation",
+    priority: 3,
+    description: "Robotic lab automation, liquid handling, plate logistics, barcode tracking, LIMS handoff, and assay QC workflows.",
+    flagshipTemplateId: "lab-automation-platform",
+    assetIds: ["lab-automation-platform", "liquid-handler", "robotic-arm", "automated-liquid-handler", "plate-handler", "plate-stack", "barcode-scanner", "plate-reader", "reagent-reservoir", "tip-rack", "robotic-gripper", "lims-dashboard", "assay-scheduler", "sample-tracker", "qc-gate-automation", "incubator-stack", "automated-microscope", "acoustic-dispenser", "colony-picker", "tube-rack", "sample-tube-array", "robotic-rail", "deck-layout", "waste-chute", "seal-peeler", "lab-sensor", "automation-orchestrator", "plate-96", "plate-384", "pipette", "incubator", "centrifuge", "microfluidic-chip", "biosafety-cabinet", "microscope", "confocal-microscope", "flow-cytometry", "sequencer", "dataset", "metric-card", "calibration", "error-analysis"],
+    templates: ["lab-automation-platform", "liquid-handling-deck-layout", "plate-logistics-qc", "lims-run-monitor"],
+    agentUseHints: ["Use for automated assay execution, robotic plate movement, liquid handling, LIMS tracking, and lab operations slides.", "Keep deck setup, robotic execution, readout, sample tracking, and QC handoff as separate editable objects."]
+  },
+  {
     id: "space-biology-genelab",
     name: "Space biology / GeneLab",
     priority: 3,
@@ -1549,6 +1559,54 @@ export const PREMIUM_WORKFLOW_TEMPLATES: WorkflowTemplate[] = [
     qaChecklist: ["Human review is visually distinct from model output.", "Annotation state is not treated as final ground truth without source confirmation.", "PPTX export warnings name fallback assets."]
   },
   {
+    id: "lab-automation-platform",
+    workflowPack: "lab-automation",
+    name: "Lab automation platform",
+    description: "Deck setup, robotic liquid handling, plate logistics, readout, LIMS tracking, and QC handoff workflow for automated assays.",
+    layout: "workflow",
+    recommendedStyleProfile: "consulting-2p5d",
+    previewAssetIds: ["lab-automation-platform", "automated-liquid-handler", "robotic-arm", "lims-dashboard"],
+    nodeKinds: ["shape", "text", "symbol", "plot", "connector"],
+    agentUseHints: ["Use as the flagship slide for automated wetlab workflows, high-throughput screening operations, and lab robotics platform decks.", "Separate physical deck setup, robotic execution, readout, sample tracking, and QC/LIMS handoff."],
+    qaChecklist: ["Deck positions are readable.", "Sample identity/barcode path is visible.", "QC and LIMS handoff are source-backed or marked reviewable.", "PPTX warnings name layered automation fallback assets."]
+  },
+  {
+    id: "liquid-handling-deck-layout",
+    workflowPack: "lab-automation",
+    name: "Liquid handling deck layout",
+    description: "Editable deck-map figure with plate, tip rack, reagent reservoir, waste, and liquid handler head.",
+    layout: "workflow",
+    recommendedStyleProfile: "consulting-2p5d",
+    previewAssetIds: ["deck-layout", "tip-rack", "reagent-reservoir", "automated-liquid-handler"],
+    nodeKinds: ["shape", "text", "symbol", "connector"],
+    agentUseHints: ["Use when the slide brief mentions liquid handling method setup, plate map, reagent layout, or deck configuration.", "Keep deck layout schematic, not protocol-operational instructions."],
+    qaChecklist: ["Deck locations are labeled at slide size.", "Reagent and waste labels are unambiguous.", "Export fallback warnings name premium SVG assets."]
+  },
+  {
+    id: "plate-logistics-qc",
+    workflowPack: "lab-automation",
+    name: "Plate logistics and QC",
+    description: "Plate stack, handler, barcode scanner, incubator stack, plate reader, and automated QC routing.",
+    layout: "workflow",
+    recommendedStyleProfile: "consulting-2p5d",
+    previewAssetIds: ["plate-stack", "plate-handler", "barcode-scanner", "qc-gate-automation"],
+    nodeKinds: ["shape", "text", "symbol", "plot", "connector"],
+    agentUseHints: ["Use for plate movement, scheduling, barcode identity, incubation, readout, and QC gate diagrams.", "Keep sample identity tracking explicit before interpreting assay output."],
+    qaChecklist: ["Barcode/sample identity path is visible.", "QC threshold is not overclaimed without source data.", "PPTX fallback names exact automation assets."]
+  },
+  {
+    id: "lims-run-monitor",
+    workflowPack: "lab-automation",
+    name: "LIMS run monitor",
+    description: "LIMS dashboard, run scheduler, sample tracker, sensor telemetry, automation orchestrator, and review queue summary.",
+    layout: "results",
+    recommendedStyleProfile: "consulting-2p5d",
+    previewAssetIds: ["lims-dashboard", "assay-scheduler", "sample-tracker", "automation-orchestrator"],
+    nodeKinds: ["shape", "text", "symbol", "plot"],
+    agentUseHints: ["Use for lab operations, LIMS integration, run monitoring, and automation reliability dashboards.", "Represent scheduling and QC alerts as reviewable operational state, not scientific conclusions."],
+    qaChecklist: ["Run status is readable.", "Alerts are actionable.", "Operational metrics are marked synthetic or source-backed."]
+  },
+  {
     id: "spatial-workflow",
     workflowPack: "spatial-transcriptomics",
     name: "Spatial workflow",
@@ -1893,6 +1951,23 @@ const SIGNATURE_ASSET_IDS = new Set([
   "phenotype-feature-vector",
   "morphology-embedding",
   "segmentation-model",
+  "liquid-handler",
+  "lab-automation-platform",
+  "robotic-arm",
+  "automated-liquid-handler",
+  "plate-handler",
+  "plate-stack",
+  "barcode-scanner",
+  "plate-reader",
+  "reagent-reservoir",
+  "tip-rack",
+  "lims-dashboard",
+  "assay-scheduler",
+  "sample-tracker",
+  "qc-gate-automation",
+  "incubator-stack",
+  "automated-microscope",
+  "automation-orchestrator",
   "medicinal-chemistry-cycle",
   "efficacy-model",
   "ind-enabling-package",
@@ -2031,6 +2106,38 @@ const BIOLOGY_SEEDS: AssetSeed[] = [
     ["mass-spectrometer", "Mass spectrometer", "proteomics metabolomics"],
     ["liquid-handler", "Liquid handler", "automation plate"]
   ], "#0891b2"),
+  ...biology("Lab automation", "workflowBlock", "process", [
+    ["lab-automation-platform", "Lab automation platform", "lab automation platform robotic workflow high throughput assay"],
+    ["plate-handler", "Plate handler", "automated plate handler shuttle robot plate logistics"],
+    ["plate-stack", "Plate stack", "plate stack hotel loader automated plate logistics"],
+    ["assay-scheduler", "Assay scheduler", "assay scheduler run calendar batch automation"],
+    ["automation-orchestrator", "Automation orchestrator", "automation orchestrator run control workflow engine"],
+    ["robotic-rail", "Robotic rail", "robotic rail gantry transport automation"],
+    ["deck-layout", "Deck layout", "liquid handler deck layout reagent plate map"],
+    ["seal-peeler", "Seal peeler", "plate seal peeler automated lab"],
+    ["waste-chute", "Waste chute", "waste chute tips liquid handler deck"]
+  ], "#0ea5e9"),
+  ...biology("Lab automation", "instrument", "assay", [
+    ["robotic-arm", "Robotic arm", "robotic arm gripper lab automation"],
+    ["automated-liquid-handler", "Automated liquid handler", "automated liquid handler pipetting head deck"],
+    ["barcode-scanner", "Barcode scanner", "barcode scanner sample identity plate tracking"],
+    ["plate-reader", "Plate reader", "plate reader absorbance fluorescence luminescence"],
+    ["reagent-reservoir", "Reagent reservoir", "reagent reservoir liquid handler trough"],
+    ["tip-rack", "Tip rack", "pipette tip rack automated liquid handling"],
+    ["robotic-gripper", "Robotic gripper", "robotic gripper plate transfer end effector"],
+    ["incubator-stack", "Incubator stack", "automated incubator stack plate storage"],
+    ["automated-microscope", "Automated microscope", "automated microscope imaging robot integration"],
+    ["acoustic-dispenser", "Acoustic dispenser", "acoustic dispenser nanoliter compound transfer"],
+    ["colony-picker", "Colony picker", "colony picker robotic picking microbiology"],
+    ["tube-rack", "Tube rack", "tube rack sample rack automation"],
+    ["sample-tube-array", "Sample tube array", "sample tube array rack barcode automation"]
+  ], "#0891b2"),
+  ...biology("Lab automation", "metricPanel", "evaluation", [
+    ["lims-dashboard", "LIMS dashboard", "lims dashboard sample tracking run status"],
+    ["sample-tracker", "Sample tracker", "sample tracker barcode chain of custody"],
+    ["qc-gate-automation", "Automation QC gate", "automation qc gate threshold run acceptance"],
+    ["lab-sensor", "Lab sensor", "lab sensor telemetry temperature humidity status"]
+  ], "#2563eb"),
   ...biology("Spatial and imaging", "spatial", "assay", [
     ["spatial-grid", "Spatial transcriptomics grid", "spatial transcriptomics visium"],
     ["visium-spot-array", "Visium spot array", "spatial spot"],
@@ -2510,11 +2617,11 @@ export function getAssetQualityReport(): AssetQualityReport {
     qualityRubric: [...ASSET_QUALITY_RUBRIC],
     priorityGaps: buildPriorityGaps(workflowCoverage, styleCoverage),
     recommendedNextPacks: [
-      "lab-automation",
       "anatomy-organ-systems",
       "methods-and-protocols",
       "grant-and-consulting-summary",
-      "clinical-translational"
+      "clinical-translational",
+      "immunology-oncology"
     ]
   };
 }
@@ -2585,8 +2692,9 @@ export function getAssetCoverageGapReport(): AssetCoverageGapReport {
       "Use microbiome-infectious-disease as the fourth active broad-market pack and audit community/barrier/metagenomic/AMR/outbreak visual QA.",
       "Use cell-therapy as the fifth active broad-market pack and audit CAR/TCR/NK, manufacturing, release QC, infusion, and monitoring visual QA.",
       "Use microscopy-image-analysis as the sixth active broad-market pack and audit field/channel/z-stack/segmentation/tracking/phenotyping/QC visual QA.",
+      "Use lab-automation as the seventh active broad-market pack and audit liquid handling, robotics, plate logistics, LIMS, scheduling, and QC visual QA.",
       "Promote or add pack-specific signature assets for target validation, compound library, toxicity screen, ADMET, candidate nomination, and assay evidence.",
-      "Add the next broad packs in order: lab-automation, anatomy-organ-systems.",
+      "Add the next broad packs in order: anatomy-organ-systems, methods-and-protocols.",
       "Keep MCP/API recommendations pack-first so Codex or Claude can request workflowPack, templateId, assetId, styleProfile, semanticSlot, and appearance overrides."
     ]
   };
@@ -2874,6 +2982,32 @@ function premiumSeedTheme(seed: AssetSeed): Pick<AssetSeed, "accent" | "secondar
     "image-qc-dashboard": "#0f766e",
     "annotation-brush": "#b45309",
     "segmentation-model": "#4f46e5",
+    "lab-automation-platform": "#0ea5e9",
+    "robotic-arm": "#2563eb",
+    "automated-liquid-handler": "#0891b2",
+    "plate-handler": "#0f766e",
+    "plate-stack": "#0284c7",
+    "barcode-scanner": "#7c3aed",
+    "plate-reader": "#16a34a",
+    "reagent-reservoir": "#0d9488",
+    "tip-rack": "#64748b",
+    "robotic-gripper": "#4f46e5",
+    "lims-dashboard": "#2563eb",
+    "assay-scheduler": "#f59e0b",
+    "sample-tracker": "#9333ea",
+    "qc-gate-automation": "#dc2626",
+    "incubator-stack": "#0f766e",
+    "automated-microscope": "#38bdf8",
+    "acoustic-dispenser": "#7c3aed",
+    "colony-picker": "#b45309",
+    "tube-rack": "#0891b2",
+    "sample-tube-array": "#2563eb",
+    "robotic-rail": "#475569",
+    "deck-layout": "#0ea5e9",
+    "waste-chute": "#64748b",
+    "seal-peeler": "#f97316",
+    "lab-sensor": "#16a34a",
+    "automation-orchestrator": "#4f46e5",
     "pathway-node": "#c2410c",
     "signaling-cascade": "#9333ea",
     "activation-edge": "#16a34a",
@@ -4188,6 +4322,28 @@ const WORKFLOW_CORE_ASSET_IDS: Record<string, string[]> = {
     "microscope",
     "confocal-microscope",
     "cell-boundary"
+  ],
+  "lab-automation": [
+    "lab-automation-platform",
+    "liquid-handler",
+    "automated-liquid-handler",
+    "robotic-arm",
+    "robotic-gripper",
+    "plate-handler",
+    "plate-stack",
+    "plate-384",
+    "barcode-scanner",
+    "sample-tracker",
+    "assay-scheduler",
+    "deck-layout",
+    "tip-rack",
+    "reagent-reservoir",
+    "plate-reader",
+    "incubator-stack",
+    "automated-microscope",
+    "lims-dashboard",
+    "qc-gate-automation",
+    "automation-orchestrator"
   ]
 };
 
@@ -6083,6 +6239,7 @@ function createTemplateFigureNodes(pack: WorkflowPack, template: WorkflowTemplat
   if (template.id === "microbiome-infectious-disease-platform") return createMicrobiomeInfectiousDiseaseFlagshipTemplateNodes(template, input);
   if (template.id === "cell-therapy-manufacturing-platform") return createCellTherapyFlagshipTemplateNodes(template, input);
   if (template.id === "microscopy-image-analysis-pipeline") return createMicroscopyImageAnalysisFlagshipTemplateNodes(template, input);
+  if (template.id === "lab-automation-platform") return createLabAutomationFlagshipTemplateNodes(template, input);
   if (template.id === "ai-biosecurity-pipeline") return createAiBiosecurityFlagshipTemplateNodes(template, input);
   if (template.id === "permissioning-ladder") return createPermissioningLadderTemplateNodes(template, input);
   if (template.id === "benchmark-dashboard") return createBenchmarkDashboardTemplateNodes(template, input);
@@ -8303,6 +8460,252 @@ function createMicroscopyImageAnalysisFlagshipTemplateNodes(template: WorkflowTe
   return nodes.map((node, index) => ({ ...node, transform: { ...node.transform, z: index } }));
 }
 
+function createLabAutomationFlagshipTemplateNodes(template: WorkflowTemplate, input: {
+  styleProfile?: AssetStyleProfile;
+  x?: number;
+  y?: number;
+  width?: number;
+}): SceneNode[] {
+  const styleProfile = input.styleProfile ?? template.recommendedStyleProfile;
+  const x = input.x ?? 72;
+  const y = input.y ?? 104;
+  const width = input.width ?? 1064;
+  const theme = flagshipStyleTheme(styleProfile, "blue");
+  const source = curatedProvenance("Synthetic lab automation flagship demo data generated by Scientific Image", "Scientific Image lab-automation workflow pack fixture");
+  const figureText = (text: string, transform: Transform, style: Style = {}): SceneNode => ({
+    ...createTextNode(text, transform, style),
+    claimStatus: "draft-visual"
+  });
+  const figureShape = (shape: "round-rect" | "ellipse" | "rect" | "diamond" | "line", label: string, transform: Transform, style: Style = {}): SceneNode => ({
+    ...createShapeNode(shape, label, transform, style),
+    claimStatus: "draft-visual"
+  });
+  const symbol = (
+    assetId: string,
+    label: string,
+    sx: number,
+    sy: number,
+    sw: number,
+    sh: number,
+    layoutHint: string,
+    appearance: SymbolAppearance = {},
+    profile: AssetStyleProfile = styleProfile
+  ): SceneNode => createCuratedSymbolNode({
+    assetId,
+    label,
+    x: sx,
+    y: sy,
+    width: sw,
+    height: sh,
+    styleProfile: profile,
+    semanticRole: "lab-automation",
+    layoutHint,
+    appearance: { ...theme.symbolAppearance, ...appearance }
+  });
+  const nodes: SceneNode[] = [
+    figureShape("round-rect", "", createTransform(x - 18, y - 44, width + 36, 538), {
+      fill: theme.outerFill,
+      stroke: theme.outerStroke,
+      strokeWidth: 2,
+      depth: theme.outerDepth
+    }),
+    figureText("Lab automation assay execution platform", createTransform(x, y - 32, 640, 30), {
+      fontSize: 22,
+      fontWeight: 900,
+      color: theme.heading
+    }),
+    figureText("Agent-ready workflow separates deck setup, robotic execution, readout, sample identity, LIMS handoff, and QC review.", createTransform(x + 650, y - 34, width - 650, 44), {
+      fontSize: 11.2,
+      fontWeight: 650,
+      color: theme.muted
+    }),
+    figureShape("round-rect", "", createTransform(x + 4, y + 12, 210, 28), {
+      fill: theme.chipFill,
+      stroke: theme.chipStroke,
+      strokeWidth: 1,
+      depth: "surface"
+    }),
+    figureText("pack: lab-automation", createTransform(x + 18, y + 17, 178, 18), {
+      fontSize: 10.2,
+      fontWeight: 850,
+      color: theme.accent
+    }),
+    figureShape("round-rect", "", createTransform(x + 228, y + 12, 336, 28), {
+      fill: theme.chipAltFill,
+      stroke: theme.isLine ? "#111827" : theme.isDark ? "#334155" : "#bbf7d0",
+      strokeWidth: 1,
+      depth: "surface"
+    }),
+    figureText("agent-ready deck -> robot -> readout -> LIMS path", createTransform(x + 244, y + 17, 306, 18), {
+      fontSize: 10.2,
+      fontWeight: 850,
+      color: theme.accent2
+    })
+  ];
+
+  const stageY = y + 64;
+  const stageH = 164;
+  const stageW = Math.round((width - 64) / 5);
+  const stages: Array<{ assetId: string; label: string; kind: string; note: string; accent: string; profile?: AssetStyleProfile }> = [
+    { assetId: "assay-scheduler", label: "Schedule", kind: "plan", note: "batch + timing", accent: "#f59e0b" },
+    { assetId: "automated-liquid-handler", label: "Dispense", kind: "deck", note: "tips + reagents", accent: theme.accent },
+    { assetId: "robotic-arm", label: "Transfer", kind: "robot", note: "plates + identity", accent: "#4f46e5" },
+    { assetId: "plate-reader", label: "Read", kind: "signal", note: "assay output", accent: theme.accent2 },
+    { assetId: "lims-dashboard", label: "Review", kind: "LIMS/QC", note: "run + QC state", accent: theme.isLine ? "#111827" : theme.isDark ? "#fdba74" : "#dc2626", profile: theme.riskSymbolProfile }
+  ];
+  stages.forEach((stage, index) => {
+    const sx = x + index * (stageW + 16);
+    const reviewStage = index === stages.length - 1;
+    nodes.push(figureShape("round-rect", "", createTransform(sx, stageY, stageW, stageH), {
+      fill: reviewStage ? theme.warningFill : index % 2 ? theme.panelAltFill : theme.panelFill,
+      stroke: reviewStage ? theme.warningStroke : theme.panelStroke,
+      strokeWidth: 1.25,
+      depth: reviewStage ? theme.floatingDepth : theme.panelDepth
+    }));
+    nodes.push(figureShape("round-rect", "", createTransform(sx + 12, stageY + 12, 36, 20), {
+      fill: theme.isDark ? "#0f172a" : "#ffffff",
+      stroke: reviewStage ? theme.warningStroke : theme.panelStroke,
+      strokeWidth: 1,
+      depth: "surface"
+    }));
+    nodes.push(figureText(`0${index + 1}`, createTransform(sx + 21, stageY + 16, 18, 12), {
+      fontSize: 8.8,
+      fontWeight: 950,
+      color: reviewStage ? theme.warningText : stage.accent
+    }));
+    nodes.push(figureShape("round-rect", "", createTransform(sx + stageW - 90, stageY + 12, 76, 20), {
+      fill: reviewStage ? theme.warningFill : theme.chipFill,
+      stroke: reviewStage ? theme.warningStroke : theme.chipStroke,
+      strokeWidth: 1,
+      depth: "surface"
+    }));
+    nodes.push(figureText(stage.kind, createTransform(sx + stageW - 78, stageY + 16, 58, 12), {
+      fontSize: 7.6,
+      fontWeight: 850,
+      color: reviewStage ? theme.warningText : stage.accent
+    }));
+    nodes.push(symbol(stage.assetId, stage.label, sx + Math.round((stageW - 112) / 2), stageY + 34, 112, 86, `${template.id}:stage-${index + 1}`, { accent: stage.accent, stroke: stage.accent, labelVisible: false }, stage.profile ?? styleProfile));
+    nodes.push(figureText(stage.label, createTransform(sx + 14, stageY + 122, stageW - 28, 18), {
+      fontSize: 12,
+      fontWeight: 900,
+      color: reviewStage ? theme.warningText : theme.text
+    }));
+    nodes.push(figureText(stage.note, createTransform(sx + 14, stageY + 142, stageW - 28, 16), {
+      fontSize: 9.2,
+      fontWeight: 720,
+      color: theme.muted
+    }));
+    if (index > 0) {
+      nodes.push(createConnectorNode([
+        { x: sx - 16, y: stageY + 82 },
+        { x: sx - 2, y: stageY + 82 }
+      ], "", { stroke: theme.connector, strokeWidth: 2.3 }));
+    }
+  });
+  nodes.push(figureShape("round-rect", "", createTransform(x + 4, stageY + stageH + 14, width - 8, 28), {
+    fill: theme.isDark ? "#0f172a" : "#f8fafc",
+    stroke: theme.panelStroke,
+    strokeWidth: 1,
+    depth: "surface"
+  }));
+  nodes.push(figureText("Decision spine: deck setup -> robotic dispense -> plate transfer -> readout -> LIMS and QC review", createTransform(x + 24, stageY + stageH + 20, width - 48, 16), {
+    fontSize: 9.5,
+    fontWeight: 820,
+    color: theme.muted
+  }));
+
+  const lowerY = y + 280;
+  const gap = 22;
+  const panelW = Math.round((width - gap * 2) / 3);
+  const runTable = {
+    id: createId("table"),
+    name: "Illustrative automation run QC",
+    columns: ["step", "score", "series"],
+    rows: [
+      { step: 1, score: 0.91, series: "run-qc" },
+      { step: 2, score: 0.87, series: "run-qc" },
+      { step: 3, score: 0.94, series: "run-qc" },
+      { step: 4, score: 0.89, series: "run-qc" }
+    ],
+    source
+  };
+  const addPanel = (tag: string, title: string, status: string, px: number, py: number, pw: number, fill = theme.panelFill, tone = theme.text) => {
+    const review = status === "review";
+    nodes.push(figureShape("round-rect", "", createTransform(px, py, pw, 204), {
+      fill,
+      stroke: review ? theme.warningStroke : theme.panelStroke,
+      strokeWidth: 1.25,
+      depth: theme.panelDepth
+    }));
+    nodes.push(figureShape("round-rect", "", createTransform(px + 14, py + 14, 28, 22), {
+      fill: theme.isDark ? "#0f172a" : "#ffffff",
+      stroke: review ? theme.warningStroke : theme.panelStroke,
+      strokeWidth: 1,
+      depth: "surface"
+    }));
+    nodes.push(figureText(tag, createTransform(px + 14, py + 17, 28, 16), {
+      fontSize: 12,
+      fontWeight: 920,
+      color: tone
+    }));
+    nodes.push(figureText(title, createTransform(px + 52, py + 16, pw - 142, 20), {
+      fontSize: 11.6,
+      fontWeight: 850,
+      color: tone
+    }));
+    nodes.push(figureShape("round-rect", "", createTransform(px + pw - 88, py + 14, 74, 22), {
+      fill: review ? theme.warningFill : theme.chipFill,
+      stroke: review ? theme.warningStroke : theme.chipStroke,
+      strokeWidth: 1,
+      depth: "surface"
+    }));
+    nodes.push(figureText(status, createTransform(px + pw - 76, py + 19, 52, 12), {
+      fontSize: 7.9,
+      fontWeight: 850,
+      color: review ? theme.warningText : tone
+    }));
+  };
+  addPanel("A", "Deck setup", "layout", x, lowerY, panelW, theme.panelFill, theme.accent);
+  addPanel("B", "Plate logistics", "identity", x + panelW + gap, lowerY, panelW, theme.panelAltFill, theme.accent2);
+  addPanel("C", "LIMS + QC handoff", "review", x + (panelW + gap) * 2, lowerY, width - (panelW + gap) * 2, theme.warningFill, theme.warningText);
+  nodes.push(
+    symbol("deck-layout", "Deck", x + 20, lowerY + 52, 74, 76, `${template.id}:deck`, { accent: theme.accent, stroke: theme.accent, labelVisible: false }),
+    symbol("tip-rack", "Tips", x + 100, lowerY + 52, 68, 74, `${template.id}:tips`, { accent: "#64748b", stroke: "#64748b", labelVisible: false }),
+    symbol("reagent-reservoir", "Reagent", x + 174, lowerY + 52, 68, 74, `${template.id}:reservoir`, { accent: "#0d9488", stroke: "#0d9488", labelVisible: false }),
+    symbol("plate-384", "384-well", x + 248, lowerY + 52, 76, 76, `${template.id}:plate384`, { accent: theme.accent, stroke: theme.accent, labelVisible: false }),
+    figureText("Deck layout, tips, reagents, and assay plate stay editable.", createTransform(x + 24, lowerY + 160, panelW - 48, 24), { fontSize: 10, fontWeight: 720, color: theme.muted }),
+    symbol("plate-stack", "Stack", x + panelW + gap + 18, lowerY + 52, 56, 72, `${template.id}:stack`, { accent: "#0284c7", stroke: "#0284c7", labelVisible: false }),
+    symbol("plate-handler", "Handler", x + panelW + gap + 82, lowerY + 52, 56, 72, `${template.id}:handler`, { accent: "#0f766e", stroke: "#0f766e", labelVisible: false }),
+    symbol("barcode-scanner", "Scan", x + panelW + gap + 146, lowerY + 52, 56, 72, `${template.id}:barcode`, { accent: "#7c3aed", stroke: "#7c3aed", labelVisible: false }),
+    symbol("incubator-stack", "Incubate", x + panelW + gap + 210, lowerY + 52, 56, 72, `${template.id}:incubator`, { accent: "#0f766e", stroke: "#0f766e", labelVisible: false }),
+    symbol("sample-tracker", "Track", x + panelW + gap + 274, lowerY + 52, 54, 72, `${template.id}:tracker`, { accent: "#9333ea", stroke: "#9333ea", labelVisible: false }),
+    figureText("Barcode and movement state stay separate from assay interpretation.", createTransform(x + panelW + gap + 24, lowerY + 160, panelW - 48, 24), { fontSize: 10, fontWeight: 720, color: theme.muted }),
+    symbol("automation-orchestrator", "Orchestrator", x + (panelW + gap) * 2 + 20, lowerY + 52, 72, 76, `${template.id}:orchestrator`, { accent: theme.warningText, stroke: theme.warningText, labelVisible: false }, theme.riskSymbolProfile),
+    symbol("qc-gate-automation", "QC gate", x + (panelW + gap) * 2 + 100, lowerY + 52, 70, 76, `${template.id}:qcgateway`, { accent: theme.warningText, stroke: theme.warningText, labelVisible: false }, theme.riskSymbolProfile),
+    symbol("lab-sensor", "Sensor", x + (panelW + gap) * 2 + 178, lowerY + 54, 62, 72, `${template.id}:sensor`, { accent: theme.warningText, stroke: theme.warningText, labelVisible: false }, theme.riskSymbolProfile),
+    createPlotNode({
+      id: createId("plot"),
+      plotType: "line",
+      title: "Run QC",
+      table: runTable,
+      encodings: { x: "step", y: "score", color: "series" },
+      style: theme.plotStyle
+    }, createTransform(x + (panelW + gap) * 2 + 248, lowerY + 50, 86, 86)),
+    figureShape("round-rect", "", createTransform(x + (panelW + gap) * 2 + 118, lowerY + 148, 196, 24), {
+      fill: theme.isDark ? "#111827" : "#ffffff",
+      stroke: theme.warningStroke,
+      strokeWidth: 1,
+      depth: "surface"
+    }),
+    figureText("operator-review-and-qc-signoff", createTransform(x + (panelW + gap) * 2 + 130, lowerY + 154, 172, 13), {
+      fontSize: 8.2,
+      fontWeight: 850,
+      color: theme.warningText
+    })
+  );
+  return nodes.map((node, index) => ({ ...node, transform: { ...node.transform, z: index } }));
+}
+
 function createSpatialResultsFlagshipTemplateNodes(template: WorkflowTemplate, input: {
   styleProfile?: AssetStyleProfile;
   x?: number;
@@ -10457,6 +10860,7 @@ function inferWorkflowPack(text: string): string | undefined {
   if (/microbiome|metagenomic|metagenomics|taxonomy|taxonomic|alpha diversity|beta diversity|dysbiosis|host[-\s]?pathogen|infectious disease|infection model|antimicrobial resistance|amr|antibiotic|outbreak|pathogen surveillance|phage|fungal|mucosal barrier/.test(normalized)) return "microbiome-infectious-disease";
   if (/synthetic biology|genetic circuit|dbtl|design build test learn|dna assembly|golden gate|gibson|plasmid vector|synthetic operon|biosensor|kill switch|chassis cell|metabolic engineering|pathway flux|strain library|bioreactor|engineered organism/.test(normalized)) return "synthetic-biology";
   if (/protein engineering|protein design|directed evolution|affinity maturation|binding pocket|protein domain|variant library|enzyme kinetics|protein stability|developability|purification column|structure prediction|binder optimization|nanobody|scfv/.test(normalized)) return "protein-engineering";
+  if (/lab automation|liquid handler|automated liquid handler|robotic arm|robotic gripper|plate handler|plate stack|plate reader|barcode scanner|lims|assay scheduler|sample tracker|automation qc|qc gate|incubator stack|automated microscope|acoustic dispenser|colony picker|deck layout|tip rack|reagent reservoir|automation orchestrator|robotic rail/.test(normalized)) return "lab-automation";
   if (/drug|compound|hit triage|lead|admet|toxicity|target validation|candidate nomination|pharma|potency|selectivity/.test(normalized)) return "drug-discovery";
   if (/perturb|crispr|screen|guide|lentiviral/.test(normalized)) return "perturb-seq-crispr";
   if (/publication|manuscript|paper|results?|figure panel|multi-panel|volcano|heatmap|result panel/.test(normalized)) return "publication-results-panels";
