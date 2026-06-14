@@ -40,12 +40,12 @@ import { exportProject } from "../packages/export/src/index.ts";
 
 test("premium asset registry has growing complete curated assets", () => {
   const validation = validatePremiumAssetRegistry();
-  assert.equal(CURATED_ASSETS.length, 361);
+  assert.equal(CURATED_ASSETS.length, 392);
   assert.deepEqual(validation.issues, []);
 
   const ids = new Set(CURATED_ASSETS.map((asset) => asset.id));
-  assert.equal(ids.size, 361);
-  assert.equal(CURATED_ASSETS.filter((asset) => asset.category.startsWith("Biology /")).length, 281);
+  assert.equal(ids.size, 392);
+  assert.equal(CURATED_ASSETS.filter((asset) => asset.category.startsWith("Biology /")).length, 312);
   assert.equal(CURATED_ASSETS.filter((asset) => asset.category.startsWith("AI /")).length, 80);
 });
 
@@ -219,9 +219,9 @@ test("commercial signature and hero assets have v2 recipes and quality metadata"
   const premiumIds = new Set(premiumAssets.map((asset) => asset.id));
   const recipes = new Set(premiumAssets.map((asset) => asset.renderSpec.assetRecipe));
 
-  assert.equal(HERO_ASSET_IDS.length, 296);
-  assert.equal(premiumAssets.length, 296);
-  assert.equal(recipes.size, 296);
+  assert.equal(HERO_ASSET_IDS.length, 327);
+  assert.equal(premiumAssets.length, 327);
+  assert.equal(recipes.size, 327);
   assert.ok(CURATED_ASSETS.filter((asset) => asset.qualityTier === "signature").length >= 20);
   for (const assetId of HERO_ASSET_IDS) {
     const asset = getAsset(assetId);
@@ -799,6 +799,32 @@ test("anatomy organ systems broad pack assets expose dedicated premium recipe ma
   }
 });
 
+test("methods and protocols broad pack assets expose dedicated premium recipe markers", () => {
+  const expectedMarkers: Record<string, RegExp[]> = {
+    "protocol-overview": [/asset-methods-protocol-overview/, /asset-methods-step-node/, /asset-methods-review-gate/],
+    "sample-prep-workflow": [/asset-methods-sample-prep-workflow/, /asset-sample-prep-input-tube/, /asset-sample-prep-cleanup/],
+    "reagent-mastermix": [/asset-methods-reagent-mastermix/, /asset-reagent-mastermix-bottle/, /asset-reagent-mastermix-droplet/],
+    "serial-dilution": [/asset-methods-serial-dilution/, /asset-serial-dilution-tube-row/, /asset-serial-dilution-gradient/],
+    "qpcr-assay": [/asset-methods-qpcr-assay/, /asset-qpcr-instrument/, /asset-qpcr-amplification-curve/],
+    "elisa-assay": [/asset-methods-elisa-assay/, /asset-elisa-plate/, /asset-elisa-antibody-bridge/],
+    "western-blot-workflow": [/asset-methods-western-blot-workflow/, /asset-western-blot-gel/, /asset-western-blot-bands/],
+    "protocol-qc-gate": [/asset-methods-protocol-qc-gate/, /asset-protocol-qc-gate-shield/, /asset-protocol-qc-check/],
+    "standard-curve": [/asset-methods-standard-curve/, /asset-standard-curve-fit/, /asset-standard-curve-points/],
+    "method-safety-note": [/asset-methods-method-safety-note/, /asset-method-safety-note-card/, /asset-method-safety-note-badge/]
+  };
+
+  for (const [assetId, markers] of Object.entries(expectedMarkers)) {
+    const asset = getAsset(assetId);
+    const svg = renderPremiumAssetSvg(assetId, { styleProfile: "consulting-2p5d", width: 180, height: 140 });
+    assert.match(svg, /commercial-premium-asset/);
+    assert.match(svg, new RegExp(`data-recipe="hero-${assetId}"`));
+    assert.ok(asset.workflowPacks.includes("methods-and-protocols"));
+    assert.ok(asset.qualityTier === "signature" || asset.qualityTier === "hero");
+    assert.ok(svg.length > 1800, `${assetId} render is too small to be a premium methods/protocols asset`);
+    for (const marker of markers) assert.match(svg, marker);
+  }
+});
+
 test("spatial transcriptomics assets expose premium map and image-analysis markers", () => {
   const expectedMarkers: Record<string, RegExp[]> = {
     "visium-spot-array": [
@@ -897,7 +923,7 @@ test("spatial results template uses compact copy and roomier heatmap", () => {
 
 test("premium style profiles and workflow packs are queryable", () => {
   const packs = listWorkflowPacks();
-  assert.equal(packs.length, 15);
+  assert.equal(packs.length, 16);
   assert.ok(packs.every((pack) => pack.assetIds.length >= 20));
   assert.ok(packs.every((pack) => pack.templates.length >= 4));
   assert.ok(packs.every((pack) => pack.flagshipTemplateId));
@@ -1049,18 +1075,18 @@ test("workflow pack export snapshots summarize fallbacks and next actions", () =
 
 test("premium coverage roadmap exposes 12 month targets and ontology contracts", () => {
   const coverage = getAssetCoverageGapReport();
-  assert.equal(coverage.baseline.totalAssets, 361);
-  assert.equal(coverage.baseline.signatureHeroAssets, 296);
-  assert.equal(coverage.baseline.workflowPacks, 15);
-  assert.equal(coverage.baseline.templates, 65);
+  assert.equal(coverage.baseline.totalAssets, 392);
+  assert.equal(coverage.baseline.signatureHeroAssets, 327);
+  assert.equal(coverage.baseline.workflowPacks, 16);
+  assert.equal(coverage.baseline.templates, 69);
   assert.equal(coverage.productWedge, "asset-breadth-library");
   assert.equal(coverage.firstWave, "broad-biology-market");
   assert.equal(coverage.qualityGate, "pack-complete-premium");
   assert.deepEqual(coverage.broadMarketPackOrder.slice(0, 5), ["drug-discovery", "protein-engineering", "synthetic-biology", "microbiome-infectious-disease", "cell-therapy"]);
   assert.equal(coverage.packMinimumContract.minSignatureHeroAssets, 12);
   assert.equal(coverage.packMinimumContract.requiresAgentPath, true);
-  assert.ok(coverage.milestones.some((milestone) => milestone.targetAssets === 1200 && milestone.remainingAssets === 839));
-  assert.ok(coverage.milestones.some((milestone) => milestone.targetWorkflowPacks === 24 && milestone.remainingWorkflowPacks === 9));
+  assert.ok(coverage.milestones.some((milestone) => milestone.targetAssets === 1200 && milestone.remainingAssets === 808));
+  assert.ok(coverage.milestones.some((milestone) => milestone.targetWorkflowPacks === 24 && milestone.remainingWorkflowPacks === 8));
   assert.ok(coverage.plannedWorkflowPacks.some((pack) => pack.id === "bio-llm-benchmarks" && pack.wave === "jk-aligned"));
   assert.ok(coverage.plannedWorkflowPacks.some((pack) => pack.id === "drug-discovery" && pack.wave === "commercial-broad"));
   assert.equal(coverage.plannedWorkflowPacks.filter((pack) => pack.wave === "commercial-broad")[0].id, "drug-discovery");
@@ -1415,6 +1441,48 @@ test("agent-facing pack and asset-set recommendations are workflow aware", () =>
   for (const assetId of expectedAnatomyCore) assert.ok(anatomyInsertIds.includes(assetId), `${assetId} should be an insert-ready anatomy organ systems core anchor`);
   assert.ok(anatomySet.insertPlan.every((action) => action.tool === "insert_premium_asset" && action.args.styleProfile === "consulting-2p5d"));
 
+  const methodsPackRecommendations = recommendWorkflowPack({
+    title: "Methods protocol overview with qPCR ELISA controls and QC",
+    narrative: "Sample preparation, reagent mastermix, serial dilution, incubation, wash step, PCR amplification, qPCR assay, ELISA, standard curve, replicate layout, controls, protocol QC gate, and method safety caveat.",
+    limit: 3
+  });
+  assert.equal(methodsPackRecommendations[0].pack.id, "methods-and-protocols");
+  assert.equal(methodsPackRecommendations[0].recommendedTemplateId, "methods-protocol-overview");
+
+  const methodsSet = recommendAssetSet({
+    title: "Methods and protocols overview slide",
+    sourceText: "Build a high-level method figure from sample prep to reagent mastermix, serial dilution, incubation, wash, magnetic bead cleanup, PCR amplification, qPCR assay, ELISA assay, western blot workflow, replicate layout, control sample set, standard curve, sample normalization, protocol QC gate, and method safety note.",
+    styleProfile: "consulting-2p5d",
+    limit: 35
+  });
+  const methodsInsertIds = methodsSet.insertPlan.map((action) => action.args.assetId);
+  const expectedMethodsCore = [
+    "protocol-overview",
+    "sample-prep-workflow",
+    "reagent-mastermix",
+    "serial-dilution",
+    "incubation-step",
+    "wash-step",
+    "centrifugation-step",
+    "magnetic-bead-cleanup",
+    "pcr-amplification",
+    "qpcr-assay",
+    "rt-qpcr-assay",
+    "elisa-assay",
+    "western-blot-workflow",
+    "gel-imaging",
+    "immunostaining",
+    "protocol-checklist",
+    "protocol-qc-gate",
+    "replicate-layout",
+    "control-sample-set",
+    "standard-curve"
+  ];
+  assert.equal(methodsSet.workflowPack, "methods-and-protocols");
+  assert.equal(methodsSet.templateId, "methods-protocol-overview");
+  for (const assetId of expectedMethodsCore) assert.ok(methodsInsertIds.includes(assetId), `${assetId} should be an insert-ready methods and protocols core anchor`);
+  assert.ok(methodsSet.insertPlan.every((action) => action.tool === "insert_premium_asset" && action.args.styleProfile === "consulting-2p5d"));
+
   const drugPackRecommendations = recommendWorkflowPack({
     title: "Drug discovery hit validation and lead optimization slide",
     narrative: "Target validation, compound library screen, hit triage, toxicity review, and candidate nomination.",
@@ -1697,6 +1765,18 @@ test("priority flagship templates generate commercial editable figure structures
   assert.ok(anatomy.some((node) => node.kind === "symbol" && node.payload.layoutHint?.startsWith("anatomy-organ-system-overview:stage-")));
   assert.ok(anatomy.every((node) => node.payload.workflowPack === "anatomy-organ-systems" && node.payload.templateId === "anatomy-organ-system-overview"));
 
+  const methods = createWorkflowFigureNodes({ templateId: "methods-protocol-overview", styleProfile: "consulting-2p5d" });
+  assert.ok(methods.length >= 80);
+  assert.ok(methods.some((node) => node.kind === "text" && node.payload.text?.includes("Methods and protocol overview")));
+  assert.ok(methods.some((node) => node.kind === "text" && node.payload.text?.includes("Decision spine: sample preparation")));
+  assert.ok(methods.some((node) => node.kind === "text" && node.payload.text === "method-caveat-review"));
+  assert.ok(methods.some((node) => node.kind === "plot" && node.payload.spec.plotType === "line" && node.payload.spec.title === "QC signal"));
+  for (const assetId of ["sample-prep-workflow", "reagent-mastermix", "pcr-amplification", "qpcr-assay", "protocol-qc-gate", "serial-dilution", "plate-96", "replicate-layout", "control-sample-set", "incubation-step", "wash-step", "magnetic-bead-cleanup", "western-blot-workflow", "elisa-assay", "standard-curve", "protocol-checklist", "method-safety-note"]) {
+    assert.ok(methods.some((node) => node.kind === "symbol" && node.payload.assetId === assetId), `${assetId} should appear in methods and protocols flagship`);
+  }
+  assert.ok(methods.some((node) => node.kind === "symbol" && node.payload.layoutHint?.startsWith("methods-protocol-overview:stage-")));
+  assert.ok(methods.every((node) => node.payload.workflowPack === "methods-and-protocols" && node.payload.templateId === "methods-protocol-overview"));
+
   const hybridTemplate = getWorkflowTemplate("spatial-realistic-hybrid-panel");
   assert.equal(hybridTemplate.recommendedStyleProfile, "scientific-editorial-realism");
   assert.ok(hybridTemplate.previewAssetIds.includes("realistic-he-tissue-section"));
@@ -1792,16 +1872,16 @@ test("priority flagship templates generate commercial editable figure structures
 
 test("asset quality report captures benchmark-driven coverage gaps", () => {
   const report = getAssetQualityReport();
-  assert.equal(report.summary.totalAssets, 361);
-  assert.equal(report.summary.biologyAssets, 281);
+  assert.equal(report.summary.totalAssets, 392);
+  assert.equal(report.summary.biologyAssets, 312);
   assert.equal(report.summary.aiAssets, 80);
-  assert.equal(report.tierCounts.signature + report.tierCounts.hero, 296);
-  assert.equal(report.workflowCoverage.length, 15);
+  assert.equal(report.tierCounts.signature + report.tierCounts.hero, 327);
+  assert.equal(report.workflowCoverage.length, 16);
   assert.ok(report.workflowCoverage.every((pack) => pack.missingAssetIds.length === 0));
   assert.ok(report.workflowCoverage.every((pack) => pack.missingTemplateIds.length === 0));
   assert.ok(report.workflowCoverage.every((pack) => pack.templateCount >= 4));
   assert.ok(report.workflowCoverage.every((pack) => pack.flagshipTemplateId));
-  assert.ok(report.styleCoverage.every((style) => style.count === 361));
+  assert.ok(report.styleCoverage.every((style) => style.count === 392));
   assert.ok(report.benchmarks.some((benchmark) => benchmark.id === "biorender"));
   assert.ok(report.benchmarks.some((benchmark) => benchmark.id === "figma-components"));
   assert.ok(report.qualityRubric.some((item) => item.includes("Recognizable at 48px")));
@@ -1815,7 +1895,8 @@ test("asset quality report captures benchmark-driven coverage gaps", () => {
   assert.ok(report.workflowCoverage.some((pack) => pack.id === "microscopy-image-analysis" && pack.signatureOrHeroCount >= 12 && pack.qaStatus === "premium"));
   assert.ok(report.workflowCoverage.some((pack) => pack.id === "lab-automation" && pack.signatureOrHeroCount >= 12 && pack.qaStatus === "premium"));
   assert.ok(report.workflowCoverage.some((pack) => pack.id === "anatomy-organ-systems" && pack.signatureOrHeroCount >= 12 && pack.qaStatus === "premium"));
-  assert.deepEqual(report.recommendedNextPacks.slice(0, 3), ["methods-and-protocols", "grant-and-consulting-summary", "clinical-translational"]);
+  assert.ok(report.workflowCoverage.some((pack) => pack.id === "methods-and-protocols" && pack.signatureOrHeroCount >= 12 && pack.qaStatus === "premium"));
+  assert.deepEqual(report.recommendedNextPacks.slice(0, 3), ["grant-and-consulting-summary", "clinical-translational", "immunology-oncology"]);
 });
 
 test("premium asset appearance overrides survive rendering and export", () => {

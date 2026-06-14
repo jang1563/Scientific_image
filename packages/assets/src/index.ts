@@ -560,7 +560,8 @@ export const BROAD_MARKET_PACK_ORDER = [
   "cell-therapy",
   "microscopy-image-analysis",
   "lab-automation",
-  "anatomy-organ-systems"
+  "anatomy-organ-systems",
+  "methods-and-protocols"
 ];
 
 const COMMERCIAL_PACK_MINIMUM_CONTRACT = {
@@ -648,8 +649,8 @@ const PLANNED_WORKFLOW_PACKS: PlannedWorkflowPack[] = [
     agentUseHints: ["Use for translational study designs, cohort diagrams, and biomarker result decks."]
   },
   {
-    id: "wetlab-methods-protocols",
-    name: "Wetlab methods / protocols",
+    id: "methods-and-protocols",
+    name: "Methods and protocols",
     wave: "jk-aligned",
     priority: 2,
     rationale: "Covers common lab procedure figures and protocol-safe visual communication.",
@@ -1086,6 +1087,16 @@ export const PREMIUM_WORKFLOW_PACKS: WorkflowPack[] = [
     assetIds: ["anatomy-overview", "organ-axis-brain-lung-gut", "brain", "lung", "gut", "liver", "heart", "immune-system", "blood-brain-barrier", "kidney", "spleen", "pancreas", "skin", "bone-marrow", "lymph-node", "vasculature", "respiratory-tract", "intestinal-villus", "renal-nephron", "hepatic-lobule", "cardiac-muscle", "neural-circuit", "blood-vessel", "lymphatic-vessel", "immune-organ-map", "organ-chip", "patient-organ-cohort", "disease-tissue-map", "organ-sample-flow", "tissue-biomarker-panel", "organ-risk-context", "clinical-endpoint-card", "anatomy-callout", "organ-scale-bar", "tissue-region-map", "organ-legend", "organ-system-network", "cross-organ-comparison", "human-cohort", "mouse-model", "organoid-model", "blood-sample", "tissue-section", "histology-section", "cell-immune", "cell-epithelial", "cell-neuron", "cell-hepatocyte", "cell-muscle", "dataset", "metric-card", "spatial-grid"],
     templates: ["anatomy-organ-system-overview", "cross-organ-disease-context", "organ-to-sample-flow", "clinical-anatomy-summary"],
     agentUseHints: ["Use for anatomy-aware study overviews, organ-to-sample workflows, tissue biomarker context, translational evidence, and clinical endpoint slides.", "Keep organ context, tissue region, sample flow, evidence panel, and clinical review as separate editable objects."]
+  },
+  {
+    id: "methods-and-protocols",
+    name: "Methods and protocols",
+    priority: 3,
+    description: "Protocol overview figures, sample preparation, assay setup, readout, controls, timeline, QC, and review-safe method summaries.",
+    flagshipTemplateId: "methods-protocol-overview",
+    assetIds: ["protocol-overview", "sample-prep-workflow", "reagent-mastermix", "serial-dilution", "incubation-step", "wash-step", "centrifugation-step", "magnetic-bead-cleanup", "pcr-amplification", "qpcr-assay", "rt-qpcr-assay", "elisa-assay", "western-blot-workflow", "gel-imaging", "immunostaining", "fixation-permeabilization", "cell-culture-passaging", "transfection-step", "library-prep-workflow", "assay-timeline", "protocol-checklist", "protocol-qc-gate", "replicate-layout", "control-sample-set", "standard-curve", "reagent-compatibility", "temperature-profile", "sample-normalization", "aliquot-plan", "protocol-deviation", "method-safety-note", "pipette", "plate-96", "plate-384", "centrifuge", "incubator", "gel-electrophoresis", "western-blot", "qpcr-machine", "flow-cytometry", "sequencer", "microscope", "biosafety-cabinet", "dataset", "metric-card"],
+    templates: ["methods-protocol-overview", "sample-prep-to-readout", "assay-qc-summary", "protocol-timeline-panel"],
+    agentUseHints: ["Use for protocol-safe method overview slides, manuscript methods schematics, SOP summary decks, and assay setup figures.", "Keep sample preparation, reagent setup, assay execution, readout, controls, QC, and safety/review caveats as separate editable objects."]
   },
   {
     id: "space-biology-genelab",
@@ -1665,6 +1676,54 @@ export const PREMIUM_WORKFLOW_TEMPLATES: WorkflowTemplate[] = [
     qaChecklist: ["Endpoint status is source-backed or marked draft.", "Cohort/sample context is visible.", "PPTX fallback warnings name exact anatomy assets."]
   },
   {
+    id: "methods-protocol-overview",
+    workflowPack: "methods-and-protocols",
+    name: "Methods protocol overview",
+    description: "Sample preparation, reagent setup, assay execution, readout, controls, QC, and review-safe method caveats for manuscript or deck method slides.",
+    layout: "workflow",
+    recommendedStyleProfile: "consulting-2p5d",
+    previewAssetIds: ["protocol-overview", "sample-prep-workflow", "reagent-mastermix", "protocol-qc-gate"],
+    nodeKinds: ["shape", "text", "symbol", "plot", "connector"],
+    agentUseHints: ["Use as the flagship methods slide from notes about protocol summary, sample prep, assay setup, readout, controls, or method validation.", "Keep visual communication high-level; do not convert into operational hidden procedural instructions."],
+    qaChecklist: ["Protocol steps are schematic and non-operational.", "Controls and QC are visible.", "Method caveats and provenance are reviewable before export."]
+  },
+  {
+    id: "sample-prep-to-readout",
+    workflowPack: "methods-and-protocols",
+    name: "Sample prep to readout",
+    description: "Editable workflow from biological sample to cleanup, amplification, assay readout, and data handoff.",
+    layout: "workflow",
+    recommendedStyleProfile: "consulting-2p5d",
+    previewAssetIds: ["sample-prep-workflow", "magnetic-bead-cleanup", "pcr-amplification", "standard-curve"],
+    nodeKinds: ["shape", "text", "symbol", "connector"],
+    agentUseHints: ["Use for methods sections, lab meeting assay overview, and assay-to-data handoff figures.", "Separate sample handling, cleanup, amplification, readout, and data interpretation as explicit objects."],
+    qaChecklist: ["Sample and assay stages are clearly labeled.", "No timing or concentration detail is implied unless source-backed.", "Export warnings name exact method assets."]
+  },
+  {
+    id: "assay-qc-summary",
+    workflowPack: "methods-and-protocols",
+    name: "Assay QC summary",
+    description: "Controls, replicate layout, standard curve, normalization, protocol deviation, and QC gate summary panel.",
+    layout: "results",
+    recommendedStyleProfile: "consulting-2p5d",
+    previewAssetIds: ["control-sample-set", "replicate-layout", "standard-curve", "protocol-qc-gate"],
+    nodeKinds: ["shape", "text", "symbol", "plot"],
+    agentUseHints: ["Use when the brief asks for controls, assay validation, standard curve, replicates, or method QC.", "Keep QC thresholds marked illustrative unless source data is imported."],
+    qaChecklist: ["Control/sample labels fit.", "QC thresholds are not overclaimed.", "Plot evidence is synthetic or source-backed."]
+  },
+  {
+    id: "protocol-timeline-panel",
+    workflowPack: "methods-and-protocols",
+    name: "Protocol timeline panel",
+    description: "Timeline-style method overview with setup, incubation, wash, readout, review, and safety caveat checkpoints.",
+    layout: "pipeline",
+    recommendedStyleProfile: "consulting-2p5d",
+    previewAssetIds: ["assay-timeline", "incubation-step", "wash-step", "method-safety-note"],
+    nodeKinds: ["shape", "text", "symbol", "connector"],
+    agentUseHints: ["Use for non-operational protocol timeline summaries in talks, posters, or consulting decks.", "Show order and review gates, not executable step-by-step conditions."],
+    qaChecklist: ["Timeline labels remain compact.", "Safety/review caveat is visible.", "PPTX fallback warnings name exact method assets."]
+  },
+  {
     id: "spatial-workflow",
     workflowPack: "spatial-transcriptomics",
     name: "Spatial workflow",
@@ -2049,6 +2108,31 @@ const SIGNATURE_ASSET_IDS = new Set([
   "tissue-biomarker-panel",
   "clinical-endpoint-card",
   "organ-system-network",
+  "protocol-overview",
+  "sample-prep-workflow",
+  "reagent-mastermix",
+  "serial-dilution",
+  "incubation-step",
+  "wash-step",
+  "centrifugation-step",
+  "magnetic-bead-cleanup",
+  "pcr-amplification",
+  "qpcr-assay",
+  "rt-qpcr-assay",
+  "elisa-assay",
+  "western-blot-workflow",
+  "gel-imaging",
+  "immunostaining",
+  "fixation-permeabilization",
+  "library-prep-workflow",
+  "assay-timeline",
+  "protocol-checklist",
+  "protocol-qc-gate",
+  "replicate-layout",
+  "control-sample-set",
+  "standard-curve",
+  "sample-normalization",
+  "method-safety-note",
   "medicinal-chemistry-cycle",
   "efficacy-model",
   "ind-enabling-package",
@@ -2219,6 +2303,45 @@ const BIOLOGY_SEEDS: AssetSeed[] = [
     ["qc-gate-automation", "Automation QC gate", "automation qc gate threshold run acceptance"],
     ["lab-sensor", "Lab sensor", "lab sensor telemetry temperature humidity status"]
   ], "#2563eb"),
+  ...biology("Methods and protocols", "workflowBlock", "process", [
+    ["protocol-overview", "Protocol overview", "methods protocol overview schematic workflow"],
+    ["sample-prep-workflow", "Sample prep workflow", "sample preparation workflow extraction cleanup assay"],
+    ["reagent-mastermix", "Reagent mastermix", "reagent mastermix tube mix assay setup"],
+    ["serial-dilution", "Serial dilution", "serial dilution gradient assay calibration"],
+    ["incubation-step", "Incubation step", "incubation step method timeline"],
+    ["wash-step", "Wash step", "wash step buffer method protocol"],
+    ["centrifugation-step", "Centrifugation step", "centrifugation spin sample prep protocol"],
+    ["magnetic-bead-cleanup", "Magnetic bead cleanup", "magnetic bead cleanup purification sample prep"],
+    ["pcr-amplification", "PCR amplification", "pcr amplification thermocycler method"],
+    ["library-prep-workflow", "Library prep workflow", "library preparation sequencing sample prep"],
+    ["assay-timeline", "Assay timeline", "assay timeline method schedule"],
+    ["aliquot-plan", "Aliquot plan", "aliquot plan sample split protocol"],
+    ["cell-culture-passaging", "Cell culture passaging", "cell culture passaging method"],
+    ["transfection-step", "Transfection step", "transfection delivery method cell culture"],
+    ["fixation-permeabilization", "Fixation permeabilization", "fixation permeabilization immunostaining method"]
+  ], "#0d9488"),
+  ...biology("Methods and protocols", "instrument", "assay", [
+    ["qpcr-assay", "qPCR assay", "qpcr assay amplification curve method"],
+    ["rt-qpcr-assay", "RT-qPCR assay", "reverse transcription qpcr assay method"],
+    ["elisa-assay", "ELISA assay", "elisa plate antibody assay"],
+    ["western-blot-workflow", "Western blot workflow", "western blot protein transfer membrane antibody"],
+    ["gel-imaging", "Gel imaging", "gel imaging electrophoresis bands"],
+    ["immunostaining", "Immunostaining", "immunostaining antibody fluorescence method"]
+  ], "#0891b2"),
+  ...biology("Methods and protocols", "metricPanel", "evaluation", [
+    ["protocol-checklist", "Protocol checklist", "protocol checklist method review"],
+    ["replicate-layout", "Replicate layout", "replicate layout controls plate map"],
+    ["control-sample-set", "Control sample set", "positive negative control sample set"],
+    ["standard-curve", "Standard curve", "standard curve assay calibration"],
+    ["reagent-compatibility", "Reagent compatibility", "reagent compatibility matrix"],
+    ["temperature-profile", "Temperature profile", "temperature profile thermocycler incubation"],
+    ["sample-normalization", "Sample normalization", "sample normalization input equalization"],
+    ["protocol-deviation", "Protocol deviation", "protocol deviation exception log"]
+  ], "#2563eb"),
+  ...biology("Methods and protocols", "riskGate", "risk", [
+    ["protocol-qc-gate", "Protocol QC gate", "protocol qc gate acceptance review"],
+    ["method-safety-note", "Method safety note", "method safety note caveat review"]
+  ], "#dc2626"),
   ...biology("Spatial and imaging", "spatial", "assay", [
     ["spatial-grid", "Spatial transcriptomics grid", "spatial transcriptomics visium"],
     ["visium-spot-array", "Visium spot array", "spatial spot"],
@@ -2739,11 +2862,11 @@ export function getAssetQualityReport(): AssetQualityReport {
     qualityRubric: [...ASSET_QUALITY_RUBRIC],
     priorityGaps: buildPriorityGaps(workflowCoverage, styleCoverage),
     recommendedNextPacks: [
-      "methods-and-protocols",
       "grant-and-consulting-summary",
       "clinical-translational",
       "immunology-oncology",
-      "bio-llm-benchmarks"
+      "bio-llm-benchmarks",
+      "biosafety-permissioning"
     ]
   };
 }
@@ -2816,8 +2939,9 @@ export function getAssetCoverageGapReport(): AssetCoverageGapReport {
       "Use microscopy-image-analysis as the sixth active broad-market pack and audit field/channel/z-stack/segmentation/tracking/phenotyping/QC visual QA.",
       "Use lab-automation as the seventh active broad-market pack and audit liquid handling, robotics, plate logistics, LIMS, scheduling, and QC visual QA.",
       "Use anatomy-organ-systems as the eighth active broad-market pack and audit organ maps, tissue modules, sample flow, biomarker evidence, and clinical endpoint review.",
+      "Use methods-and-protocols as the ninth active broad-market pack and audit sample prep, reagent setup, assay readout, controls, QC, and method caveat visual QA.",
       "Promote or add pack-specific signature assets for target validation, compound library, toxicity screen, ADMET, candidate nomination, and assay evidence.",
-      "Add the next broad packs in order: methods-and-protocols, grant-and-consulting-summary.",
+      "Add the next broad packs in order: grant-and-consulting-summary, clinical-translational.",
       "Keep MCP/API recommendations pack-first so Codex or Claude can request workflowPack, templateId, assetId, styleProfile, semanticSlot, and appearance overrides."
     ]
   };
@@ -4527,6 +4651,37 @@ const WORKFLOW_CORE_ASSET_IDS: Record<string, string[]> = {
     "patient-organ-cohort",
     "tissue-region-map",
     "human-cohort"
+  ],
+  "methods-and-protocols": [
+    "protocol-overview",
+    "sample-prep-workflow",
+    "reagent-mastermix",
+    "serial-dilution",
+    "incubation-step",
+    "wash-step",
+    "centrifugation-step",
+    "magnetic-bead-cleanup",
+    "pcr-amplification",
+    "qpcr-assay",
+    "rt-qpcr-assay",
+    "elisa-assay",
+    "western-blot-workflow",
+    "gel-imaging",
+    "immunostaining",
+    "fixation-permeabilization",
+    "library-prep-workflow",
+    "assay-timeline",
+    "protocol-checklist",
+    "protocol-qc-gate",
+    "replicate-layout",
+    "control-sample-set",
+    "standard-curve",
+    "sample-normalization",
+    "method-safety-note",
+    "pipette",
+    "plate-96",
+    "centrifuge",
+    "incubator"
   ]
 };
 
@@ -6424,6 +6579,7 @@ function createTemplateFigureNodes(pack: WorkflowPack, template: WorkflowTemplat
   if (template.id === "microscopy-image-analysis-pipeline") return createMicroscopyImageAnalysisFlagshipTemplateNodes(template, input);
   if (template.id === "lab-automation-platform") return createLabAutomationFlagshipTemplateNodes(template, input);
   if (template.id === "anatomy-organ-system-overview") return createAnatomyOrganSystemsFlagshipTemplateNodes(template, input);
+  if (template.id === "methods-protocol-overview") return createMethodsProtocolsFlagshipTemplateNodes(template, input);
   if (template.id === "ai-biosecurity-pipeline") return createAiBiosecurityFlagshipTemplateNodes(template, input);
   if (template.id === "permissioning-ladder") return createPermissioningLadderTemplateNodes(template, input);
   if (template.id === "benchmark-dashboard") return createBenchmarkDashboardTemplateNodes(template, input);
@@ -9136,6 +9292,252 @@ function createAnatomyOrganSystemsFlagshipTemplateNodes(template: WorkflowTempla
   return nodes.map((node, index) => ({ ...node, transform: { ...node.transform, z: index } }));
 }
 
+function createMethodsProtocolsFlagshipTemplateNodes(template: WorkflowTemplate, input: {
+  styleProfile?: AssetStyleProfile;
+  x?: number;
+  y?: number;
+  width?: number;
+}): SceneNode[] {
+  const styleProfile = input.styleProfile ?? template.recommendedStyleProfile;
+  const x = input.x ?? 72;
+  const y = input.y ?? 104;
+  const width = input.width ?? 1064;
+  const theme = flagshipStyleTheme(styleProfile, "blue");
+  const source = curatedProvenance("Synthetic methods-and-protocols flagship demo data generated by Scientific Image", "Scientific Image methods-and-protocols workflow pack fixture");
+  const figureText = (text: string, transform: Transform, style: Style = {}): SceneNode => ({
+    ...createTextNode(text, transform, style),
+    claimStatus: "draft-visual"
+  });
+  const figureShape = (shape: "round-rect" | "ellipse" | "rect" | "diamond" | "line", label: string, transform: Transform, style: Style = {}): SceneNode => ({
+    ...createShapeNode(shape, label, transform, style),
+    claimStatus: "draft-visual"
+  });
+  const symbol = (
+    assetId: string,
+    label: string,
+    sx: number,
+    sy: number,
+    sw: number,
+    sh: number,
+    layoutHint: string,
+    appearance: SymbolAppearance = {},
+    profile: AssetStyleProfile = styleProfile
+  ): SceneNode => createCuratedSymbolNode({
+    assetId,
+    label,
+    x: sx,
+    y: sy,
+    width: sw,
+    height: sh,
+    styleProfile: profile,
+    semanticRole: "methods-and-protocols",
+    layoutHint,
+    appearance: { ...theme.symbolAppearance, ...appearance }
+  });
+  const nodes: SceneNode[] = [
+    figureShape("round-rect", "", createTransform(x - 18, y - 44, width + 36, 538), {
+      fill: theme.outerFill,
+      stroke: theme.outerStroke,
+      strokeWidth: 2,
+      depth: theme.outerDepth
+    }),
+    figureText("Methods and protocol overview", createTransform(x, y - 32, 560, 30), {
+      fontSize: 22,
+      fontWeight: 900,
+      color: theme.heading
+    }),
+    figureText("Editable method communication separates sample prep, reagent setup, assay readout, controls, QC, and review caveats without becoming an operational protocol.", createTransform(x + 590, y - 34, width - 590, 44), {
+      fontSize: 11.2,
+      fontWeight: 650,
+      color: theme.muted
+    }),
+    figureShape("round-rect", "", createTransform(x + 4, y + 12, 224, 28), {
+      fill: theme.chipFill,
+      stroke: theme.chipStroke,
+      strokeWidth: 1,
+      depth: "surface"
+    }),
+    figureText("pack: methods-and-protocols", createTransform(x + 18, y + 17, 194, 18), {
+      fontSize: 10.2,
+      fontWeight: 850,
+      color: theme.accent
+    }),
+    figureShape("round-rect", "", createTransform(x + 242, y + 12, 344, 28), {
+      fill: theme.chipAltFill,
+      stroke: theme.isLine ? "#111827" : theme.isDark ? "#334155" : "#bbf7d0",
+      strokeWidth: 1,
+      depth: "surface"
+    }),
+    figureText("agent-ready sample -> assay -> QC path", createTransform(x + 258, y + 17, 310, 18), {
+      fontSize: 10.2,
+      fontWeight: 850,
+      color: theme.accent2
+    })
+  ];
+
+  const stageY = y + 64;
+  const stageH = 164;
+  const stageW = Math.round((width - 64) / 5);
+  const stages: Array<{ assetId: string; label: string; kind: string; note: string; accent: string; profile?: AssetStyleProfile }> = [
+    { assetId: "sample-prep-workflow", label: "Sample", kind: "prep", note: "source + aliquot", accent: theme.accent },
+    { assetId: "reagent-mastermix", label: "Reagents", kind: "setup", note: "mastermix + controls", accent: "#0d9488" },
+    { assetId: "pcr-amplification", label: "Assay", kind: "reaction", note: "amplify / bind", accent: "#7c3aed" },
+    { assetId: "qpcr-assay", label: "Readout", kind: "signal", note: "curve + endpoint", accent: theme.accent2 },
+    { assetId: "protocol-qc-gate", label: "Review", kind: "QC gate", note: "controls + caveat", accent: theme.warningText, profile: theme.riskSymbolProfile }
+  ];
+  stages.forEach((stage, index) => {
+    const sx = x + index * (stageW + 16);
+    const reviewStage = index === stages.length - 1;
+    nodes.push(figureShape("round-rect", "", createTransform(sx, stageY, stageW, stageH), {
+      fill: reviewStage ? theme.warningFill : index % 2 ? theme.panelAltFill : theme.panelFill,
+      stroke: reviewStage ? theme.warningStroke : theme.panelStroke,
+      strokeWidth: 1.25,
+      depth: reviewStage ? theme.floatingDepth : theme.panelDepth
+    }));
+    nodes.push(figureShape("round-rect", "", createTransform(sx + 12, stageY + 12, 36, 20), {
+      fill: theme.isDark ? "#0f172a" : "#ffffff",
+      stroke: reviewStage ? theme.warningStroke : theme.panelStroke,
+      strokeWidth: 1,
+      depth: "surface"
+    }));
+    nodes.push(figureText(`0${index + 1}`, createTransform(sx + 21, stageY + 16, 18, 12), {
+      fontSize: 8.8,
+      fontWeight: 950,
+      color: reviewStage ? theme.warningText : stage.accent
+    }));
+    nodes.push(figureShape("round-rect", "", createTransform(sx + stageW - 86, stageY + 12, 72, 20), {
+      fill: reviewStage ? theme.warningFill : theme.chipFill,
+      stroke: reviewStage ? theme.warningStroke : theme.chipStroke,
+      strokeWidth: 1,
+      depth: "surface"
+    }));
+    nodes.push(figureText(stage.kind, createTransform(sx + stageW - 75, stageY + 16, 50, 12), {
+      fontSize: 7.2,
+      fontWeight: 850,
+      color: reviewStage ? theme.warningText : stage.accent
+    }));
+    nodes.push(symbol(stage.assetId, stage.label, sx + Math.round((stageW - 112) / 2), stageY + 34, 112, 86, `${template.id}:stage-${index + 1}`, { accent: stage.accent, stroke: stage.accent, labelVisible: false }, stage.profile ?? styleProfile));
+    nodes.push(figureText(stage.label, createTransform(sx + 14, stageY + 122, stageW - 28, 18), {
+      fontSize: 12,
+      fontWeight: 900,
+      color: reviewStage ? theme.warningText : theme.text
+    }));
+    nodes.push(figureText(stage.note, createTransform(sx + 14, stageY + 142, stageW - 28, 16), {
+      fontSize: 9.2,
+      fontWeight: 720,
+      color: theme.muted
+    }));
+    if (index > 0) {
+      nodes.push(createConnectorNode([
+        { x: sx - 16, y: stageY + 82 },
+        { x: sx - 2, y: stageY + 82 }
+      ], "", { stroke: theme.connector, strokeWidth: 2.3 }));
+    }
+  });
+  nodes.push(figureShape("round-rect", "", createTransform(x + 4, stageY + stageH + 14, width - 8, 28), {
+    fill: theme.isDark ? "#0f172a" : "#f8fafc",
+    stroke: theme.panelStroke,
+    strokeWidth: 1,
+    depth: "surface"
+  }));
+  nodes.push(figureText("Decision spine: sample preparation -> reagent setup -> assay execution -> readout -> controls and QC review", createTransform(x + 24, stageY + stageH + 20, width - 48, 16), {
+    fontSize: 9.5,
+    fontWeight: 820,
+    color: theme.muted
+  }));
+
+  const lowerY = y + 280;
+  const gap = 22;
+  const panelW = Math.round((width - gap * 2) / 3);
+  const qcTable = {
+    id: createId("table"),
+    name: "Illustrative method QC signal",
+    columns: ["cycle", "signal", "series"],
+    rows: [
+      { cycle: 1, signal: 0.12, series: "qc" },
+      { cycle: 2, signal: 0.28, series: "qc" },
+      { cycle: 3, signal: 0.52, series: "qc" },
+      { cycle: 4, signal: 0.81, series: "qc" }
+    ],
+    source
+  };
+  const addPanel = (tag: string, title: string, status: string, px: number, py: number, pw: number, fill = theme.panelFill, tone = theme.text) => {
+    const review = status === "review";
+    nodes.push(figureShape("round-rect", "", createTransform(px, py, pw, 204), {
+      fill,
+      stroke: review ? theme.warningStroke : theme.panelStroke,
+      strokeWidth: 1.25,
+      depth: theme.panelDepth
+    }));
+    nodes.push(figureShape("round-rect", "", createTransform(px + 14, py + 14, 28, 22), {
+      fill: theme.isDark ? "#0f172a" : "#ffffff",
+      stroke: review ? theme.warningStroke : theme.panelStroke,
+      strokeWidth: 1,
+      depth: "surface"
+    }));
+    nodes.push(figureText(tag, createTransform(px + 14, py + 17, 28, 16), {
+      fontSize: 12,
+      fontWeight: 920,
+      color: tone
+    }));
+    nodes.push(figureText(title, createTransform(px + 52, py + 16, pw - 142, 20), {
+      fontSize: 11.6,
+      fontWeight: 850,
+      color: tone
+    }));
+    nodes.push(figureShape("round-rect", "", createTransform(px + pw - 88, py + 14, 74, 22), {
+      fill: review ? theme.warningFill : theme.chipFill,
+      stroke: review ? theme.warningStroke : theme.chipStroke,
+      strokeWidth: 1,
+      depth: "surface"
+    }));
+    nodes.push(figureText(status, createTransform(px + pw - 76, py + 19, 52, 12), {
+      fontSize: 7.9,
+      fontWeight: 850,
+      color: review ? theme.warningText : tone
+    }));
+  };
+  addPanel("A", "Assay setup", "controls", x, lowerY, panelW, theme.panelFill, theme.accent);
+  addPanel("B", "Method modules", "readout", x + panelW + gap, lowerY, panelW, theme.panelAltFill, theme.accent2);
+  addPanel("C", "QC + caveat", "review", x + (panelW + gap) * 2, lowerY, width - (panelW + gap) * 2, theme.warningFill, theme.warningText);
+  nodes.push(
+    symbol("serial-dilution", "Dilution", x + 20, lowerY + 52, 64, 74, `${template.id}:dilution`, { accent: "#0d9488", stroke: "#0d9488", labelVisible: false }),
+    symbol("plate-96", "Plate", x + 92, lowerY + 52, 64, 74, `${template.id}:plate`, { accent: theme.accent, stroke: theme.accent, labelVisible: false }),
+    symbol("replicate-layout", "Replicates", x + 164, lowerY + 52, 64, 74, `${template.id}:replicates`, { accent: "#2563eb", stroke: "#2563eb", labelVisible: false }),
+    symbol("control-sample-set", "Controls", x + 236, lowerY + 52, 64, 74, `${template.id}:controls`, { accent: "#7c3aed", stroke: "#7c3aed", labelVisible: false }),
+    figureText("Controls, replicates, and reagent setup stay editable as structured objects.", createTransform(x + 24, lowerY + 160, panelW - 48, 24), { fontSize: 10, fontWeight: 720, color: theme.muted }),
+    symbol("incubation-step", "Incubate", x + panelW + gap + 18, lowerY + 52, 58, 72, `${template.id}:incubate`, { accent: "#f59e0b", stroke: "#f59e0b", labelVisible: false }),
+    symbol("wash-step", "Wash", x + panelW + gap + 82, lowerY + 52, 58, 72, `${template.id}:wash`, { accent: "#0891b2", stroke: "#0891b2", labelVisible: false }),
+    symbol("magnetic-bead-cleanup", "Cleanup", x + panelW + gap + 146, lowerY + 52, 58, 72, `${template.id}:cleanup`, { accent: "#0d9488", stroke: "#0d9488", labelVisible: false }),
+    symbol("western-blot-workflow", "Blot", x + panelW + gap + 210, lowerY + 52, 58, 72, `${template.id}:blot`, { accent: "#7c3aed", stroke: "#7c3aed", labelVisible: false }),
+    symbol("elisa-assay", "ELISA", x + panelW + gap + 274, lowerY + 52, 58, 72, `${template.id}:elisa`, { accent: "#dc2626", stroke: "#dc2626", labelVisible: false }),
+    figureText("Method modules can be swapped for qPCR, ELISA, staining, blot, or library prep.", createTransform(x + panelW + gap + 24, lowerY + 160, panelW - 48, 24), { fontSize: 10, fontWeight: 720, color: theme.muted }),
+    symbol("standard-curve", "Curve", x + (panelW + gap) * 2 + 20, lowerY + 52, 66, 76, `${template.id}:curve`, { accent: theme.warningText, stroke: theme.warningText, labelVisible: false }, theme.riskSymbolProfile),
+    symbol("protocol-checklist", "Checklist", x + (panelW + gap) * 2 + 92, lowerY + 52, 66, 76, `${template.id}:checklist`, { accent: theme.warningText, stroke: theme.warningText, labelVisible: false }, theme.riskSymbolProfile),
+    symbol("method-safety-note", "Safety note", x + (panelW + gap) * 2 + 164, lowerY + 52, 66, 76, `${template.id}:safety`, { accent: theme.warningText, stroke: theme.warningText, labelVisible: false }, theme.riskSymbolProfile),
+    createPlotNode({
+      id: createId("plot"),
+      plotType: "line",
+      title: "QC signal",
+      table: qcTable,
+      encodings: { x: "cycle", y: "signal", color: "series" },
+      style: theme.plotStyle
+    }, createTransform(x + (panelW + gap) * 2 + 242, lowerY + 50, 88, 88)),
+    figureShape("round-rect", "", createTransform(x + (panelW + gap) * 2 + 104, lowerY + 148, 210, 24), {
+      fill: theme.isDark ? "#111827" : "#ffffff",
+      stroke: theme.warningStroke,
+      strokeWidth: 1,
+      depth: "surface"
+    }),
+    figureText("method-caveat-review", createTransform(x + (panelW + gap) * 2 + 138, lowerY + 154, 142, 13), {
+      fontSize: 8.2,
+      fontWeight: 850,
+      color: theme.warningText
+    })
+  );
+  return nodes.map((node, index) => ({ ...node, transform: { ...node.transform, z: index } }));
+}
+
 function createSpatialResultsFlagshipTemplateNodes(template: WorkflowTemplate, input: {
   styleProfile?: AssetStyleProfile;
   x?: number;
@@ -11292,6 +11694,7 @@ function inferWorkflowPack(text: string): string | undefined {
   if (/protein engineering|protein design|directed evolution|affinity maturation|binding pocket|protein domain|variant library|enzyme kinetics|protein stability|developability|purification column|structure prediction|binder optimization|nanobody|scfv/.test(normalized)) return "protein-engineering";
   if (/lab automation|liquid handler|automated liquid handler|robotic arm|robotic gripper|plate handler|plate stack|plate reader|barcode scanner|lims|assay scheduler|sample tracker|automation qc|qc gate|incubator stack|automated microscope|acoustic dispenser|colony picker|deck layout|tip rack|reagent reservoir|automation orchestrator|robotic rail/.test(normalized)) return "lab-automation";
   if (/drug|compound|hit triage|lead|admet|toxicity|target validation|candidate nomination|pharma|potency|selectivity/.test(normalized)) return "drug-discovery";
+  if (/(?:^|[^a-z0-9])(?:methods?|protocols?|sample prep(?:aration)?|reagent mastermix|mastermix|serial dilution|incubation|wash step|centrifugation|magnetic bead|pcr amplification|qpcr|rt[-\s]?qpcr|elisa|western blot|gel imaging|immunostaining|fixation|permeabilization|library prep(?:aration)?|assay timeline|protocol checklist|protocol qc|replicate layout|control sample|standard curve|sample normalization|aliquot|protocol deviation|method safety)(?:$|[^a-z0-9])/.test(normalized)) return "methods-and-protocols";
   if (/(?:^|[^a-z0-9])(?:perturb(?:-seq)?|crispr|screens?|screening|guide rnas?|grnas?|lentiviral)(?:$|[^a-z0-9])/.test(normalized)) return "perturb-seq-crispr";
   if (/(?:^|[^a-z0-9])(?:anatomy|organ systems?|cross[-\s]?organ|organ axis|brain[-\s]?lung[-\s]?gut|brain|lung|liver|kidney|heart|spleen|pancreas|skin|bone marrow|lymph node|vasculature|respiratory tract|intestinal villus|renal nephron|hepatic lobule|cardiac muscle|neural circuit|blood vessel|lymphatic vessel|organ sample|tissue biomarker|clinical endpoint)(?:$|[^a-z0-9])/.test(normalized)) return "anatomy-organ-systems";
   if (/publication|manuscript|paper|results?|figure panel|multi-panel|volcano|heatmap|result panel/.test(normalized)) return "publication-results-panels";

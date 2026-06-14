@@ -285,6 +285,37 @@ export const HERO_ASSET_IDS = Object.freeze([
   "organ-legend",
   "organ-system-network",
   "cross-organ-comparison",
+  "protocol-overview",
+  "sample-prep-workflow",
+  "reagent-mastermix",
+  "serial-dilution",
+  "incubation-step",
+  "wash-step",
+  "centrifugation-step",
+  "magnetic-bead-cleanup",
+  "pcr-amplification",
+  "qpcr-assay",
+  "rt-qpcr-assay",
+  "elisa-assay",
+  "western-blot-workflow",
+  "gel-imaging",
+  "immunostaining",
+  "fixation-permeabilization",
+  "cell-culture-passaging",
+  "transfection-step",
+  "library-prep-workflow",
+  "assay-timeline",
+  "protocol-checklist",
+  "protocol-qc-gate",
+  "replicate-layout",
+  "control-sample-set",
+  "standard-curve",
+  "reagent-compatibility",
+  "temperature-profile",
+  "sample-normalization",
+  "aliquot-plan",
+  "protocol-deviation",
+  "method-safety-note",
   "microgravity",
   "spacecraft",
   "astronaut-sample",
@@ -926,6 +957,38 @@ function renderRecipe(asset, width, height, palette) {
     case "organ-system-network":
     case "cross-organ-comparison":
       return anatomyOrganSystemsAsset(id, cx, cy, s, palette);
+    case "protocol-overview":
+    case "sample-prep-workflow":
+    case "reagent-mastermix":
+    case "serial-dilution":
+    case "incubation-step":
+    case "wash-step":
+    case "centrifugation-step":
+    case "magnetic-bead-cleanup":
+    case "pcr-amplification":
+    case "qpcr-assay":
+    case "rt-qpcr-assay":
+    case "elisa-assay":
+    case "western-blot-workflow":
+    case "gel-imaging":
+    case "immunostaining":
+    case "fixation-permeabilization":
+    case "cell-culture-passaging":
+    case "transfection-step":
+    case "library-prep-workflow":
+    case "assay-timeline":
+    case "protocol-checklist":
+    case "protocol-qc-gate":
+    case "replicate-layout":
+    case "control-sample-set":
+    case "standard-curve":
+    case "reagent-compatibility":
+    case "temperature-profile":
+    case "sample-normalization":
+    case "aliquot-plan":
+    case "protocol-deviation":
+    case "method-safety-note":
+      return methodsProtocolsAsset(id, cx, cy, s, palette);
     case "microgravity":
       return microgravityAsset(cx, cy, s, palette);
     case "spacecraft":
@@ -3047,6 +3110,108 @@ function anatomyOrganSystemsAsset(id, cx, cy, s, palette) {
     default:
       return `${panel(`asset-anatomy-${id} asset-anatomy-organ-card`)}${miniOrgan(-15, -2, 19, 25, `asset-anatomy-${id}-silhouette`, palette.fill)}<path d="M${fmt(cx + 5 * s)},${fmt(cy - 26 * s)} C${fmt(cx + 25 * s)},${fmt(cy - 14 * s)} ${fmt(cx + 31 * s)},${fmt(cy + 11 * s)} ${fmt(cx + 13 * s)},${fmt(cy + 28 * s)}" fill="none" stroke="${palette.accent}" stroke-width="${fmt(2 * s)}" stroke-linecap="round"/>`;
   }
+}
+
+function methodsProtocolsAsset(id, cx, cy, s, palette) {
+  const panel = (classes) => `<g class="asset-methods-protocols ${classes}" filter="url(#asset-soft-shadow)"><rect x="${fmt(cx - 52 * s)}" y="${fmt(cy - 38 * s)}" width="${fmt(104 * s)}" height="${fmt(76 * s)}" rx="${fmt(17 * s)}" fill="${palette.fill}" stroke="${palette.stroke}" stroke-width="${fmt(2 * s)}"/><path d="M${fmt(cx - 43 * s)},${fmt(cy - 30 * s)} h${fmt(86 * s)}" stroke="#ffffff" stroke-width="${fmt(1.6 * s)}" opacity="0.56" stroke-linecap="round"/>`;
+  const close = "</g>";
+  const tube = (x, y, fill = "#ffffff", klass = "asset-methods-tube") => `<g class="${klass}"><rect x="${fmt(cx + x * s)}" y="${fmt(cy + y * s)}" width="${fmt(16 * s)}" height="${fmt(42 * s)}" rx="${fmt(6 * s)}" fill="${fill}" stroke="${palette.stroke}" stroke-width="${fmt(1.3 * s)}"/><path d="M${fmt(cx + (x + 2) * s)},${fmt(cy + (y + 22) * s)} h${fmt(12 * s)} v${fmt(14 * s)} h${fmt(-12 * s)} Z" fill="${palette.secondary}" stroke="${palette.accent}" stroke-width="${fmt(0.8 * s)}"/><circle cx="${fmt(cx + (x + 8) * s)}" cy="${fmt(cy + (y + 9) * s)}" r="${fmt(2.2 * s)}" fill="${palette.accent}"/></g>`;
+  const miniPlate = (x, y, klass = "asset-methods-plate", cols = 6, rows = 3) => `<g class="${klass}"><rect x="${fmt(cx + x * s)}" y="${fmt(cy + y * s)}" width="${fmt(58 * s)}" height="${fmt(31 * s)}" rx="${fmt(7 * s)}" fill="#ffffff" stroke="${palette.accent}" stroke-width="${fmt(1.25 * s)}"/><g>${Array.from({ length: cols * rows }, (_value, i) => `<circle cx="${fmt(cx + (x + 7 + (i % cols) * 8.4) * s)}" cy="${fmt(cy + (y + 7 + Math.floor(i / cols) * 7.4) * s)}" r="${fmt(1.7 * s)}" fill="${i % 5 === 0 ? palette.accent : palette.secondary}" opacity="${i % 5 === 0 ? 0.9 : 0.58}"/>`).join("")}</g></g>`;
+  const curve = (klass = "asset-methods-curve") => `<g class="${klass}"><path d="M${fmt(cx - 36 * s)},${fmt(cy + 22 * s)} H${fmt(cx + 38 * s)} M${fmt(cx - 34 * s)},${fmt(cy + 22 * s)} V${fmt(cy - 25 * s)}" stroke="${palette.stroke}" stroke-width="${fmt(1.5 * s)}" stroke-linecap="round" opacity="0.55"/><path d="M${fmt(cx - 30 * s)},${fmt(cy + 17 * s)} C${fmt(cx - 10 * s)},${fmt(cy + 15 * s)} ${fmt(cx - 2 * s)},${fmt(cy - 12 * s)} ${fmt(cx + 33 * s)},${fmt(cy - 23 * s)}" fill="none" stroke="${palette.accent}" stroke-width="${fmt(2.6 * s)}" stroke-linecap="round"/><circle cx="${fmt(cx + 33 * s)}" cy="${fmt(cy - 23 * s)}" r="${fmt(4 * s)}" fill="${palette.accent}"/></g>`;
+  const checklist = (klass = "asset-methods-check-row", count = 4) => Array.from({ length: count }, (_value, i) => `<g class="${klass}"><rect x="${fmt(cx - 34 * s)}" y="${fmt(cy + (-24 + i * 13) * s)}" width="${fmt(68 * s)}" height="${fmt(8 * s)}" rx="${fmt(3.5 * s)}" fill="${i % 2 ? palette.secondary : "#ffffff"}" stroke="${palette.accent}" stroke-width="${fmt(0.75 * s)}" opacity="${fmt(0.88 - i * 0.07)}"/><path d="M${fmt(cx - 29 * s)},${fmt(cy + (-20 + i * 13) * s)} l${fmt(3 * s)},${fmt(3 * s)} l${fmt(6 * s)},${fmt(-7 * s)}" fill="none" stroke="${palette.accent}" stroke-width="${fmt(1.2 * s)}" stroke-linecap="round" stroke-linejoin="round"/></g>`).join("");
+  const arrow = (x1, y1, x2, y2, klass = "asset-methods-flow-arrow") => `<path class="${klass}" d="M${fmt(cx + x1 * s)},${fmt(cy + y1 * s)} L${fmt(cx + x2 * s)},${fmt(cy + y2 * s)}" stroke="${palette.accent}" stroke-width="${fmt(2 * s)}" stroke-linecap="round"/><path d="M${fmt(cx + (x2 - 8) * s)},${fmt(cy + (y2 - 6) * s)} L${fmt(cx + x2 * s)},${fmt(cy + y2 * s)} L${fmt(cx + (x2 - 8) * s)},${fmt(cy + (y2 + 6) * s)}" fill="none" stroke="${palette.accent}" stroke-width="${fmt(2 * s)}" stroke-linecap="round" stroke-linejoin="round"/>`;
+
+  if (id === "protocol-overview") {
+    return `${baseLayer(cx, cy, s, palette, "panel")}${panel("asset-methods-protocol-overview")}<g>${[-34, -11, 12, 35].map((x0, i) => `<circle class="asset-methods-step-node" cx="${fmt(cx + x0 * s)}" cy="${fmt(cy - 2 * s)}" r="${fmt(10 * s)}" fill="${i === 3 ? palette.accent : i % 2 ? palette.secondary : "#ffffff"}" stroke="${palette.stroke}" stroke-width="${fmt(1.3 * s)}"/><text x="${fmt(cx + x0 * s)}" y="${fmt(cy + 1.5 * s)}" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="${fmt(7 * s)}" font-weight="900" fill="${i === 3 ? "#ffffff" : palette.accent}">${i + 1}</text>`).join("")}<path class="asset-methods-review-gate" d="M${fmt(cx - 22 * s)},${fmt(cy - 2 * s)} H${fmt(cx + 24 * s)}" stroke="${palette.accent}" stroke-width="${fmt(2 * s)}" stroke-linecap="round" stroke-dasharray="${fmt(5 * s)} ${fmt(4 * s)}"/></g>${close}`;
+  }
+  if (id === "sample-prep-workflow") {
+    return `${baseLayer(cx, cy, s, palette, "panel")}${panel("asset-methods-sample-prep-workflow")}${tube(-39, -21, "#ffffff", "asset-sample-prep-input-tube")}${arrow(-16, 0, 5, 0)}<g class="asset-sample-prep-cleanup">${tube(9, -20, palette.secondary, "asset-sample-prep-output-tube")}<circle cx="${fmt(cx + 37 * s)}" cy="${fmt(cy + 20 * s)}" r="${fmt(8 * s)}" fill="${palette.accent}" opacity="0.72"/></g>${close}`;
+  }
+  if (id === "reagent-mastermix") {
+    return `${baseLayer(cx, cy, s, palette, "panel")}${panel("asset-methods-reagent-mastermix")}<g class="asset-reagent-mastermix-bottle"><path d="M${fmt(cx - 10 * s)},${fmt(cy - 31 * s)} h${fmt(20 * s)} v${fmt(18 * s)} l${fmt(20 * s)},${fmt(34 * s)} q${fmt(6 * s)},${fmt(10 * s)} ${fmt(-7 * s)},${fmt(10 * s)} h${fmt(-46 * s)} q${fmt(-13 * s)},0 ${fmt(-7 * s)},${fmt(-10 * s)} l${fmt(20 * s)},${fmt(-34 * s)} Z" fill="#ffffff" stroke="${palette.stroke}" stroke-width="${fmt(1.7 * s)}"/><path d="M${fmt(cx - 22 * s)},${fmt(cy + 7 * s)} h${fmt(44 * s)} v${fmt(18 * s)} h${fmt(-44 * s)} Z" fill="${palette.secondary}" stroke="${palette.accent}" stroke-width="${fmt(1 * s)}"/></g><g class="asset-reagent-mastermix-droplet">${[-27, 28, 38].map((x0, i) => `<circle cx="${fmt(cx + x0 * s)}" cy="${fmt(cy + (-24 + i * 12) * s)}" r="${fmt(4 * s)}" fill="${palette.accent}" opacity="${fmt(0.72 - i * 0.08)}"/>`).join("")}</g>${close}`;
+  }
+  if (id === "serial-dilution") {
+    return `${baseLayer(cx, cy, s, palette, "panel")}${panel("asset-methods-serial-dilution")}<g class="asset-serial-dilution-tube-row">${[-39, -19, 1, 21, 41].map((x0, i) => tube(x0, -22, i < 2 ? palette.secondary : "#ffffff", "asset-serial-dilution-tube")).join("")}</g><path class="asset-serial-dilution-gradient" d="M${fmt(cx - 33 * s)},${fmt(cy + 30 * s)} H${fmt(cx + 45 * s)}" stroke="${palette.accent}" stroke-width="${fmt(2.4 * s)}" stroke-linecap="round"/><circle cx="${fmt(cx - 33 * s)}" cy="${fmt(cy + 30 * s)}" r="${fmt(4 * s)}" fill="${palette.accent}"/>${close}`;
+  }
+  if (id === "incubation-step") {
+    return `${baseLayer(cx, cy, s, palette, "panel")}${panel("asset-methods-incubation-step")}<rect class="asset-incubation-chamber" x="${fmt(cx - 36 * s)}" y="${fmt(cy - 25 * s)}" width="${fmt(72 * s)}" height="${fmt(50 * s)}" rx="${fmt(10 * s)}" fill="#ffffff" stroke="${palette.stroke}" stroke-width="${fmt(1.7 * s)}"/><circle class="asset-incubation-clock" cx="${fmt(cx + 23 * s)}" cy="${fmt(cy - 12 * s)}" r="${fmt(10 * s)}" fill="${palette.secondary}" stroke="${palette.accent}" stroke-width="${fmt(1.3 * s)}"/><path d="M${fmt(cx + 23 * s)},${fmt(cy - 12 * s)} v${fmt(-6 * s)} l${fmt(5 * s)},${fmt(4 * s)}" stroke="${palette.accent}" stroke-width="${fmt(1.4 * s)}" fill="none" stroke-linecap="round"/><path class="asset-incubation-heat-line" d="M${fmt(cx - 24 * s)},${fmt(cy + 14 * s)} c${fmt(4 * s)},${fmt(-7 * s)} ${fmt(-4 * s)},${fmt(-11 * s)} 0,${fmt(-18 * s)} M${fmt(cx - 8 * s)},${fmt(cy + 14 * s)} c${fmt(4 * s)},${fmt(-7 * s)} ${fmt(-4 * s)},${fmt(-11 * s)} 0,${fmt(-18 * s)}" stroke="${palette.accent}" stroke-width="${fmt(1.6 * s)}" fill="none" stroke-linecap="round"/>${close}`;
+  }
+  if (id === "wash-step") {
+    return `${baseLayer(cx, cy, s, palette, "panel")}${panel("asset-methods-wash-step")}<g class="asset-wash-buffer-stream">${[-24, -8, 8, 24].map((x0) => `<path d="M${fmt(cx + x0 * s)},${fmt(cy - 25 * s)} c${fmt(7 * s)},${fmt(10 * s)} ${fmt(-7 * s)},${fmt(16 * s)} 0,${fmt(26 * s)}" fill="none" stroke="${palette.accent}" stroke-width="${fmt(2 * s)}" stroke-linecap="round"/>`).join("")}</g>${miniPlate(-30, 10, "asset-wash-step-plate", 5, 1)}${close}`;
+  }
+  if (id === "centrifugation-step") {
+    return `${baseLayer(cx, cy, s, palette, "panel")}${panel("asset-methods-centrifugation-step")}<circle class="asset-centrifuge-rotor" cx="${fmt(cx)}" cy="${fmt(cy)}" r="${fmt(34 * s)}" fill="#ffffff" stroke="${palette.stroke}" stroke-width="${fmt(1.8 * s)}"/><g>${[0, 60, 120, 180, 240, 300].map((deg) => `<rect class="asset-centrifuge-tube-slot" x="${fmt(cx - 5 * s)}" y="${fmt(cy - 29 * s)}" width="${fmt(10 * s)}" height="${fmt(22 * s)}" rx="${fmt(4 * s)}" fill="${palette.secondary}" stroke="${palette.accent}" stroke-width="${fmt(0.9 * s)}" transform="rotate(${deg} ${fmt(cx)} ${fmt(cy)})"/>`).join("")}</g><path class="asset-centrifuge-spin-arrow" d="M${fmt(cx - 32 * s)},${fmt(cy + 8 * s)} C${fmt(cx - 16 * s)},${fmt(cy + 33 * s)} ${fmt(cx + 21 * s)},${fmt(cy + 29 * s)} ${fmt(cx + 33 * s)},${fmt(cy + 4 * s)}" fill="none" stroke="${palette.accent}" stroke-width="${fmt(2 * s)}" stroke-linecap="round"/>${close}`;
+  }
+  if (id === "magnetic-bead-cleanup") {
+    return `${baseLayer(cx, cy, s, palette, "panel")}${panel("asset-methods-magnetic-bead-cleanup")}${tube(-28, -23, "#ffffff", "asset-bead-cleanup-tube")}<path class="asset-bead-cleanup-magnet" d="M${fmt(cx + 16 * s)},${fmt(cy - 23 * s)} h${fmt(28 * s)} v${fmt(44 * s)} h${fmt(-10 * s)} v${fmt(-32 * s)} h${fmt(-8 * s)} v${fmt(32 * s)} h${fmt(-10 * s)} Z" fill="${palette.secondary}" stroke="${palette.stroke}" stroke-width="${fmt(1.5 * s)}"/><g class="asset-bead-cleanup-beads">${[[-23, 10], [-18, 15], [-13, 8], [-9, 15]].map(([x0, y0]) => `<circle cx="${fmt(cx + x0 * s)}" cy="${fmt(cy + y0 * s)}" r="${fmt(2.8 * s)}" fill="${palette.accent}"/>`).join("")}</g>${close}`;
+  }
+  if (id === "pcr-amplification") {
+    return `${baseLayer(cx, cy, s, palette, "panel")}${panel("asset-methods-pcr-amplification")}<rect class="asset-pcr-thermocycler" x="${fmt(cx - 40 * s)}" y="${fmt(cy - 25 * s)}" width="${fmt(80 * s)}" height="${fmt(50 * s)}" rx="${fmt(11 * s)}" fill="#ffffff" stroke="${palette.stroke}" stroke-width="${fmt(1.7 * s)}"/><path class="asset-pcr-helix" d="M${fmt(cx - 27 * s)},${fmt(cy + 14 * s)} C${fmt(cx - 13 * s)},${fmt(cy - 25 * s)} ${fmt(cx + 13 * s)},${fmt(cy + 25 * s)} ${fmt(cx + 27 * s)},${fmt(cy - 14 * s)} M${fmt(cx - 27 * s)},${fmt(cy - 14 * s)} C${fmt(cx - 13 * s)},${fmt(cy + 25 * s)} ${fmt(cx + 13 * s)},${fmt(cy - 25 * s)} ${fmt(cx + 27 * s)},${fmt(cy + 14 * s)}" fill="none" stroke="${palette.accent}" stroke-width="${fmt(1.8 * s)}" stroke-linecap="round"/><path d="M${fmt(cx + 24 * s)},${fmt(cy - 20 * s)} h${fmt(10 * s)} v${fmt(10 * s)} h${fmt(-10 * s)} Z" fill="${palette.secondary}" stroke="${palette.accent}" stroke-width="${fmt(0.9 * s)}"/>${close}`;
+  }
+  if (id === "qpcr-assay" || id === "rt-qpcr-assay") {
+    return `${baseLayer(cx, cy, s, palette, "panel")}${panel(`asset-methods-${id}`)}<rect class="asset-qpcr-instrument" x="${fmt(cx - 42 * s)}" y="${fmt(cy - 30 * s)}" width="${fmt(84 * s)}" height="${fmt(60 * s)}" rx="${fmt(12 * s)}" fill="#ffffff" stroke="${palette.stroke}" stroke-width="${fmt(1.7 * s)}"/>${curve("asset-qpcr-amplification-curve")}${id === "rt-qpcr-assay" ? `<path class="asset-rt-qpcr-rna-input" d="M${fmt(cx - 42 * s)},${fmt(cy - 29 * s)} C${fmt(cx - 30 * s)},${fmt(cy - 39 * s)} ${fmt(cx - 12 * s)},${fmt(cy - 38 * s)} ${fmt(cx - 2 * s)},${fmt(cy - 27 * s)}" fill="none" stroke="${palette.accent}" stroke-width="${fmt(1.8 * s)}" stroke-linecap="round"/>` : ""}${close}`;
+  }
+  if (id === "elisa-assay") {
+    return `${baseLayer(cx, cy, s, palette, "panel")}${panel("asset-methods-elisa-assay")}${miniPlate(-32, -19, "asset-elisa-plate", 6, 3)}<path class="asset-elisa-antibody-bridge" d="M${fmt(cx - 23 * s)},${fmt(cy + 24 * s)} q${fmt(12 * s)},${fmt(-20 * s)} ${fmt(24 * s)},0 M${fmt(cx + 4 * s)},${fmt(cy + 24 * s)} q${fmt(12 * s)},${fmt(-20 * s)} ${fmt(24 * s)},0" fill="none" stroke="${palette.accent}" stroke-width="${fmt(2 * s)}" stroke-linecap="round"/>${close}`;
+  }
+  if (id === "western-blot-workflow") {
+    return `${baseLayer(cx, cy, s, palette, "panel")}${panel("asset-methods-western-blot-workflow")}<rect class="asset-western-blot-gel" x="${fmt(cx - 42 * s)}" y="${fmt(cy - 24 * s)}" width="${fmt(34 * s)}" height="${fmt(52 * s)}" rx="${fmt(6 * s)}" fill="#ffffff" stroke="${palette.stroke}" stroke-width="${fmt(1.5 * s)}"/><rect class="asset-western-blot-membrane" x="${fmt(cx + 8 * s)}" y="${fmt(cy - 24 * s)}" width="${fmt(34 * s)}" height="${fmt(52 * s)}" rx="${fmt(6 * s)}" fill="${palette.secondary}" stroke="${palette.stroke}" stroke-width="${fmt(1.5 * s)}"/><path class="asset-western-blot-bands" d="M${fmt(cx - 36 * s)},${fmt(cy - 10 * s)} h${fmt(22 * s)} M${fmt(cx - 35 * s)},${fmt(cy + 4 * s)} h${fmt(16 * s)} M${fmt(cx + 14 * s)},${fmt(cy - 5 * s)} h${fmt(22 * s)} M${fmt(cx + 14 * s)},${fmt(cy + 13 * s)} h${fmt(14 * s)}" stroke="${palette.accent}" stroke-width="${fmt(2.2 * s)}" stroke-linecap="round"/>${arrow(-2, 2, 8, 2)}${close}`;
+  }
+  if (id === "gel-imaging") {
+    return `${baseLayer(cx, cy, s, palette, "panel")}${panel("asset-methods-gel-imaging")}<rect class="asset-gel-imaging-box" x="${fmt(cx - 39 * s)}" y="${fmt(cy - 29 * s)}" width="${fmt(78 * s)}" height="${fmt(58 * s)}" rx="${fmt(10 * s)}" fill="#ffffff" stroke="${palette.stroke}" stroke-width="${fmt(1.7 * s)}"/><g class="asset-gel-imaging-bands">${[-25, -13, -1, 11, 23].map((x0, i) => `<path d="M${fmt(cx + x0 * s)},${fmt(cy - 18 * s)} v${fmt(36 * s)} M${fmt(cx + (x0 - 4) * s)},${fmt(cy + (-8 + i * 3) * s)} h${fmt((8 + i * 2) * s)}" stroke="${palette.accent}" stroke-width="${fmt(i === 2 ? 2.4 : 1.5)}" stroke-linecap="round" opacity="${fmt(0.88 - i * 0.08)}"/>`).join("")}</g>${close}`;
+  }
+  if (id === "immunostaining") {
+    return `${baseLayer(cx, cy, s, palette, "panel")}${panel("asset-methods-immunostaining")}<g class="asset-immunostaining-cells">${[[-23, -5], [1, -12], [24, 5], [-5, 17]].map(([x0, y0], i) => `<circle cx="${fmt(cx + x0 * s)}" cy="${fmt(cy + y0 * s)}" r="${fmt((10 + i % 2 * 2) * s)}" fill="${i % 2 ? palette.secondary : "#ffffff"}" stroke="${palette.stroke}" stroke-width="${fmt(1.2 * s)}"/><circle cx="${fmt(cx + (x0 - 2) * s)}" cy="${fmt(cy + y0 * s)}" r="${fmt(3.2 * s)}" fill="${palette.accent}"/>`).join("")}</g><path class="asset-immunostaining-antibody" d="M${fmt(cx - 42 * s)},${fmt(cy - 26 * s)} q${fmt(9 * s)},${fmt(15 * s)} ${fmt(18 * s)},0 M${fmt(cx - 33 * s)},${fmt(cy - 13 * s)} v${fmt(18 * s)}" stroke="${palette.accent}" stroke-width="${fmt(2 * s)}" fill="none" stroke-linecap="round"/>${close}`;
+  }
+  if (id === "fixation-permeabilization") {
+    return `${baseLayer(cx, cy, s, palette, "panel")}${panel("asset-methods-fixation-permeabilization")}<circle class="asset-fixperm-cell" cx="${fmt(cx - 14 * s)}" cy="${fmt(cy)}" r="${fmt(24 * s)}" fill="#ffffff" stroke="${palette.stroke}" stroke-width="${fmt(1.7 * s)}" stroke-dasharray="${fmt(5 * s)} ${fmt(4 * s)}"/><circle cx="${fmt(cx - 14 * s)}" cy="${fmt(cy)}" r="${fmt(8 * s)}" fill="${palette.secondary}" stroke="${palette.accent}" stroke-width="${fmt(1.1 * s)}"/><path class="asset-fixperm-permeabilization-drops" d="M${fmt(cx + 24 * s)},${fmt(cy - 24 * s)} c${fmt(7 * s)},${fmt(11 * s)} ${fmt(-7 * s)},${fmt(16 * s)} 0,${fmt(27 * s)} M${fmt(cx + 38 * s)},${fmt(cy - 13 * s)} c${fmt(6 * s)},${fmt(9 * s)} ${fmt(-5 * s)},${fmt(14 * s)} 0,${fmt(22 * s)}" stroke="${palette.accent}" stroke-width="${fmt(2 * s)}" fill="none" stroke-linecap="round"/>${close}`;
+  }
+  if (id === "cell-culture-passaging") {
+    return `${baseLayer(cx, cy, s, palette, "panel")}${panel("asset-methods-cell-culture-passaging")}<path class="asset-cell-culture-flask" d="M${fmt(cx - 35 * s)},${fmt(cy - 4 * s)} h${fmt(44 * s)} l${fmt(18 * s)},${fmt(28 * s)} h${fmt(-68 * s)} Z" fill="#ffffff" stroke="${palette.stroke}" stroke-width="${fmt(1.7 * s)}"/><path d="M${fmt(cx - 26 * s)},${fmt(cy + 12 * s)} h${fmt(54 * s)}" stroke="${palette.accent}" stroke-width="${fmt(1.3 * s)}"/><g class="asset-cell-culture-cells">${[[-20, 18], [-4, 15], [12, 20], [24, 16]].map(([x0, y0]) => `<circle cx="${fmt(cx + x0 * s)}" cy="${fmt(cy + y0 * s)}" r="${fmt(3 * s)}" fill="${palette.accent}"/>`).join("")}</g>${close}`;
+  }
+  if (id === "transfection-step") {
+    return `${baseLayer(cx, cy, s, palette, "panel")}${panel("asset-methods-transfection-step")}<circle class="asset-transfection-cell" cx="${fmt(cx - 12 * s)}" cy="${fmt(cy + 4 * s)}" r="${fmt(25 * s)}" fill="#ffffff" stroke="${palette.stroke}" stroke-width="${fmt(1.7 * s)}"/><path class="asset-transfection-vector" d="M${fmt(cx + 36 * s)},${fmt(cy - 23 * s)} C${fmt(cx + 11 * s)},${fmt(cy - 20 * s)} ${fmt(cx + 8 * s)},${fmt(cy - 3 * s)} ${fmt(cx + 1 * s)},${fmt(cy + 2 * s)}" fill="none" stroke="${palette.accent}" stroke-width="${fmt(2.4 * s)}" stroke-linecap="round"/><circle cx="${fmt(cx + 38 * s)}" cy="${fmt(cy - 23 * s)}" r="${fmt(5 * s)}" fill="${palette.accent}"/><circle cx="${fmt(cx - 15 * s)}" cy="${fmt(cy + 4 * s)}" r="${fmt(7 * s)}" fill="${palette.secondary}" stroke="${palette.accent}" stroke-width="${fmt(1 * s)}"/>${close}`;
+  }
+  if (id === "library-prep-workflow") {
+    return `${baseLayer(cx, cy, s, palette, "panel")}${panel("asset-methods-library-prep-workflow")}<g class="asset-library-prep-fragments">${[-27, -13, 1, 15].map((y0, i) => `<path d="M${fmt(cx - 41 * s)},${fmt(cy + y0 * s)} h${fmt((23 + i * 4) * s)}" stroke="${palette.accent}" stroke-width="${fmt(2.1 * s)}" stroke-linecap="round"/>`).join("")}</g>${arrow(-7, -4, 10, -4)}<rect class="asset-library-prep-indexed-library" x="${fmt(cx + 17 * s)}" y="${fmt(cy - 25 * s)}" width="${fmt(31 * s)}" height="${fmt(50 * s)}" rx="${fmt(8 * s)}" fill="#ffffff" stroke="${palette.stroke}" stroke-width="${fmt(1.5 * s)}"/><path d="M${fmt(cx + 23 * s)},${fmt(cy - 12 * s)} h${fmt(19 * s)} M${fmt(cx + 23 * s)},${fmt(cy + 2 * s)} h${fmt(14 * s)} M${fmt(cx + 23 * s)},${fmt(cy + 16 * s)} h${fmt(19 * s)}" stroke="${palette.accent}" stroke-width="${fmt(1.5 * s)}" stroke-linecap="round"/>${close}`;
+  }
+  if (id === "assay-timeline") {
+    return `${baseLayer(cx, cy, s, palette, "panel")}${panel("asset-methods-assay-timeline")}<g class="asset-assay-timeline-lanes">${[-26, -10, 6, 22].map((y0, i) => `<rect class="asset-assay-timeline-step" x="${fmt(cx + (-39 + i * 16) * s)}" y="${fmt(cy + y0 * s)}" width="${fmt((40 + i * 8) * s)}" height="${fmt(8 * s)}" rx="${fmt(4 * s)}" fill="${i === 2 ? palette.accent : palette.secondary}" stroke="${palette.accent}" stroke-width="${fmt(0.85 * s)}" opacity="${i === 2 ? 0.9 : 0.66}"/>`).join("")}</g><path d="M${fmt(cx - 43 * s)},${fmt(cy + 34 * s)} H${fmt(cx + 43 * s)}" stroke="${palette.stroke}" stroke-width="${fmt(1.5 * s)}" stroke-linecap="round" opacity="0.5"/>${close}`;
+  }
+  if (id === "protocol-checklist") {
+    return `${baseLayer(cx, cy, s, palette, "panel")}${panel("asset-methods-protocol-checklist")}<g class="asset-protocol-checklist-rows">${checklist("asset-protocol-checklist-row", 4)}</g>${close}`;
+  }
+  if (id === "protocol-qc-gate") {
+    return `${baseLayer(cx, cy, s, palette, "panel")}${panel("asset-methods-protocol-qc-gate")}<path class="asset-protocol-qc-gate-shield" d="M${fmt(cx)},${fmt(cy - 31 * s)} L${fmt(cx + 34 * s)},${fmt(cy - 16 * s)} v${fmt(24 * s)} c0,${fmt(20 * s)} ${fmt(-15 * s)},${fmt(32 * s)} ${fmt(-34 * s)},${fmt(40 * s)} c${fmt(-19 * s)},${fmt(-8 * s)} ${fmt(-34 * s)},${fmt(-20 * s)} ${fmt(-34 * s)},${fmt(-40 * s)} v${fmt(-24 * s)} Z" fill="#ffffff" stroke="${palette.stroke}" stroke-width="${fmt(1.8 * s)}"/><path class="asset-protocol-qc-check" d="M${fmt(cx - 16 * s)},${fmt(cy + 6 * s)} l${fmt(11 * s)},${fmt(11 * s)} l${fmt(25 * s)},${fmt(-29 * s)}" fill="none" stroke="${palette.accent}" stroke-width="${fmt(4 * s)}" stroke-linecap="round" stroke-linejoin="round"/><path class="asset-protocol-qc-threshold" d="M${fmt(cx - 25 * s)},${fmt(cy - 9 * s)} H${fmt(cx + 25 * s)}" stroke="${palette.accent}" stroke-width="${fmt(1.6 * s)}" stroke-dasharray="${fmt(4 * s)} ${fmt(3 * s)}"/>${close}`;
+  }
+  if (id === "replicate-layout") {
+    return `${baseLayer(cx, cy, s, palette, "panel")}${panel("asset-methods-replicate-layout")}${miniPlate(-31, -20, "asset-replicate-layout-plate", 6, 4)}<path class="asset-replicate-layout-grouping" d="M${fmt(cx - 23 * s)},${fmt(cy - 12 * s)} h${fmt(19 * s)} v${fmt(14 * s)} h${fmt(-19 * s)} Z M${fmt(cx + 3 * s)},${fmt(cy - 12 * s)} h${fmt(19 * s)} v${fmt(14 * s)} h${fmt(-19 * s)} Z" fill="none" stroke="${palette.accent}" stroke-width="${fmt(1.4 * s)}"/>${close}`;
+  }
+  if (id === "control-sample-set") {
+    return `${baseLayer(cx, cy, s, palette, "panel")}${panel("asset-methods-control-sample-set")}<g class="asset-control-sample-tubes">${tube(-36, -23, "#ffffff", "asset-control-negative")}${tube(-9, -23, palette.secondary, "asset-control-positive")}${tube(18, -23, "#ffffff", "asset-control-sample")}</g><path class="asset-control-sample-labels" d="M${fmt(cx - 37 * s)},${fmt(cy + 28 * s)} h${fmt(16 * s)} M${fmt(cx - 10 * s)},${fmt(cy + 28 * s)} h${fmt(16 * s)} M${fmt(cx + 17 * s)},${fmt(cy + 28 * s)} h${fmt(16 * s)}" stroke="${palette.accent}" stroke-width="${fmt(1.7 * s)}" stroke-linecap="round"/>${close}`;
+  }
+  if (id === "standard-curve") {
+    return `${baseLayer(cx, cy, s, palette, "panel")}${panel("asset-methods-standard-curve")}${curve("asset-standard-curve-fit")}<g class="asset-standard-curve-points">${[-27, -15, -3, 12, 27].map((x0, i) => `<circle cx="${fmt(cx + x0 * s)}" cy="${fmt(cy + (17 - i * 9) * s)}" r="${fmt(3 * s)}" fill="#ffffff" stroke="${palette.accent}" stroke-width="${fmt(1.2 * s)}"/>`).join("")}</g>${close}`;
+  }
+  if (id === "reagent-compatibility") {
+    return `${baseLayer(cx, cy, s, palette, "panel")}${panel("asset-methods-reagent-compatibility")}<g class="asset-reagent-compatibility-matrix">${Array.from({ length: 16 }, (_v, i) => `<rect x="${fmt(cx + (-30 + (i % 4) * 18) * s)}" y="${fmt(cy + (-26 + Math.floor(i / 4) * 15) * s)}" width="${fmt(14 * s)}" height="${fmt(10 * s)}" rx="${fmt(3 * s)}" fill="${i % 5 === 0 ? palette.accent : i % 2 ? palette.secondary : "#ffffff"}" stroke="${palette.accent}" stroke-width="${fmt(0.7 * s)}" opacity="${i % 5 === 0 ? 0.9 : 0.66}"/>`).join("")}</g>${close}`;
+  }
+  if (id === "temperature-profile") {
+    return `${baseLayer(cx, cy, s, palette, "panel")}${panel("asset-methods-temperature-profile")}<path class="asset-temperature-profile-curve" d="M${fmt(cx - 38 * s)},${fmt(cy + 22 * s)} V${fmt(cy - 25 * s)} H${fmt(cx + 39 * s)} M${fmt(cx - 33 * s)},${fmt(cy + 8 * s)} h${fmt(16 * s)} v${fmt(-24 * s)} h${fmt(22 * s)} v${fmt(24 * s)} h${fmt(22 * s)}" fill="none" stroke="${palette.accent}" stroke-width="${fmt(2.2 * s)}" stroke-linejoin="round"/><circle class="asset-temperature-profile-hold" cx="${fmt(cx + 7 * s)}" cy="${fmt(cy - 16 * s)}" r="${fmt(4 * s)}" fill="${palette.accent}"/>${close}`;
+  }
+  if (id === "sample-normalization") {
+    return `${baseLayer(cx, cy, s, palette, "panel")}${panel("asset-methods-sample-normalization")}<g class="asset-sample-normalization-bars">${[-27, -9, 9, 27].map((x0, i) => `<rect x="${fmt(cx + (x0 - 5) * s)}" y="${fmt(cy + (12 - i * 8) * s)}" width="${fmt(10 * s)}" height="${fmt((21 + i * 8) * s)}" rx="${fmt(4 * s)}" fill="${i === 3 ? palette.accent : palette.secondary}" stroke="${palette.accent}" stroke-width="${fmt(0.8 * s)}"/>`).join("")}</g><path class="asset-sample-normalization-target" d="M${fmt(cx - 38 * s)},${fmt(cy - 13 * s)} H${fmt(cx + 38 * s)}" stroke="${palette.stroke}" stroke-width="${fmt(1.6 * s)}" stroke-dasharray="${fmt(4 * s)} ${fmt(3 * s)}"/>${close}`;
+  }
+  if (id === "aliquot-plan") {
+    return `${baseLayer(cx, cy, s, palette, "panel")}${panel("asset-methods-aliquot-plan")}${tube(-9, -29, palette.secondary, "asset-aliquot-source-tube")}${arrow(-1, 6, -28, 22, "asset-aliquot-split-arrow")}${arrow(8, 6, 28, 22, "asset-aliquot-split-arrow")}<g class="asset-aliquot-child-tubes">${tube(-39, 8, "#ffffff", "asset-aliquot-child")}${tube(19, 8, "#ffffff", "asset-aliquot-child")}</g>${close}`;
+  }
+  if (id === "protocol-deviation") {
+    return `${baseLayer(cx, cy, s, palette, "panel")}${panel("asset-methods-protocol-deviation")}<path class="asset-protocol-deviation-warning" d="M${fmt(cx)},${fmt(cy - 31 * s)} L${fmt(cx + 38 * s)},${fmt(cy + 29 * s)} H${fmt(cx - 38 * s)} Z" fill="#ffffff" stroke="${palette.stroke}" stroke-width="${fmt(1.8 * s)}"/><text x="${fmt(cx)}" y="${fmt(cy + 11 * s)}" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="${fmt(22 * s)}" font-weight="900" fill="${palette.accent}">!</text><path class="asset-protocol-deviation-log-line" d="M${fmt(cx - 29 * s)},${fmt(cy + 35 * s)} H${fmt(cx + 29 * s)}" stroke="${palette.accent}" stroke-width="${fmt(2 * s)}" stroke-linecap="round"/>${close}`;
+  }
+  if (id === "method-safety-note") {
+    return `${baseLayer(cx, cy, s, palette, "panel")}${panel("asset-methods-method-safety-note")}<rect class="asset-method-safety-note-card" x="${fmt(cx - 38 * s)}" y="${fmt(cy - 27 * s)}" width="${fmt(76 * s)}" height="${fmt(54 * s)}" rx="${fmt(10 * s)}" fill="#ffffff" stroke="${palette.stroke}" stroke-width="${fmt(1.8 * s)}"/><path class="asset-method-safety-note-badge" d="M${fmt(cx - 23 * s)},${fmt(cy - 8 * s)} l${fmt(11 * s)},${fmt(11 * s)} l${fmt(22 * s)},${fmt(-24 * s)}" fill="none" stroke="${palette.accent}" stroke-width="${fmt(3 * s)}" stroke-linecap="round" stroke-linejoin="round"/><path d="M${fmt(cx - 25 * s)},${fmt(cy + 15 * s)} H${fmt(cx + 25 * s)} M${fmt(cx - 25 * s)},${fmt(cy + 23 * s)} H${fmt(cx + 10 * s)}" stroke="${palette.accent}" stroke-width="${fmt(1.6 * s)}" stroke-linecap="round"/>${close}`;
+  }
+  return `${baseLayer(cx, cy, s, palette, "panel")}${panel(`asset-methods-${escapeXml(id)}`)}${checklist("asset-methods-default-row", 3)}<circle class="asset-methods-status-dot" cx="${fmt(cx + 38 * s)}" cy="${fmt(cy - 28 * s)}" r="${fmt(5 * s)}" fill="${palette.accent}"/>${close}`;
 }
 
 function workflowBlock(cx, cy, s, palette) {
