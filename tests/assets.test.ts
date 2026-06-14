@@ -40,12 +40,12 @@ import { exportProject } from "../packages/export/src/index.ts";
 
 test("premium asset registry has growing complete curated assets", () => {
   const validation = validatePremiumAssetRegistry();
-  assert.equal(CURATED_ASSETS.length, 392);
+  assert.equal(CURATED_ASSETS.length, 428);
   assert.deepEqual(validation.issues, []);
 
   const ids = new Set(CURATED_ASSETS.map((asset) => asset.id));
-  assert.equal(ids.size, 392);
-  assert.equal(CURATED_ASSETS.filter((asset) => asset.category.startsWith("Biology /")).length, 312);
+  assert.equal(ids.size, 428);
+  assert.equal(CURATED_ASSETS.filter((asset) => asset.category.startsWith("Biology /")).length, 348);
   assert.equal(CURATED_ASSETS.filter((asset) => asset.category.startsWith("AI /")).length, 80);
 });
 
@@ -219,9 +219,9 @@ test("commercial signature and hero assets have v2 recipes and quality metadata"
   const premiumIds = new Set(premiumAssets.map((asset) => asset.id));
   const recipes = new Set(premiumAssets.map((asset) => asset.renderSpec.assetRecipe));
 
-  assert.equal(HERO_ASSET_IDS.length, 327);
-  assert.equal(premiumAssets.length, 327);
-  assert.equal(recipes.size, 327);
+  assert.equal(HERO_ASSET_IDS.length, 363);
+  assert.equal(premiumAssets.length, 363);
+  assert.equal(recipes.size, 363);
   assert.ok(CURATED_ASSETS.filter((asset) => asset.qualityTier === "signature").length >= 20);
   for (const assetId of HERO_ASSET_IDS) {
     const asset = getAsset(assetId);
@@ -309,6 +309,14 @@ test("commercial signature and hero assets have v2 recipes and quality metadata"
     assert.equal(asset.qualityTier, "signature");
     assert.equal(asset.renderSpec.assetRecipe, `hero-${assetId}`);
     assert.ok(asset.workflowPacks.includes("anatomy-organ-systems"));
+    assert.match(renderPremiumAssetSvg(assetId, { styleProfile: "consulting-2p5d" }), new RegExp(`data-recipe="hero-${assetId}"`));
+    assert.doesNotMatch(renderPremiumAssetSvg(assetId, { styleProfile: "consulting-2p5d" }), /data-recipe="standard-/);
+  }
+  for (const assetId of ["grant-summary-board", "problem-statement-card", "scientific-opportunity-map", "hypothesis-aims", "specific-aim-1", "specific-aim-2", "specific-aim-3", "milestone-roadmap", "budget-envelope", "resource-allocation", "team-capability-map", "stakeholder-map", "decision-brief", "impact-metric-card", "outcome-kpi", "evidence-snapshot", "risk-matrix", "risk-mitigation-plan", "go-no-go-gate", "recommendation-card", "executive-takeaway", "priority-scorecard"]) {
+    const asset = getAsset(assetId);
+    assert.ok(asset.qualityTier === "signature" || asset.qualityTier === "hero");
+    assert.equal(asset.renderSpec.assetRecipe, `hero-${assetId}`);
+    assert.ok(asset.workflowPacks.includes("grant-and-consulting-summary"));
     assert.match(renderPremiumAssetSvg(assetId, { styleProfile: "consulting-2p5d" }), new RegExp(`data-recipe="hero-${assetId}"`));
     assert.doesNotMatch(renderPremiumAssetSvg(assetId, { styleProfile: "consulting-2p5d" }), /data-recipe="standard-/);
   }
@@ -825,6 +833,37 @@ test("methods and protocols broad pack assets expose dedicated premium recipe ma
   }
 });
 
+test("grant and consulting summary broad pack assets expose dedicated premium recipe markers", () => {
+  const expectedMarkers: Record<string, RegExp[]> = {
+    "grant-summary-board": [/asset-grant-grant-summary-board/, /asset-grant-summary-kpi-card/, /asset-grant-summary-decision-band/, /asset-grant-summary-board-layout/],
+    "problem-statement-card": [/asset-grant-problem-statement-card/, /asset-problem-gap-marker/, /asset-problem-statement-lines/],
+    "scientific-opportunity-map": [/asset-grant-scientific-opportunity-map/, /asset-opportunity-map-axes/, /asset-opportunity-zone/, /asset-opportunity-position/],
+    "hypothesis-aims": [/asset-grant-hypothesis-aims/, /asset-hypothesis-aims/, /asset-aim-node/, /asset-hypothesis-arrow/],
+    "specific-aim-1": [/asset-grant-specific-aim-1/, /asset-specific-aim-card/, /asset-specific-aim-1/, /asset-specific-aim-number/],
+    "milestone-roadmap": [/asset-grant-milestone-roadmap/, /asset-milestone-roadmap/, /asset-roadmap-milestone/, /asset-roadmap-swimlane/],
+    "budget-envelope": [/asset-grant-budget-envelope/, /asset-budget-envelope/, /asset-budget-envelope-card/, /asset-budget-stack/],
+    "team-capability-map": [/asset-grant-team-capability-map/, /asset-stakeholder-map/, /asset-stakeholder-node/, /asset-team-node/],
+    "impact-metric-card": [/asset-grant-impact-metric-card/, /asset-impact-metric-card/, /asset-impact-sparkline/, /asset-priority-score-dots/],
+    "evidence-snapshot": [/asset-grant-evidence-snapshot/, /asset-evidence-snapshot/, /asset-evidence-snapshot-card/],
+    "risk-matrix": [/asset-grant-risk-matrix/, /asset-risk-matrix-grid/, /asset-risk-cell/],
+    "risk-mitigation-plan": [/asset-grant-risk-mitigation-plan/, /asset-go-no-go-gate/, /asset-risk-mitigation-arrow/],
+    "recommendation-card": [/asset-grant-recommendation-card/, /asset-recommendation-card/, /asset-recommendation-check/, /asset-takeaway-headline/],
+    "executive-takeaway": [/asset-grant-executive-takeaway/, /asset-recommendation-card/, /asset-takeaway-headline/],
+    "priority-scorecard": [/asset-grant-priority-scorecard/, /asset-impact-metric-card/, /asset-priority-score-dots/]
+  };
+
+  for (const [assetId, markers] of Object.entries(expectedMarkers)) {
+    const asset = getAsset(assetId);
+    const svg = renderPremiumAssetSvg(assetId, { styleProfile: "consulting-2p5d", width: 180, height: 140 });
+    assert.match(svg, /commercial-premium-asset/);
+    assert.match(svg, new RegExp(`data-recipe="hero-${assetId}"`));
+    assert.ok(asset.workflowPacks.includes("grant-and-consulting-summary"));
+    assert.ok(asset.qualityTier === "signature" || asset.qualityTier === "hero");
+    assert.ok(svg.length > 1800, `${assetId} render is too small to be a premium grant/consulting asset`);
+    for (const marker of markers) assert.match(svg, marker);
+  }
+});
+
 test("spatial transcriptomics assets expose premium map and image-analysis markers", () => {
   const expectedMarkers: Record<string, RegExp[]> = {
     "visium-spot-array": [
@@ -923,7 +962,7 @@ test("spatial results template uses compact copy and roomier heatmap", () => {
 
 test("premium style profiles and workflow packs are queryable", () => {
   const packs = listWorkflowPacks();
-  assert.equal(packs.length, 16);
+  assert.equal(packs.length, 17);
   assert.ok(packs.every((pack) => pack.assetIds.length >= 20));
   assert.ok(packs.every((pack) => pack.templates.length >= 4));
   assert.ok(packs.every((pack) => pack.flagshipTemplateId));
@@ -935,6 +974,7 @@ test("premium style profiles and workflow packs are queryable", () => {
   assert.ok(packs.some((pack) => pack.id === "microscopy-image-analysis" && pack.templates.includes("microscopy-image-analysis-pipeline")));
   assert.ok(packs.some((pack) => pack.id === "lab-automation" && pack.templates.includes("lab-automation-platform")));
   assert.ok(packs.some((pack) => pack.id === "anatomy-organ-systems" && pack.templates.includes("anatomy-organ-system-overview")));
+  assert.ok(packs.some((pack) => pack.id === "grant-and-consulting-summary" && pack.templates.includes("grant-consulting-one-slide")));
 
   const templates = listWorkflowTemplates();
   assert.ok(templates.length >= 25);
@@ -968,6 +1008,9 @@ test("premium style profiles and workflow packs are queryable", () => {
   const anatomyTemplates = listWorkflowTemplates({ workflowPack: "anatomy-organ-systems" });
   assert.equal(anatomyTemplates.length, 4);
   assert.ok(anatomyTemplates.some((template) => template.id === "anatomy-organ-system-overview" && template.layout === "workflow"));
+  const grantTemplates = listWorkflowTemplates({ workflowPack: "grant-and-consulting-summary" });
+  assert.equal(grantTemplates.length, 4);
+  assert.ok(grantTemplates.some((template) => template.id === "grant-consulting-one-slide" && template.layout === "multi-panel"));
 
   const perturb = searchAssets({ workflowPack: "perturb-seq-crispr", styleProfile: "consulting-2p5d", limit: 10 });
   assert.ok(perturb.length >= 5);
@@ -1013,6 +1056,11 @@ test("premium style profiles and workflow packs are queryable", () => {
   assert.ok(anatomy.length >= 8);
   assert.ok(anatomy.every((result) => result.asset.workflowPacks.includes("anatomy-organ-systems")));
   assert.ok(anatomy.some((result) => result.asset.id === "anatomy-overview" || result.asset.id === "kidney"));
+
+  const grant = searchAssets({ workflowPack: "grant-and-consulting-summary", query: "grant specific aims executive summary roadmap risk recommendation", styleProfile: "consulting-2p5d", limit: 12 });
+  assert.ok(grant.length >= 8);
+  assert.ok(grant.every((result) => result.asset.workflowPacks.includes("grant-and-consulting-summary")));
+  assert.ok(grant.some((result) => result.asset.id === "grant-summary-board" || result.asset.id === "recommendation-card"));
 
   const lineSvg = renderPremiumAssetSvg("crispr-cas9", { styleProfile: "publication-line" });
   assert.match(lineSvg, /data-style-profile="publication-line"/);
@@ -1075,18 +1123,18 @@ test("workflow pack export snapshots summarize fallbacks and next actions", () =
 
 test("premium coverage roadmap exposes 12 month targets and ontology contracts", () => {
   const coverage = getAssetCoverageGapReport();
-  assert.equal(coverage.baseline.totalAssets, 392);
-  assert.equal(coverage.baseline.signatureHeroAssets, 327);
-  assert.equal(coverage.baseline.workflowPacks, 16);
-  assert.equal(coverage.baseline.templates, 69);
+  assert.equal(coverage.baseline.totalAssets, 428);
+  assert.equal(coverage.baseline.signatureHeroAssets, 363);
+  assert.equal(coverage.baseline.workflowPacks, 17);
+  assert.equal(coverage.baseline.templates, 73);
   assert.equal(coverage.productWedge, "asset-breadth-library");
   assert.equal(coverage.firstWave, "broad-biology-market");
   assert.equal(coverage.qualityGate, "pack-complete-premium");
   assert.deepEqual(coverage.broadMarketPackOrder.slice(0, 5), ["drug-discovery", "protein-engineering", "synthetic-biology", "microbiome-infectious-disease", "cell-therapy"]);
   assert.equal(coverage.packMinimumContract.minSignatureHeroAssets, 12);
   assert.equal(coverage.packMinimumContract.requiresAgentPath, true);
-  assert.ok(coverage.milestones.some((milestone) => milestone.targetAssets === 1200 && milestone.remainingAssets === 808));
-  assert.ok(coverage.milestones.some((milestone) => milestone.targetWorkflowPacks === 24 && milestone.remainingWorkflowPacks === 8));
+  assert.ok(coverage.milestones.some((milestone) => milestone.targetAssets === 1200 && milestone.remainingAssets === 772));
+  assert.ok(coverage.milestones.some((milestone) => milestone.targetWorkflowPacks === 24 && milestone.remainingWorkflowPacks === 7));
   assert.ok(coverage.plannedWorkflowPacks.some((pack) => pack.id === "bio-llm-benchmarks" && pack.wave === "jk-aligned"));
   assert.ok(coverage.plannedWorkflowPacks.some((pack) => pack.id === "drug-discovery" && pack.wave === "commercial-broad"));
   assert.equal(coverage.plannedWorkflowPacks.filter((pack) => pack.wave === "commercial-broad")[0].id, "drug-discovery");
@@ -1483,6 +1531,49 @@ test("agent-facing pack and asset-set recommendations are workflow aware", () =>
   for (const assetId of expectedMethodsCore) assert.ok(methodsInsertIds.includes(assetId), `${assetId} should be an insert-ready methods and protocols core anchor`);
   assert.ok(methodsSet.insertPlan.every((action) => action.tool === "insert_premium_asset" && action.args.styleProfile === "consulting-2p5d"));
 
+  const grantPackRecommendations = recommendWorkflowPack({
+    title: "Grant consulting one-pager specific aims roadmap risk recommendation",
+    narrative: "Problem statement, scientific opportunity, hypothesis aims, specific aims, milestone roadmap, budget envelope, evidence snapshot, risk matrix, go/no-go gate, executive takeaway, and recommendation card.",
+    limit: 3
+  });
+  assert.equal(grantPackRecommendations[0].pack.id, "grant-and-consulting-summary");
+  assert.equal(grantPackRecommendations[0].recommendedTemplateId, "grant-consulting-one-slide");
+
+  const grantSet = recommendAssetSet({
+    title: "Grant and consulting executive summary slide",
+    sourceText: "Build an executive grant and consulting one-pager with problem statement, scientific opportunity, hypothesis aims, specific aim 1, specific aim 2, specific aim 3, milestone roadmap, budget envelope, resource allocation, impact metric, evidence snapshot, risk matrix, risk mitigation, go/no-go gate, recommendation card, executive takeaway, and priority scorecard.",
+    styleProfile: "consulting-2p5d",
+    limit: 35
+  });
+  const grantInsertIds = grantSet.insertPlan.map((action) => action.args.assetId);
+  const expectedGrantCore = [
+    "grant-summary-board",
+    "problem-statement-card",
+    "scientific-opportunity-map",
+    "hypothesis-aims",
+    "specific-aim-1",
+    "specific-aim-2",
+    "specific-aim-3",
+    "milestone-roadmap",
+    "budget-envelope",
+    "resource-allocation",
+    "team-capability-map",
+    "stakeholder-map",
+    "evidence-snapshot",
+    "impact-metric-card",
+    "outcome-kpi",
+    "risk-matrix",
+    "risk-mitigation-plan",
+    "go-no-go-gate",
+    "recommendation-card",
+    "executive-takeaway",
+    "priority-scorecard"
+  ];
+  assert.equal(grantSet.workflowPack, "grant-and-consulting-summary");
+  assert.equal(grantSet.templateId, "grant-consulting-one-slide");
+  for (const assetId of expectedGrantCore) assert.ok(grantInsertIds.includes(assetId), `${assetId} should be an insert-ready grant and consulting core anchor`);
+  assert.ok(grantSet.insertPlan.every((action) => action.tool === "insert_premium_asset" && action.args.styleProfile === "consulting-2p5d"));
+
   const drugPackRecommendations = recommendWorkflowPack({
     title: "Drug discovery hit validation and lead optimization slide",
     narrative: "Target validation, compound library screen, hit triage, toxicity review, and candidate nomination.",
@@ -1777,6 +1868,18 @@ test("priority flagship templates generate commercial editable figure structures
   assert.ok(methods.some((node) => node.kind === "symbol" && node.payload.layoutHint?.startsWith("methods-protocol-overview:stage-")));
   assert.ok(methods.every((node) => node.payload.workflowPack === "methods-and-protocols" && node.payload.templateId === "methods-protocol-overview"));
 
+  const grant = createWorkflowFigureNodes({ templateId: "grant-consulting-one-slide", styleProfile: "consulting-2p5d" });
+  assert.ok(grant.length >= 80);
+  assert.ok(grant.some((node) => node.kind === "text" && node.payload.text?.includes("Grant and consulting executive summary")));
+  assert.ok(grant.some((node) => node.kind === "text" && node.payload.text?.includes("Decision spine: define need")));
+  assert.ok(grant.some((node) => node.kind === "text" && node.payload.text === "executive-recommendation-review"));
+  assert.ok(grant.some((node) => node.kind === "plot" && node.payload.spec.plotType === "line" && node.payload.spec.title === "Impact"));
+  for (const assetId of ["problem-statement-card", "scientific-opportunity-map", "hypothesis-aims", "milestone-roadmap", "recommendation-card", "evidence-snapshot", "impact-metric-card", "outcome-kpi", "specific-aim-1", "specific-aim-2", "specific-aim-3", "budget-envelope", "team-capability-map", "risk-matrix", "risk-mitigation-plan", "go-no-go-gate", "executive-takeaway"]) {
+    assert.ok(grant.some((node) => node.kind === "symbol" && node.payload.assetId === assetId), `${assetId} should appear in grant and consulting flagship`);
+  }
+  assert.ok(grant.some((node) => node.kind === "symbol" && node.payload.layoutHint?.startsWith("grant-consulting-one-slide:stage-")));
+  assert.ok(grant.every((node) => node.payload.workflowPack === "grant-and-consulting-summary" && node.payload.templateId === "grant-consulting-one-slide"));
+
   const hybridTemplate = getWorkflowTemplate("spatial-realistic-hybrid-panel");
   assert.equal(hybridTemplate.recommendedStyleProfile, "scientific-editorial-realism");
   assert.ok(hybridTemplate.previewAssetIds.includes("realistic-he-tissue-section"));
@@ -1872,16 +1975,16 @@ test("priority flagship templates generate commercial editable figure structures
 
 test("asset quality report captures benchmark-driven coverage gaps", () => {
   const report = getAssetQualityReport();
-  assert.equal(report.summary.totalAssets, 392);
-  assert.equal(report.summary.biologyAssets, 312);
+  assert.equal(report.summary.totalAssets, 428);
+  assert.equal(report.summary.biologyAssets, 348);
   assert.equal(report.summary.aiAssets, 80);
-  assert.equal(report.tierCounts.signature + report.tierCounts.hero, 327);
-  assert.equal(report.workflowCoverage.length, 16);
+  assert.equal(report.tierCounts.signature + report.tierCounts.hero, 363);
+  assert.equal(report.workflowCoverage.length, 17);
   assert.ok(report.workflowCoverage.every((pack) => pack.missingAssetIds.length === 0));
   assert.ok(report.workflowCoverage.every((pack) => pack.missingTemplateIds.length === 0));
   assert.ok(report.workflowCoverage.every((pack) => pack.templateCount >= 4));
   assert.ok(report.workflowCoverage.every((pack) => pack.flagshipTemplateId));
-  assert.ok(report.styleCoverage.every((style) => style.count === 392));
+  assert.ok(report.styleCoverage.every((style) => style.count === 428));
   assert.ok(report.benchmarks.some((benchmark) => benchmark.id === "biorender"));
   assert.ok(report.benchmarks.some((benchmark) => benchmark.id === "figma-components"));
   assert.ok(report.qualityRubric.some((item) => item.includes("Recognizable at 48px")));
@@ -1896,7 +1999,8 @@ test("asset quality report captures benchmark-driven coverage gaps", () => {
   assert.ok(report.workflowCoverage.some((pack) => pack.id === "lab-automation" && pack.signatureOrHeroCount >= 12 && pack.qaStatus === "premium"));
   assert.ok(report.workflowCoverage.some((pack) => pack.id === "anatomy-organ-systems" && pack.signatureOrHeroCount >= 12 && pack.qaStatus === "premium"));
   assert.ok(report.workflowCoverage.some((pack) => pack.id === "methods-and-protocols" && pack.signatureOrHeroCount >= 12 && pack.qaStatus === "premium"));
-  assert.deepEqual(report.recommendedNextPacks.slice(0, 3), ["grant-and-consulting-summary", "clinical-translational", "immunology-oncology"]);
+  assert.ok(report.workflowCoverage.some((pack) => pack.id === "grant-and-consulting-summary" && pack.signatureOrHeroCount >= 12 && pack.qaStatus === "premium"));
+  assert.deepEqual(report.recommendedNextPacks.slice(0, 3), ["clinical-translational", "immunology-oncology", "bio-llm-benchmarks"]);
 });
 
 test("premium asset appearance overrides survive rendering and export", () => {

@@ -112,7 +112,7 @@ test("local API exposes premium asset search, render, and recommendations", asyn
 
   try {
     const packs = await fetch(`${base}/assets/workflow-packs`).then((response) => response.json());
-    assert.equal(packs.workflowPacks.length, 16);
+    assert.equal(packs.workflowPacks.length, 17);
     assert.ok(packs.workflowPacks.some((pack: { id: string; flagshipTemplateId?: string }) => pack.id === "drug-discovery" && pack.flagshipTemplateId === "drug-discovery-funnel"));
     assert.ok(packs.workflowPacks.some((pack: { id: string; flagshipTemplateId?: string }) => pack.id === "protein-engineering" && pack.flagshipTemplateId === "protein-engineering-platform"));
     assert.ok(packs.workflowPacks.some((pack: { id: string; flagshipTemplateId?: string }) => pack.id === "synthetic-biology" && pack.flagshipTemplateId === "synthetic-biology-platform"));
@@ -122,6 +122,7 @@ test("local API exposes premium asset search, render, and recommendations", asyn
     assert.ok(packs.workflowPacks.some((pack: { id: string; flagshipTemplateId?: string }) => pack.id === "lab-automation" && pack.flagshipTemplateId === "lab-automation-platform"));
     assert.ok(packs.workflowPacks.some((pack: { id: string; flagshipTemplateId?: string }) => pack.id === "anatomy-organ-systems" && pack.flagshipTemplateId === "anatomy-organ-system-overview"));
     assert.ok(packs.workflowPacks.some((pack: { id: string; flagshipTemplateId?: string }) => pack.id === "methods-and-protocols" && pack.flagshipTemplateId === "methods-protocol-overview"));
+    assert.ok(packs.workflowPacks.some((pack: { id: string; flagshipTemplateId?: string }) => pack.id === "grant-and-consulting-summary" && pack.flagshipTemplateId === "grant-consulting-one-slide"));
 
     const gallery = await fetch(`${base}/assets/workflow-packs/ai-biosecurity-eval/gallery?styleProfile=risk-warning`).then((response) => response.json());
     assert.equal(gallery.gallery.pack.id, "ai-biosecurity-eval");
@@ -155,12 +156,12 @@ test("local API exposes premium asset search, render, and recommendations", asyn
     assert.ok(templateQa.qa.actionItems.some((item: { title: string }) => item.title === "Resolve claim citations"));
 
     const report = await fetch(`${base}/assets/quality-report`).then((response) => response.json());
-    assert.equal(report.report.summary.totalAssets, 392);
+    assert.equal(report.report.summary.totalAssets, 428);
     assert.ok(report.report.benchmarks.some((benchmark: { id: string }) => benchmark.id === "biorender"));
     assert.ok(report.report.priorityGaps.some((gap: string) => gap.includes("Office editability")));
 
     const coverage = await fetch(`${base}/assets/coverage-gap-report`).then((response) => response.json());
-    assert.equal(coverage.report.baseline.totalAssets, 392);
+    assert.equal(coverage.report.baseline.totalAssets, 428);
     assert.equal(coverage.report.productWedge, "asset-breadth-library");
     assert.deepEqual(coverage.report.broadMarketPackOrder.slice(0, 3), ["drug-discovery", "protein-engineering", "synthetic-biology"]);
     assert.ok(coverage.report.milestones.some((milestone: { targetAssets: number }) => milestone.targetAssets === 1200));
@@ -216,6 +217,14 @@ test("local API exposes premium asset search, render, and recommendations", asyn
     assert.equal(anatomyPackRecommendation.recommendations[0].pack.id, "anatomy-organ-systems");
     assert.equal(anatomyPackRecommendation.recommendations[0].recommendedTemplateId, "anatomy-organ-system-overview");
 
+    const grantPackRecommendation = await fetch(`${base}/assets/recommend-workflow-pack`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ title: "Grant consulting specific aims one-pager", narrative: "problem statement opportunity aims milestone roadmap risk matrix recommendation and executive takeaway", limit: 2 })
+    }).then((response) => response.json());
+    assert.equal(grantPackRecommendation.recommendations[0].pack.id, "grant-and-consulting-summary");
+    assert.equal(grantPackRecommendation.recommendations[0].recommendedTemplateId, "grant-consulting-one-slide");
+
     const assetSet = await fetch(`${base}/assets/recommend-asset-set`, {
       method: "POST",
       headers: { "content-type": "application/json" },
@@ -244,7 +253,7 @@ test("local API exposes premium asset search, render, and recommendations", asyn
     const searched = await fetch(`${base}/assets?query=spatial%20transcriptomics&workflowPack=spatial-transcriptomics&styleProfile=consulting-2p5d&limit=5`).then((response) => response.json());
     assert.ok(searched.assets.some((asset: { id: string }) => asset.id === "spatial-grid" || asset.id === "visium-spot-array"));
     assert.ok(searched.results.every((result: { asset: { workflowPacks: string[] } }) => result.asset.workflowPacks.includes("spatial-transcriptomics")));
-    assert.equal(searched.count, 422);
+    assert.equal(searched.count, 458);
 
     const drugDiscoverySearch = await fetch(`${base}/assets?query=lead%20toxicity%20dose%20selectivity%20pk%20sar&workflowPack=drug-discovery&styleProfile=consulting-2p5d&limit=12`).then((response) => response.json());
     const drugDiscoveryIds = drugDiscoverySearch.assets.map((asset: { id: string }) => asset.id);
@@ -304,6 +313,13 @@ test("local API exposes premium asset search, render, and recommendations", asyn
     assert.ok(anatomyIds.includes("anatomy-overview"));
     assert.ok(anatomyIds.includes("organ-axis-brain-lung-gut"));
     assert.ok(anatomyIds.includes("tissue-biomarker-panel"));
+
+    const grantSearch = await fetch(`${base}/assets?query=grant%20specific%20aims%20executive%20summary%20roadmap%20risk%20recommendation&workflowPack=grant-and-consulting-summary&styleProfile=consulting-2p5d&limit=20`).then((response) => response.json());
+    const grantIds = grantSearch.assets.map((asset: { id: string }) => asset.id);
+    assert.ok(grantSearch.results.every((result: { asset: { workflowPacks: string[] } }) => result.asset.workflowPacks.includes("grant-and-consulting-summary")));
+    assert.ok(grantIds.includes("grant-summary-board"));
+    assert.ok(grantIds.includes("hypothesis-aims"));
+    assert.ok(grantIds.includes("recommendation-card"));
 
     const asset = await fetch(`${base}/assets/risk-gate`).then((response) => response.json());
     assert.equal(asset.asset.family, "riskGate");
@@ -738,7 +754,7 @@ test("MCP tools expose premium asset search, preview, recommendation, and insert
     params: { name: "get_asset_quality_report", arguments: {} }
   });
   const qualityPayload = JSON.parse((quality.result as { content: { text: string }[] }).content[0].text);
-  assert.equal(qualityPayload.report.summary.totalAssets, 392);
+  assert.equal(qualityPayload.report.summary.totalAssets, 428);
   assert.ok(qualityPayload.report.benchmarks.some((benchmark: { id: string }) => benchmark.id === "figma-components"));
   assert.ok(qualityPayload.report.workflowCoverage.some((pack: { id: string }) => pack.id === "publication-results-panels"));
 

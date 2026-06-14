@@ -561,7 +561,8 @@ export const BROAD_MARKET_PACK_ORDER = [
   "microscopy-image-analysis",
   "lab-automation",
   "anatomy-organ-systems",
-  "methods-and-protocols"
+  "methods-and-protocols",
+  "grant-and-consulting-summary"
 ];
 
 const COMMERCIAL_PACK_MINIMUM_CONTRACT = {
@@ -1097,6 +1098,16 @@ export const PREMIUM_WORKFLOW_PACKS: WorkflowPack[] = [
     assetIds: ["protocol-overview", "sample-prep-workflow", "reagent-mastermix", "serial-dilution", "incubation-step", "wash-step", "centrifugation-step", "magnetic-bead-cleanup", "pcr-amplification", "qpcr-assay", "rt-qpcr-assay", "elisa-assay", "western-blot-workflow", "gel-imaging", "immunostaining", "fixation-permeabilization", "cell-culture-passaging", "transfection-step", "library-prep-workflow", "assay-timeline", "protocol-checklist", "protocol-qc-gate", "replicate-layout", "control-sample-set", "standard-curve", "reagent-compatibility", "temperature-profile", "sample-normalization", "aliquot-plan", "protocol-deviation", "method-safety-note", "pipette", "plate-96", "plate-384", "centrifuge", "incubator", "gel-electrophoresis", "western-blot", "qpcr-machine", "flow-cytometry", "sequencer", "microscope", "biosafety-cabinet", "dataset", "metric-card"],
     templates: ["methods-protocol-overview", "sample-prep-to-readout", "assay-qc-summary", "protocol-timeline-panel"],
     agentUseHints: ["Use for protocol-safe method overview slides, manuscript methods schematics, SOP summary decks, and assay setup figures.", "Keep sample preparation, reagent setup, assay execution, readout, controls, QC, and safety/review caveats as separate editable objects."]
+  },
+  {
+    id: "grant-and-consulting-summary",
+    name: "Grant and consulting summary",
+    priority: 3,
+    description: "Executive scientific one-pagers, grant specific aims, strategy briefs, impact evidence, milestone roadmaps, risk matrices, and recommendation slides.",
+    flagshipTemplateId: "grant-consulting-one-slide",
+    assetIds: ["grant-summary-board", "problem-statement-card", "scientific-opportunity-map", "hypothesis-aims", "specific-aim-1", "specific-aim-2", "specific-aim-3", "innovation-claim", "approach-workplan", "milestone-roadmap", "quarterly-timeline", "budget-envelope", "resource-allocation", "team-capability-map", "stakeholder-map", "decision-brief", "value-proposition", "impact-metric-card", "outcome-kpi", "market-landscape", "competitive-positioning", "evidence-snapshot", "data-room-index", "risk-matrix", "risk-mitigation-plan", "dependency-map", "go-no-go-gate", "deliverable-package", "proposal-review", "funder-alignment", "recommendation-card", "executive-takeaway", "appendix-evidence", "consulting-one-pager", "roadmap-swimlane", "priority-scorecard", "dataset", "metric-card", "calibration", "risk-gate", "human-review", "audit-log"],
+    templates: ["grant-consulting-one-slide", "specific-aims-summary", "milestone-risk-roadmap", "impact-evidence-brief"],
+    agentUseHints: ["Use for grant aims pages, biotech strategy one-pagers, funder updates, consulting summaries, and executive scientific recommendation slides.", "Keep problem, opportunity, evidence, roadmap, risk, budget/resource, and recommendation objects separately editable for human review."]
   },
   {
     id: "space-biology-genelab",
@@ -1724,6 +1735,54 @@ export const PREMIUM_WORKFLOW_TEMPLATES: WorkflowTemplate[] = [
     qaChecklist: ["Timeline labels remain compact.", "Safety/review caveat is visible.", "PPTX fallback warnings name exact method assets."]
   },
   {
+    id: "grant-consulting-one-slide",
+    workflowPack: "grant-and-consulting-summary",
+    name: "Grant consulting one-slide summary",
+    description: "Executive scientific one-pager with problem, opportunity, evidence, aims, roadmap, risk, impact metrics, and recommendation.",
+    layout: "multi-panel",
+    recommendedStyleProfile: "consulting-2p5d",
+    previewAssetIds: ["grant-summary-board", "problem-statement-card", "milestone-roadmap", "recommendation-card"],
+    nodeKinds: ["shape", "text", "symbol", "plot", "connector"],
+    agentUseHints: ["Use as the flagship slide for grant summary, consulting brief, funder update, or biotech strategy deck source notes.", "Keep problem, evidence, aims, roadmap, risk, and recommendation as separate editable objects."],
+    qaChecklist: ["Executive claim language is concise.", "Evidence and recommendation are visually separated.", "Impact and risk claims remain reviewable before export."]
+  },
+  {
+    id: "specific-aims-summary",
+    workflowPack: "grant-and-consulting-summary",
+    name: "Specific aims summary",
+    description: "Grant-style aims page with hypothesis, three aims, innovation, approach, and expected outcome cards.",
+    layout: "multi-panel",
+    recommendedStyleProfile: "consulting-2p5d",
+    previewAssetIds: ["hypothesis-aims", "specific-aim-1", "specific-aim-2", "specific-aim-3"],
+    nodeKinds: ["shape", "text", "symbol", "connector"],
+    agentUseHints: ["Use when source notes mention specific aims, proposal hypothesis, innovation, approach, or expected outcomes.", "Avoid overclaiming feasibility; attach review items to hypothesis and outcome statements."],
+    qaChecklist: ["Aim numbering is clear.", "Hypothesis and approach are distinct.", "Uncited expected outcomes are flagged."]
+  },
+  {
+    id: "milestone-risk-roadmap",
+    workflowPack: "grant-and-consulting-summary",
+    name: "Milestone and risk roadmap",
+    description: "Milestone roadmap with quarterly timeline, dependencies, go/no-go gate, risk matrix, mitigation, and deliverables.",
+    layout: "pipeline",
+    recommendedStyleProfile: "consulting-2p5d",
+    previewAssetIds: ["milestone-roadmap", "quarterly-timeline", "risk-matrix", "go-no-go-gate"],
+    nodeKinds: ["shape", "text", "symbol", "connector"],
+    agentUseHints: ["Use for workplans, project roadmaps, grant milestones, consulting implementation plans, and risk mitigation slides.", "Keep roadmap state and risk assumptions as reviewable objects."],
+    qaChecklist: ["Milestones fit without text overflow.", "Risks and mitigations are paired.", "Go/no-go criteria are marked draft unless source-backed."]
+  },
+  {
+    id: "impact-evidence-brief",
+    workflowPack: "grant-and-consulting-summary",
+    name: "Impact evidence brief",
+    description: "Impact and value brief with evidence snapshot, metrics, stakeholder alignment, market landscape, and recommendation card.",
+    layout: "results",
+    recommendedStyleProfile: "consulting-2p5d",
+    previewAssetIds: ["impact-metric-card", "evidence-snapshot", "stakeholder-map", "executive-takeaway"],
+    nodeKinds: ["shape", "text", "symbol", "plot"],
+    agentUseHints: ["Use for executive summaries, funder updates, strategy recommendations, or outcome-oriented consulting slides.", "Separate evidence, metric, stakeholder, and recommendation claims for review."],
+    qaChecklist: ["Metric provenance is visible.", "Recommendation does not hide evidence caveats.", "PPTX fallback warnings name exact strategy assets."]
+  },
+  {
     id: "spatial-workflow",
     workflowPack: "spatial-transcriptomics",
     name: "Spatial workflow",
@@ -2133,6 +2192,35 @@ const SIGNATURE_ASSET_IDS = new Set([
   "standard-curve",
   "sample-normalization",
   "method-safety-note",
+  "grant-summary-board",
+  "problem-statement-card",
+  "scientific-opportunity-map",
+  "hypothesis-aims",
+  "specific-aim-1",
+  "specific-aim-2",
+  "specific-aim-3",
+  "innovation-claim",
+  "approach-workplan",
+  "milestone-roadmap",
+  "quarterly-timeline",
+  "budget-envelope",
+  "resource-allocation",
+  "team-capability-map",
+  "stakeholder-map",
+  "decision-brief",
+  "value-proposition",
+  "impact-metric-card",
+  "outcome-kpi",
+  "market-landscape",
+  "competitive-positioning",
+  "evidence-snapshot",
+  "risk-matrix",
+  "risk-mitigation-plan",
+  "go-no-go-gate",
+  "proposal-review",
+  "funder-alignment",
+  "recommendation-card",
+  "executive-takeaway",
   "medicinal-chemistry-cycle",
   "efficacy-model",
   "ind-enabling-package",
@@ -2341,6 +2429,50 @@ const BIOLOGY_SEEDS: AssetSeed[] = [
   ...biology("Methods and protocols", "riskGate", "risk", [
     ["protocol-qc-gate", "Protocol QC gate", "protocol qc gate acceptance review"],
     ["method-safety-note", "Method safety note", "method safety note caveat review"]
+  ], "#dc2626"),
+  ...biology("Grant and consulting summary", "workflowBlock", "process", [
+    ["grant-summary-board", "Grant summary board", "grant consulting executive summary board one pager"],
+    ["problem-statement-card", "Problem statement card", "problem statement unmet need scientific challenge"],
+    ["scientific-opportunity-map", "Scientific opportunity map", "opportunity map strategy landscape science"],
+    ["hypothesis-aims", "Hypothesis and aims", "grant hypothesis specific aims overview"],
+    ["specific-aim-1", "Specific Aim 1", "specific aim one grant objective"],
+    ["specific-aim-2", "Specific Aim 2", "specific aim two grant objective"],
+    ["specific-aim-3", "Specific Aim 3", "specific aim three grant objective"],
+    ["innovation-claim", "Innovation claim", "innovation novelty scientific claim"],
+    ["approach-workplan", "Approach workplan", "approach workplan strategy plan"],
+    ["milestone-roadmap", "Milestone roadmap", "milestone roadmap project plan"],
+    ["quarterly-timeline", "Quarterly timeline", "quarterly timeline roadmap gantt"],
+    ["roadmap-swimlane", "Roadmap swimlane", "roadmap swimlane workstream plan"],
+    ["consulting-one-pager", "Consulting one-pager", "consulting one pager executive summary"],
+    ["deliverable-package", "Deliverable package", "deliverable package report deck data handoff"],
+    ["appendix-evidence", "Appendix evidence", "appendix evidence backup data"]
+  ], "#2563eb"),
+  ...biology("Grant and consulting summary", "metricPanel", "evaluation", [
+    ["budget-envelope", "Budget envelope", "budget envelope funding cost summary"],
+    ["resource-allocation", "Resource allocation", "resource allocation capacity budget"],
+    ["impact-metric-card", "Impact metric card", "impact metric kpi outcome summary"],
+    ["outcome-kpi", "Outcome KPI", "outcome kpi success metric"],
+    ["market-landscape", "Market landscape", "market landscape competitive field"],
+    ["competitive-positioning", "Competitive positioning", "competitive positioning 2x2 matrix"],
+    ["evidence-snapshot", "Evidence snapshot", "evidence snapshot result summary"],
+    ["data-room-index", "Data room index", "data room diligence document index"],
+    ["priority-scorecard", "Priority scorecard", "priority scorecard weighted ranking"]
+  ], "#0d9488"),
+  ...biology("Grant and consulting summary", "governance", "governance", [
+    ["team-capability-map", "Team capability map", "team capability map roles expertise"],
+    ["stakeholder-map", "Stakeholder map", "stakeholder map funder sponsor team"],
+    ["decision-brief", "Decision brief", "decision brief recommendation memo"],
+    ["proposal-review", "Proposal review", "proposal review panel feedback"],
+    ["funder-alignment", "Funder alignment", "funder alignment mission fit"],
+    ["recommendation-card", "Recommendation card", "recommendation card executive action"],
+    ["executive-takeaway", "Executive takeaway", "executive takeaway headline summary"]
+  ], "#7c3aed"),
+  ...biology("Grant and consulting summary", "riskGate", "risk", [
+    ["value-proposition", "Value proposition", "value proposition benefit risk tradeoff"],
+    ["risk-matrix", "Risk matrix", "risk matrix likelihood impact"],
+    ["risk-mitigation-plan", "Risk mitigation plan", "risk mitigation plan"],
+    ["dependency-map", "Dependency map", "dependency map blockers assumptions"],
+    ["go-no-go-gate", "Go/no-go gate", "go no-go gate decision milestone"]
   ], "#dc2626"),
   ...biology("Spatial and imaging", "spatial", "assay", [
     ["spatial-grid", "Spatial transcriptomics grid", "spatial transcriptomics visium"],
@@ -2862,11 +2994,11 @@ export function getAssetQualityReport(): AssetQualityReport {
     qualityRubric: [...ASSET_QUALITY_RUBRIC],
     priorityGaps: buildPriorityGaps(workflowCoverage, styleCoverage),
     recommendedNextPacks: [
-      "grant-and-consulting-summary",
       "clinical-translational",
       "immunology-oncology",
       "bio-llm-benchmarks",
-      "biosafety-permissioning"
+      "biosafety-permissioning",
+      "space-omics-mission-design"
     ]
   };
 }
@@ -2940,8 +3072,9 @@ export function getAssetCoverageGapReport(): AssetCoverageGapReport {
       "Use lab-automation as the seventh active broad-market pack and audit liquid handling, robotics, plate logistics, LIMS, scheduling, and QC visual QA.",
       "Use anatomy-organ-systems as the eighth active broad-market pack and audit organ maps, tissue modules, sample flow, biomarker evidence, and clinical endpoint review.",
       "Use methods-and-protocols as the ninth active broad-market pack and audit sample prep, reagent setup, assay readout, controls, QC, and method caveat visual QA.",
+      "Use grant-and-consulting-summary as the tenth active workflow pack and audit problem, aims, evidence, roadmap, risk, budget/resource, stakeholder, and recommendation visual QA.",
       "Promote or add pack-specific signature assets for target validation, compound library, toxicity screen, ADMET, candidate nomination, and assay evidence.",
-      "Add the next broad packs in order: grant-and-consulting-summary, clinical-translational.",
+      "Add the next broad packs in order: clinical-translational, immunology-oncology.",
       "Keep MCP/API recommendations pack-first so Codex or Claude can request workflowPack, templateId, assetId, styleProfile, semanticSlot, and appearance overrides."
     ]
   };
@@ -4682,6 +4815,38 @@ const WORKFLOW_CORE_ASSET_IDS: Record<string, string[]> = {
     "plate-96",
     "centrifuge",
     "incubator"
+  ],
+  "grant-and-consulting-summary": [
+    "grant-summary-board",
+    "problem-statement-card",
+    "scientific-opportunity-map",
+    "hypothesis-aims",
+    "specific-aim-1",
+    "specific-aim-2",
+    "specific-aim-3",
+    "innovation-claim",
+    "approach-workplan",
+    "milestone-roadmap",
+    "quarterly-timeline",
+    "roadmap-swimlane",
+    "budget-envelope",
+    "resource-allocation",
+    "team-capability-map",
+    "stakeholder-map",
+    "decision-brief",
+    "value-proposition",
+    "impact-metric-card",
+    "outcome-kpi",
+    "evidence-snapshot",
+    "risk-matrix",
+    "risk-mitigation-plan",
+    "dependency-map",
+    "go-no-go-gate",
+    "recommendation-card",
+    "executive-takeaway",
+    "priority-scorecard",
+    "dataset",
+    "metric-card"
   ]
 };
 
@@ -6580,6 +6745,7 @@ function createTemplateFigureNodes(pack: WorkflowPack, template: WorkflowTemplat
   if (template.id === "lab-automation-platform") return createLabAutomationFlagshipTemplateNodes(template, input);
   if (template.id === "anatomy-organ-system-overview") return createAnatomyOrganSystemsFlagshipTemplateNodes(template, input);
   if (template.id === "methods-protocol-overview") return createMethodsProtocolsFlagshipTemplateNodes(template, input);
+  if (template.id === "grant-consulting-one-slide") return createGrantConsultingFlagshipTemplateNodes(template, input);
   if (template.id === "ai-biosecurity-pipeline") return createAiBiosecurityFlagshipTemplateNodes(template, input);
   if (template.id === "permissioning-ladder") return createPermissioningLadderTemplateNodes(template, input);
   if (template.id === "benchmark-dashboard") return createBenchmarkDashboardTemplateNodes(template, input);
@@ -9538,6 +9704,253 @@ function createMethodsProtocolsFlagshipTemplateNodes(template: WorkflowTemplate,
   return nodes.map((node, index) => ({ ...node, transform: { ...node.transform, z: index } }));
 }
 
+function createGrantConsultingFlagshipTemplateNodes(template: WorkflowTemplate, input: {
+  styleProfile?: AssetStyleProfile;
+  x?: number;
+  y?: number;
+  width?: number;
+}): SceneNode[] {
+  const styleProfile = input.styleProfile ?? template.recommendedStyleProfile;
+  const x = input.x ?? 72;
+  const y = input.y ?? 104;
+  const width = input.width ?? 1064;
+  const theme = flagshipStyleTheme(styleProfile, "blue");
+  const source = curatedProvenance("Synthetic grant-and-consulting flagship demo data generated by Scientific Image", "Scientific Image grant-and-consulting-summary workflow pack fixture");
+  const figureText = (text: string, transform: Transform, style: Style = {}): SceneNode => ({
+    ...createTextNode(text, transform, style),
+    claimStatus: "draft-visual"
+  });
+  const figureShape = (shape: "round-rect" | "ellipse" | "rect" | "diamond" | "line", label: string, transform: Transform, style: Style = {}): SceneNode => ({
+    ...createShapeNode(shape, label, transform, style),
+    claimStatus: "draft-visual"
+  });
+  const symbol = (
+    assetId: string,
+    label: string,
+    sx: number,
+    sy: number,
+    sw: number,
+    sh: number,
+    layoutHint: string,
+    appearance: SymbolAppearance = {},
+    profile: AssetStyleProfile = styleProfile
+  ): SceneNode => createCuratedSymbolNode({
+    assetId,
+    label,
+    x: sx,
+    y: sy,
+    width: sw,
+    height: sh,
+    styleProfile: profile,
+    semanticRole: "grant-and-consulting-summary",
+    layoutHint,
+    appearance: { ...theme.symbolAppearance, ...appearance }
+  });
+
+  const nodes: SceneNode[] = [
+    figureShape("round-rect", "", createTransform(x - 18, y - 44, width + 36, 538), {
+      fill: theme.outerFill,
+      stroke: theme.outerStroke,
+      strokeWidth: 2,
+      depth: theme.outerDepth
+    }),
+    figureText("Grant and consulting executive summary", createTransform(x, y - 32, 650, 30), {
+      fontSize: 22,
+      fontWeight: 900,
+      color: theme.heading
+    }),
+    figureText("Agent-ready one-pager keeps problem, evidence, aims, roadmap, risk, resources, and recommendation as separate editable objects.", createTransform(x + 664, y - 34, width - 664, 44), {
+      fontSize: 11.2,
+      fontWeight: 650,
+      color: theme.muted
+    }),
+    figureShape("round-rect", "", createTransform(x + 4, y + 12, 274, 28), {
+      fill: theme.chipFill,
+      stroke: theme.chipStroke,
+      strokeWidth: 1,
+      depth: "surface"
+    }),
+    figureText("pack: grant-and-consulting-summary", createTransform(x + 18, y + 17, 244, 18), {
+      fontSize: 10.2,
+      fontWeight: 850,
+      color: theme.accent
+    }),
+    figureShape("round-rect", "", createTransform(x + 292, y + 12, 344, 28), {
+      fill: theme.chipAltFill,
+      stroke: theme.isLine ? "#111827" : theme.isDark ? "#334155" : "#bbf7d0",
+      strokeWidth: 1,
+      depth: "surface"
+    }),
+    figureText("agent-ready problem -> evidence -> ask", createTransform(x + 308, y + 17, 310, 18), {
+      fontSize: 10.2,
+      fontWeight: 850,
+      color: theme.accent2
+    })
+  ];
+
+  const stageY = y + 64;
+  const stageH = 164;
+  const stageW = Math.round((width - 64) / 5);
+  const stages: Array<{ assetId: string; label: string; kind: string; note: string; accent: string; profile?: AssetStyleProfile }> = [
+    { assetId: "problem-statement-card", label: "Problem", kind: "need", note: "unmet gap", accent: theme.accent },
+    { assetId: "scientific-opportunity-map", label: "Opportunity", kind: "wedge", note: "why now", accent: "#0d9488" },
+    { assetId: "hypothesis-aims", label: "Aims", kind: "plan", note: "hypothesis + aims", accent: "#7c3aed" },
+    { assetId: "milestone-roadmap", label: "Roadmap", kind: "path", note: "milestones", accent: theme.accent2 },
+    { assetId: "recommendation-card", label: "Decision", kind: "ask", note: "review + action", accent: theme.warningText, profile: theme.riskSymbolProfile }
+  ];
+  stages.forEach((stage, index) => {
+    const sx = x + index * (stageW + 16);
+    const reviewStage = index === stages.length - 1;
+    nodes.push(figureShape("round-rect", "", createTransform(sx, stageY, stageW, stageH), {
+      fill: reviewStage ? theme.warningFill : index % 2 ? theme.panelAltFill : theme.panelFill,
+      stroke: reviewStage ? theme.warningStroke : theme.panelStroke,
+      strokeWidth: 1.25,
+      depth: reviewStage ? theme.floatingDepth : theme.panelDepth
+    }));
+    nodes.push(figureShape("round-rect", "", createTransform(sx + 12, stageY + 12, 36, 20), {
+      fill: theme.isDark ? "#0f172a" : "#ffffff",
+      stroke: reviewStage ? theme.warningStroke : theme.panelStroke,
+      strokeWidth: 1,
+      depth: "surface"
+    }));
+    nodes.push(figureText(`0${index + 1}`, createTransform(sx + 21, stageY + 16, 18, 12), {
+      fontSize: 8.8,
+      fontWeight: 950,
+      color: reviewStage ? theme.warningText : stage.accent
+    }));
+    nodes.push(figureShape("round-rect", "", createTransform(sx + stageW - 84, stageY + 12, 70, 20), {
+      fill: reviewStage ? theme.warningFill : theme.chipFill,
+      stroke: reviewStage ? theme.warningStroke : theme.chipStroke,
+      strokeWidth: 1,
+      depth: "surface"
+    }));
+    nodes.push(figureText(stage.kind, createTransform(sx + stageW - 72, stageY + 16, 48, 12), {
+      fontSize: 7.4,
+      fontWeight: 850,
+      color: reviewStage ? theme.warningText : stage.accent
+    }));
+    nodes.push(symbol(stage.assetId, stage.label, sx + Math.round((stageW - 112) / 2), stageY + 34, 112, 86, `${template.id}:stage-${index + 1}`, { accent: stage.accent, stroke: stage.accent, labelVisible: false }, stage.profile ?? styleProfile));
+    nodes.push(figureText(stage.label, createTransform(sx + 14, stageY + 122, stageW - 28, 18), {
+      fontSize: 12,
+      fontWeight: 900,
+      color: reviewStage ? theme.warningText : theme.text
+    }));
+    nodes.push(figureText(stage.note, createTransform(sx + 14, stageY + 142, stageW - 28, 16), {
+      fontSize: 9.2,
+      fontWeight: 720,
+      color: theme.muted
+    }));
+    if (index > 0) {
+      nodes.push(createConnectorNode([
+        { x: sx - 16, y: stageY + 82 },
+        { x: sx - 2, y: stageY + 82 }
+      ], "", { stroke: theme.connector, strokeWidth: 2.3 }));
+    }
+  });
+  nodes.push(figureShape("round-rect", "", createTransform(x + 4, stageY + stageH + 14, width - 8, 28), {
+    fill: theme.isDark ? "#0f172a" : "#f8fafc",
+    stroke: theme.panelStroke,
+    strokeWidth: 1,
+    depth: "surface"
+  }));
+  nodes.push(figureText("Decision spine: define need -> show evidence -> commit aims -> de-risk roadmap -> make recommendation", createTransform(x + 24, stageY + stageH + 20, width - 48, 16), {
+    fontSize: 9.5,
+    fontWeight: 820,
+    color: theme.muted
+  }));
+
+  const lowerY = y + 280;
+  const gap = 22;
+  const panelW = Math.round((width - gap * 2) / 3);
+  const impactTable = {
+    id: createId("table"),
+    name: "Illustrative impact trajectory",
+    columns: ["milestone", "impact", "series"],
+    rows: [
+      { milestone: 1, impact: 0.22, series: "impact" },
+      { milestone: 2, impact: 0.38, series: "impact" },
+      { milestone: 3, impact: 0.58, series: "impact" },
+      { milestone: 4, impact: 0.76, series: "impact" }
+    ],
+    source
+  };
+  const addPanel = (tag: string, title: string, status: string, px: number, py: number, pw: number, fill = theme.panelFill, tone = theme.text) => {
+    const review = status === "review";
+    nodes.push(figureShape("round-rect", "", createTransform(px, py, pw, 204), {
+      fill,
+      stroke: review ? theme.warningStroke : theme.panelStroke,
+      strokeWidth: 1.25,
+      depth: theme.panelDepth
+    }));
+    nodes.push(figureShape("round-rect", "", createTransform(px + 14, py + 14, 28, 22), {
+      fill: theme.isDark ? "#0f172a" : "#ffffff",
+      stroke: review ? theme.warningStroke : theme.panelStroke,
+      strokeWidth: 1,
+      depth: "surface"
+    }));
+    nodes.push(figureText(tag, createTransform(px + 14, py + 17, 28, 16), {
+      fontSize: 12,
+      fontWeight: 920,
+      color: tone
+    }));
+    nodes.push(figureText(title, createTransform(px + 52, py + 16, pw - 142, 20), {
+      fontSize: 11.6,
+      fontWeight: 850,
+      color: tone
+    }));
+    nodes.push(figureShape("round-rect", "", createTransform(px + pw - 88, py + 14, 74, 22), {
+      fill: review ? theme.warningFill : theme.chipFill,
+      stroke: review ? theme.warningStroke : theme.chipStroke,
+      strokeWidth: 1,
+      depth: "surface"
+    }));
+    nodes.push(figureText(status, createTransform(px + pw - 76, py + 19, 52, 12), {
+      fontSize: 7.9,
+      fontWeight: 850,
+      color: review ? theme.warningText : tone
+    }));
+  };
+  addPanel("A", "Evidence and impact", "proof", x, lowerY, panelW, theme.panelFill, theme.accent);
+  addPanel("B", "Plan and resources", "roadmap", x + panelW + gap, lowerY, panelW, theme.panelAltFill, theme.accent2);
+  addPanel("C", "Risk and decision", "review", x + (panelW + gap) * 2, lowerY, width - (panelW + gap) * 2, theme.warningFill, theme.warningText);
+  nodes.push(
+    symbol("evidence-snapshot", "Evidence", x + 20, lowerY + 52, 62, 74, `${template.id}:evidence`, { accent: theme.accent, stroke: theme.accent, labelVisible: false }),
+    symbol("impact-metric-card", "Impact", x + 88, lowerY + 52, 62, 74, `${template.id}:impact`, { accent: "#0d9488", stroke: "#0d9488", labelVisible: false }),
+    symbol("outcome-kpi", "KPI", x + 156, lowerY + 52, 62, 74, `${template.id}:kpi`, { accent: "#2563eb", stroke: "#2563eb", labelVisible: false }),
+    createPlotNode({
+      id: createId("plot"),
+      plotType: "line",
+      title: "Impact",
+      table: impactTable,
+      encodings: { x: "milestone", y: "impact", color: "series" },
+      style: theme.plotStyle
+    }, createTransform(x + 232, lowerY + 50, 92, 88)),
+    figureText("Evidence, impact metric, and KPI stay distinct from the recommendation.", createTransform(x + 24, lowerY + 160, panelW - 48, 24), { fontSize: 10, fontWeight: 720, color: theme.muted }),
+    symbol("specific-aim-1", "Aim 1", x + panelW + gap + 18, lowerY + 52, 56, 72, `${template.id}:aim1`, { accent: "#2563eb", stroke: "#2563eb", labelVisible: false }),
+    symbol("specific-aim-2", "Aim 2", x + panelW + gap + 82, lowerY + 52, 56, 72, `${template.id}:aim2`, { accent: "#0d9488", stroke: "#0d9488", labelVisible: false }),
+    symbol("specific-aim-3", "Aim 3", x + panelW + gap + 146, lowerY + 52, 56, 72, `${template.id}:aim3`, { accent: "#7c3aed", stroke: "#7c3aed", labelVisible: false }),
+    symbol("budget-envelope", "Budget", x + panelW + gap + 210, lowerY + 52, 56, 72, `${template.id}:budget`, { accent: "#f59e0b", stroke: "#f59e0b", labelVisible: false }),
+    symbol("team-capability-map", "Team", x + panelW + gap + 274, lowerY + 52, 56, 72, `${template.id}:team`, { accent: "#0891b2", stroke: "#0891b2", labelVisible: false }),
+    figureText("Aims, budget, team, and milestones remain individually selectable.", createTransform(x + panelW + gap + 24, lowerY + 160, panelW - 48, 24), { fontSize: 10, fontWeight: 720, color: theme.muted }),
+    symbol("risk-matrix", "Risk", x + (panelW + gap) * 2 + 20, lowerY + 52, 66, 76, `${template.id}:risk`, { accent: theme.warningText, stroke: theme.warningText, labelVisible: false }, theme.riskSymbolProfile),
+    symbol("risk-mitigation-plan", "Mitigation", x + (panelW + gap) * 2 + 92, lowerY + 52, 66, 76, `${template.id}:mitigation`, { accent: theme.warningText, stroke: theme.warningText, labelVisible: false }, theme.riskSymbolProfile),
+    symbol("go-no-go-gate", "Gate", x + (panelW + gap) * 2 + 164, lowerY + 52, 66, 76, `${template.id}:gate`, { accent: theme.warningText, stroke: theme.warningText, labelVisible: false }, theme.riskSymbolProfile),
+    symbol("executive-takeaway", "Takeaway", x + (panelW + gap) * 2 + 236, lowerY + 52, 66, 76, `${template.id}:takeaway`, { accent: theme.warningText, stroke: theme.warningText, labelVisible: false }, theme.riskSymbolProfile),
+    figureShape("round-rect", "", createTransform(x + (panelW + gap) * 2 + 104, lowerY + 148, 210, 24), {
+      fill: theme.isDark ? "#111827" : "#ffffff",
+      stroke: theme.warningStroke,
+      strokeWidth: 1,
+      depth: "surface"
+    }),
+    figureText("executive-recommendation-review", createTransform(x + (panelW + gap) * 2 + 124, lowerY + 154, 170, 13), {
+      fontSize: 8.2,
+      fontWeight: 850,
+      color: theme.warningText
+    })
+  );
+  return nodes.map((node, index) => ({ ...node, transform: { ...node.transform, z: index } }));
+}
+
 function createSpatialResultsFlagshipTemplateNodes(template: WorkflowTemplate, input: {
   styleProfile?: AssetStyleProfile;
   x?: number;
@@ -11695,6 +12108,7 @@ function inferWorkflowPack(text: string): string | undefined {
   if (/lab automation|liquid handler|automated liquid handler|robotic arm|robotic gripper|plate handler|plate stack|plate reader|barcode scanner|lims|assay scheduler|sample tracker|automation qc|qc gate|incubator stack|automated microscope|acoustic dispenser|colony picker|deck layout|tip rack|reagent reservoir|automation orchestrator|robotic rail/.test(normalized)) return "lab-automation";
   if (/drug|compound|hit triage|lead|admet|toxicity|target validation|candidate nomination|pharma|potency|selectivity/.test(normalized)) return "drug-discovery";
   if (/(?:^|[^a-z0-9])(?:methods?|protocols?|sample prep(?:aration)?|reagent mastermix|mastermix|serial dilution|incubation|wash step|centrifugation|magnetic bead|pcr amplification|qpcr|rt[-\s]?qpcr|elisa|western blot|gel imaging|immunostaining|fixation|permeabilization|library prep(?:aration)?|assay timeline|protocol checklist|protocol qc|replicate layout|control sample|standard curve|sample normalization|aliquot|protocol deviation|method safety)(?:$|[^a-z0-9])/.test(normalized)) return "methods-and-protocols";
+  if (/(?:^|[^a-z0-9])(?:grant|specific aims?|proposal|consulting|executive summary|one[-\s]?pager|funder|milestone roadmap|roadmap|workplan|budget|resource allocation|stakeholder|decision brief|value proposition|impact metric|outcome kpi|market landscape|competitive positioning|evidence snapshot|risk matrix|risk mitigation|dependency map|go[-\s]?no[-\s]?go|deliverable|recommendation|executive takeaway|priority scorecard)(?:$|[^a-z0-9])/.test(normalized)) return "grant-and-consulting-summary";
   if (/(?:^|[^a-z0-9])(?:perturb(?:-seq)?|crispr|screens?|screening|guide rnas?|grnas?|lentiviral)(?:$|[^a-z0-9])/.test(normalized)) return "perturb-seq-crispr";
   if (/(?:^|[^a-z0-9])(?:anatomy|organ systems?|cross[-\s]?organ|organ axis|brain[-\s]?lung[-\s]?gut|brain|lung|liver|kidney|heart|spleen|pancreas|skin|bone marrow|lymph node|vasculature|respiratory tract|intestinal villus|renal nephron|hepatic lobule|cardiac muscle|neural circuit|blood vessel|lymphatic vessel|organ sample|tissue biomarker|clinical endpoint)(?:$|[^a-z0-9])/.test(normalized)) return "anatomy-organ-systems";
   if (/publication|manuscript|paper|results?|figure panel|multi-panel|volcano|heatmap|result panel/.test(normalized)) return "publication-results-panels";

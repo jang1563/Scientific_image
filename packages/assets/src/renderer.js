@@ -316,6 +316,42 @@ export const HERO_ASSET_IDS = Object.freeze([
   "aliquot-plan",
   "protocol-deviation",
   "method-safety-note",
+  "grant-summary-board",
+  "problem-statement-card",
+  "scientific-opportunity-map",
+  "hypothesis-aims",
+  "specific-aim-1",
+  "specific-aim-2",
+  "specific-aim-3",
+  "innovation-claim",
+  "approach-workplan",
+  "milestone-roadmap",
+  "quarterly-timeline",
+  "budget-envelope",
+  "resource-allocation",
+  "team-capability-map",
+  "stakeholder-map",
+  "decision-brief",
+  "value-proposition",
+  "impact-metric-card",
+  "outcome-kpi",
+  "market-landscape",
+  "competitive-positioning",
+  "evidence-snapshot",
+  "data-room-index",
+  "risk-matrix",
+  "risk-mitigation-plan",
+  "dependency-map",
+  "go-no-go-gate",
+  "deliverable-package",
+  "proposal-review",
+  "funder-alignment",
+  "recommendation-card",
+  "executive-takeaway",
+  "appendix-evidence",
+  "consulting-one-pager",
+  "roadmap-swimlane",
+  "priority-scorecard",
   "microgravity",
   "spacecraft",
   "astronaut-sample",
@@ -989,6 +1025,43 @@ function renderRecipe(asset, width, height, palette) {
     case "protocol-deviation":
     case "method-safety-note":
       return methodsProtocolsAsset(id, cx, cy, s, palette);
+    case "grant-summary-board":
+    case "problem-statement-card":
+    case "scientific-opportunity-map":
+    case "hypothesis-aims":
+    case "specific-aim-1":
+    case "specific-aim-2":
+    case "specific-aim-3":
+    case "innovation-claim":
+    case "approach-workplan":
+    case "milestone-roadmap":
+    case "quarterly-timeline":
+    case "budget-envelope":
+    case "resource-allocation":
+    case "team-capability-map":
+    case "stakeholder-map":
+    case "decision-brief":
+    case "value-proposition":
+    case "impact-metric-card":
+    case "outcome-kpi":
+    case "market-landscape":
+    case "competitive-positioning":
+    case "evidence-snapshot":
+    case "data-room-index":
+    case "risk-matrix":
+    case "risk-mitigation-plan":
+    case "dependency-map":
+    case "go-no-go-gate":
+    case "deliverable-package":
+    case "proposal-review":
+    case "funder-alignment":
+    case "recommendation-card":
+    case "executive-takeaway":
+    case "appendix-evidence":
+    case "consulting-one-pager":
+    case "roadmap-swimlane":
+    case "priority-scorecard":
+      return grantConsultingAsset(id, cx, cy, s, palette);
     case "microgravity":
       return microgravityAsset(cx, cy, s, palette);
     case "spacecraft":
@@ -3212,6 +3285,59 @@ function methodsProtocolsAsset(id, cx, cy, s, palette) {
     return `${baseLayer(cx, cy, s, palette, "panel")}${panel("asset-methods-method-safety-note")}<rect class="asset-method-safety-note-card" x="${fmt(cx - 38 * s)}" y="${fmt(cy - 27 * s)}" width="${fmt(76 * s)}" height="${fmt(54 * s)}" rx="${fmt(10 * s)}" fill="#ffffff" stroke="${palette.stroke}" stroke-width="${fmt(1.8 * s)}"/><path class="asset-method-safety-note-badge" d="M${fmt(cx - 23 * s)},${fmt(cy - 8 * s)} l${fmt(11 * s)},${fmt(11 * s)} l${fmt(22 * s)},${fmt(-24 * s)}" fill="none" stroke="${palette.accent}" stroke-width="${fmt(3 * s)}" stroke-linecap="round" stroke-linejoin="round"/><path d="M${fmt(cx - 25 * s)},${fmt(cy + 15 * s)} H${fmt(cx + 25 * s)} M${fmt(cx - 25 * s)},${fmt(cy + 23 * s)} H${fmt(cx + 10 * s)}" stroke="${palette.accent}" stroke-width="${fmt(1.6 * s)}" stroke-linecap="round"/>${close}`;
   }
   return `${baseLayer(cx, cy, s, palette, "panel")}${panel(`asset-methods-${escapeXml(id)}`)}${checklist("asset-methods-default-row", 3)}<circle class="asset-methods-status-dot" cx="${fmt(cx + 38 * s)}" cy="${fmt(cy - 28 * s)}" r="${fmt(5 * s)}" fill="${palette.accent}"/>${close}`;
+}
+
+function grantConsultingAsset(id, cx, cy, s, palette) {
+  const panel = (classes) => `<g class="asset-grant-consulting ${classes}" filter="url(#asset-soft-shadow)"><rect x="${fmt(cx - 52 * s)}" y="${fmt(cy - 38 * s)}" width="${fmt(104 * s)}" height="${fmt(76 * s)}" rx="${fmt(16 * s)}" fill="${palette.fill}" stroke="${palette.stroke}" stroke-width="${fmt(2 * s)}"/><path d="M${fmt(cx - 43 * s)},${fmt(cy - 30 * s)} h${fmt(86 * s)}" stroke="#ffffff" stroke-width="${fmt(1.6 * s)}" opacity="0.56" stroke-linecap="round"/>`;
+  const close = "</g>";
+  const miniCard = (x, y, w, h, klass, fill = "#ffffff") => `<rect class="${klass}" x="${fmt(cx + x * s)}" y="${fmt(cy + y * s)}" width="${fmt(w * s)}" height="${fmt(h * s)}" rx="${fmt(6 * s)}" fill="${fill}" stroke="${palette.accent}" stroke-width="${fmt(1 * s)}"/>`;
+  const check = (x, y, klass = "asset-grant-check") => `<path class="${klass}" d="M${fmt(cx + x * s)},${fmt(cy + y * s)} l${fmt(6 * s)},${fmt(6 * s)} l${fmt(14 * s)},${fmt(-16 * s)}" fill="none" stroke="${palette.accent}" stroke-width="${fmt(2.3 * s)}" stroke-linecap="round" stroke-linejoin="round"/>`;
+  const sparkline = (klass = "asset-grant-sparkline") => `<path class="${klass}" d="M${fmt(cx - 33 * s)},${fmt(cy + 18 * s)} L${fmt(cx - 17 * s)},${fmt(cy + 7 * s)} L${fmt(cx - 2 * s)},${fmt(cy + 11 * s)} L${fmt(cx + 13 * s)},${fmt(cy - 8 * s)} L${fmt(cx + 34 * s)},${fmt(cy - 22 * s)}" fill="none" stroke="${palette.accent}" stroke-width="${fmt(2.4 * s)}" stroke-linecap="round" stroke-linejoin="round"/>`;
+  const aimCard = (n) => `${miniCard(-38, -25, 76, 50, `asset-specific-aim-card asset-specific-aim-${n}`, "#ffffff")}<circle class="asset-specific-aim-number" cx="${fmt(cx - 23 * s)}" cy="${fmt(cy - 9 * s)}" r="${fmt(10 * s)}" fill="${palette.accent}"/><text x="${fmt(cx - 23 * s)}" y="${fmt(cy - 5.5 * s)}" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="${fmt(9 * s)}" font-weight="900" fill="#ffffff">${n}</text><path class="asset-specific-aim-lines" d="M${fmt(cx - 7 * s)},${fmt(cy - 14 * s)} h${fmt(30 * s)} M${fmt(cx - 7 * s)},${fmt(cy)} h${fmt(36 * s)} M${fmt(cx - 28 * s)},${fmt(cy + 18 * s)} h${fmt(56 * s)}" stroke="${palette.accent}" stroke-width="${fmt(1.5 * s)}" stroke-linecap="round" opacity="0.75"/>`;
+
+  if (id === "grant-summary-board" || id === "consulting-one-pager") {
+    return `${baseLayer(cx, cy, s, palette, "panel")}${panel(`asset-grant-${id}`)}${miniCard(-41, -23, 38, 22, "asset-grant-summary-kpi-card", palette.secondary)}${miniCard(4, -23, 38, 22, "asset-grant-summary-kpi-card", "#ffffff")}${miniCard(-41, 7, 83, 20, "asset-grant-summary-decision-band", "#ffffff")}<path class="asset-grant-summary-board-layout" d="M${fmt(cx - 34 * s)},${fmt(cy - 12 * s)} h${fmt(20 * s)} M${fmt(cx + 11 * s)},${fmt(cy - 12 * s)} h${fmt(22 * s)} M${fmt(cx - 31 * s)},${fmt(cy + 17 * s)} h${fmt(60 * s)}" stroke="${palette.accent}" stroke-width="${fmt(1.5 * s)}" stroke-linecap="round"/>${close}`;
+  }
+  if (id === "problem-statement-card") {
+    return `${baseLayer(cx, cy, s, palette, "panel")}${panel("asset-grant-problem-statement-card")}<path class="asset-problem-gap-marker" d="M${fmt(cx - 33 * s)},${fmt(cy + 21 * s)} C${fmt(cx - 25 * s)},${fmt(cy - 19 * s)} ${fmt(cx + 18 * s)},${fmt(cy - 17 * s)} ${fmt(cx + 32 * s)},${fmt(cy + 20 * s)}" fill="none" stroke="${palette.accent}" stroke-width="${fmt(4 * s)}" stroke-linecap="round"/><circle cx="${fmt(cx - 34 * s)}" cy="${fmt(cy + 21 * s)}" r="${fmt(7 * s)}" fill="#ffffff" stroke="${palette.accent}" stroke-width="${fmt(1.5 * s)}"/><circle cx="${fmt(cx + 32 * s)}" cy="${fmt(cy + 20 * s)}" r="${fmt(7 * s)}" fill="#ffffff" stroke="${palette.accent}" stroke-width="${fmt(1.5 * s)}"/><path class="asset-problem-statement-lines" d="M${fmt(cx - 30 * s)},${fmt(cy - 23 * s)} h${fmt(60 * s)} M${fmt(cx - 24 * s)},${fmt(cy - 12 * s)} h${fmt(38 * s)}" stroke="${palette.accent}" stroke-width="${fmt(1.6 * s)}" stroke-linecap="round"/>${close}`;
+  }
+  if (id === "scientific-opportunity-map" || id === "market-landscape" || id === "competitive-positioning") {
+    return `${baseLayer(cx, cy, s, palette, "panel")}${panel(`asset-grant-${id}`)}<path class="asset-opportunity-map-axes" d="M${fmt(cx - 34 * s)},${fmt(cy + 25 * s)} H${fmt(cx + 36 * s)} M${fmt(cx - 34 * s)},${fmt(cy + 25 * s)} V${fmt(cy - 28 * s)}" stroke="${palette.stroke}" stroke-width="${fmt(1.6 * s)}" stroke-linecap="round"/><ellipse class="asset-opportunity-zone" cx="${fmt(cx + 17 * s)}" cy="${fmt(cy - 13 * s)}" rx="${fmt(21 * s)}" ry="${fmt(14 * s)}" fill="${palette.secondary}" stroke="${palette.accent}" stroke-width="${fmt(1.3 * s)}"/><circle class="asset-opportunity-position" cx="${fmt(cx + 19 * s)}" cy="${fmt(cy - 13 * s)}" r="${fmt(5 * s)}" fill="${palette.accent}"/><circle cx="${fmt(cx - 12 * s)}" cy="${fmt(cy + 5 * s)}" r="${fmt(4 * s)}" fill="#ffffff" stroke="${palette.accent}" stroke-width="${fmt(1 * s)}"/>${close}`;
+  }
+  if (id === "hypothesis-aims") {
+    return `${baseLayer(cx, cy, s, palette, "panel")}${panel("asset-grant-hypothesis-aims")}<g class="asset-hypothesis-aims">${[-26, 0, 26].map((x0, i) => `<circle class="asset-aim-node" cx="${fmt(cx + x0 * s)}" cy="${fmt(cy + 7 * s)}" r="${fmt(11 * s)}" fill="${i === 1 ? palette.accent : "#ffffff"}" stroke="${palette.stroke}" stroke-width="${fmt(1.3 * s)}"/><text x="${fmt(cx + x0 * s)}" y="${fmt(cy + 10.5 * s)}" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="${fmt(7 * s)}" font-weight="900" fill="${i === 1 ? "#ffffff" : palette.accent}">${i + 1}</text>`).join("")}<path class="asset-hypothesis-arrow" d="M${fmt(cx - 35 * s)},${fmt(cy - 18 * s)} H${fmt(cx + 30 * s)}" stroke="${palette.accent}" stroke-width="${fmt(2 * s)}" stroke-linecap="round"/><path d="M${fmt(cx + 22 * s)},${fmt(cy - 26 * s)} L${fmt(cx + 33 * s)},${fmt(cy - 18 * s)} L${fmt(cx + 22 * s)},${fmt(cy - 10 * s)}" fill="none" stroke="${palette.accent}" stroke-width="${fmt(2 * s)}" stroke-linecap="round" stroke-linejoin="round"/></g>${close}`;
+  }
+  if (id === "specific-aim-1" || id === "specific-aim-2" || id === "specific-aim-3") {
+    return `${baseLayer(cx, cy, s, palette, "panel")}${panel(`asset-grant-${id}`)}${aimCard(id.endsWith("1") ? 1 : id.endsWith("2") ? 2 : 3)}${close}`;
+  }
+  if (id === "milestone-roadmap" || id === "quarterly-timeline" || id === "roadmap-swimlane") {
+    return `${baseLayer(cx, cy, s, palette, "panel")}${panel(`asset-grant-${id}`)}<g class="asset-milestone-roadmap">${[-32, -10, 12, 34].map((x0, i) => `<circle class="asset-roadmap-milestone" cx="${fmt(cx + x0 * s)}" cy="${fmt(cy + (i % 2 ? 8 : -8) * s)}" r="${fmt(7 * s)}" fill="${i === 3 ? palette.accent : "#ffffff"}" stroke="${palette.accent}" stroke-width="${fmt(1.3 * s)}"/>`).join("")}<path d="M${fmt(cx - 32 * s)},${fmt(cy - 8 * s)} C${fmt(cx - 22 * s)},${fmt(cy + 10 * s)} ${fmt(cx - 1 * s)},${fmt(cy + 9 * s)} ${fmt(cx + 12 * s)},${fmt(cy - 8 * s)} S${fmt(cx + 24 * s)},${fmt(cy + 8 * s)} ${fmt(cx + 34 * s)},${fmt(cy + 8 * s)}" fill="none" stroke="${palette.accent}" stroke-width="${fmt(2 * s)}" stroke-linecap="round"/></g><path class="asset-roadmap-swimlane" d="M${fmt(cx - 39 * s)},${fmt(cy + 27 * s)} h${fmt(78 * s)} M${fmt(cx - 39 * s)},${fmt(cy + 34 * s)} h${fmt(54 * s)}" stroke="${palette.stroke}" stroke-width="${fmt(1.2 * s)}" opacity="0.45"/>${close}`;
+  }
+  if (id === "budget-envelope" || id === "resource-allocation") {
+    return `${baseLayer(cx, cy, s, palette, "panel")}${panel(`asset-grant-${id}`)}<g class="asset-budget-envelope">${miniCard(-35, -24, 70, 48, "asset-budget-envelope-card", "#ffffff")}<path class="asset-budget-stack" d="M${fmt(cx - 27 * s)},${fmt(cy + 11 * s)} h${fmt(54 * s)} M${fmt(cx - 27 * s)},${fmt(cy - 2 * s)} h${fmt(38 * s)} M${fmt(cx - 27 * s)},${fmt(cy - 15 * s)} h${fmt(47 * s)}" stroke="${palette.accent}" stroke-width="${fmt(2 * s)}" stroke-linecap="round"/><circle cx="${fmt(cx + 29 * s)}" cy="${fmt(cy - 19 * s)}" r="${fmt(6 * s)}" fill="${palette.accent}"/></g>${close}`;
+  }
+  if (id === "team-capability-map" || id === "stakeholder-map") {
+    return `${baseLayer(cx, cy, s, palette, "panel")}${panel(`asset-grant-${id}`)}<g class="asset-stakeholder-map">${[[-26, -12], [0, -22], [26, -12], [-14, 18], [18, 18]].map(([x0, y0], i) => `<circle class="asset-stakeholder-node asset-team-node" cx="${fmt(cx + x0 * s)}" cy="${fmt(cy + y0 * s)}" r="${fmt(8 * s)}" fill="${i === 1 ? palette.accent : "#ffffff"}" stroke="${palette.stroke}" stroke-width="${fmt(1.2 * s)}"/>`).join("")}<path d="M${fmt(cx)},${fmt(cy - 14 * s)} L${fmt(cx - 26 * s)},${fmt(cy - 12 * s)} M${fmt(cx)},${fmt(cy - 14 * s)} L${fmt(cx + 26 * s)},${fmt(cy - 12 * s)} M${fmt(cx)},${fmt(cy - 14 * s)} L${fmt(cx - 14 * s)},${fmt(cy + 18 * s)} M${fmt(cx)},${fmt(cy - 14 * s)} L${fmt(cx + 18 * s)},${fmt(cy + 18 * s)}" stroke="${palette.accent}" stroke-width="${fmt(1.5 * s)}" stroke-linecap="round"/></g>${close}`;
+  }
+  if (id === "impact-metric-card" || id === "outcome-kpi" || id === "priority-scorecard") {
+    return `${baseLayer(cx, cy, s, palette, "panel")}${panel(`asset-grant-${id}`)}${miniCard(-39, -27, 78, 54, "asset-impact-metric-card", "#ffffff")}${sparkline("asset-impact-sparkline")}<g class="asset-priority-score-dots">${[-25, -9, 7, 23].map((x0, i) => `<circle cx="${fmt(cx + x0 * s)}" cy="${fmt(cy - 13 * s)}" r="${fmt(3.5 * s)}" fill="${i < 3 ? palette.accent : palette.secondary}"/>`).join("")}</g>${close}`;
+  }
+  if (id === "evidence-snapshot" || id === "data-room-index" || id === "appendix-evidence") {
+    return `${baseLayer(cx, cy, s, palette, "panel")}${panel(`asset-grant-${id}`)}<g class="asset-evidence-snapshot">${[0, 1, 2].map((i) => miniCard(-35 + i * 23, -22 + i * 5, 44, 30, "asset-evidence-snapshot-card", i === 1 ? palette.secondary : "#ffffff")).join("")}<path class="asset-data-room-index-lines" d="M${fmt(cx - 24 * s)},${fmt(cy + 20 * s)} h${fmt(50 * s)} M${fmt(cx - 24 * s)},${fmt(cy + 29 * s)} h${fmt(36 * s)}" stroke="${palette.accent}" stroke-width="${fmt(1.6 * s)}" stroke-linecap="round"/></g>${close}`;
+  }
+  if (id === "risk-matrix") {
+    return `${baseLayer(cx, cy, s, palette, "panel")}${panel("asset-grant-risk-matrix")}<g class="asset-risk-matrix-grid">${Array.from({ length: 9 }, (_v, i) => `<rect class="asset-risk-cell" x="${fmt(cx + (-30 + (i % 3) * 20) * s)}" y="${fmt(cy + (-25 + Math.floor(i / 3) * 17) * s)}" width="${fmt(18 * s)}" height="${fmt(15 * s)}" rx="${fmt(3 * s)}" fill="${i > 5 ? palette.accent : i > 2 ? palette.secondary : "#ffffff"}" stroke="${palette.accent}" stroke-width="${fmt(0.8 * s)}" opacity="${i > 5 ? 0.9 : 0.68}"/>`).join("")}</g>${close}`;
+  }
+  if (id === "risk-mitigation-plan" || id === "dependency-map" || id === "go-no-go-gate" || id === "value-proposition") {
+    return `${baseLayer(cx, cy, s, palette, "panel")}${panel(`asset-grant-${id}`)}<path class="asset-go-no-go-gate" d="M${fmt(cx - 34 * s)},${fmt(cy - 22 * s)} h${fmt(68 * s)} v${fmt(44 * s)} h${fmt(-68 * s)} Z" fill="#ffffff" stroke="${palette.stroke}" stroke-width="${fmt(1.7 * s)}"/><path class="asset-risk-mitigation-arrow" d="M${fmt(cx - 20 * s)},${fmt(cy + 5 * s)} l${fmt(10 * s)},${fmt(10 * s)} l${fmt(27 * s)},${fmt(-31 * s)}" fill="none" stroke="${palette.accent}" stroke-width="${fmt(3.4 * s)}" stroke-linecap="round" stroke-linejoin="round"/><path class="asset-dependency-map-link" d="M${fmt(cx - 32 * s)},${fmt(cy - 26 * s)} C${fmt(cx - 10 * s)},${fmt(cy - 38 * s)} ${fmt(cx + 16 * s)},${fmt(cy - 36 * s)} ${fmt(cx + 33 * s)},${fmt(cy - 20 * s)}" fill="none" stroke="${palette.accent}" stroke-width="${fmt(1.6 * s)}" stroke-dasharray="${fmt(4 * s)} ${fmt(3 * s)}"/>${close}`;
+  }
+  if (id === "recommendation-card" || id === "executive-takeaway" || id === "decision-brief" || id === "proposal-review" || id === "funder-alignment") {
+    return `${baseLayer(cx, cy, s, palette, "panel")}${panel(`asset-grant-${id}`)}${miniCard(-38, -25, 76, 50, "asset-recommendation-card", "#ffffff")}${check(-20, 2, "asset-recommendation-check")}<path class="asset-takeaway-headline" d="M${fmt(cx - 26 * s)},${fmt(cy - 14 * s)} h${fmt(52 * s)} M${fmt(cx - 26 * s)},${fmt(cy + 18 * s)} h${fmt(41 * s)}" stroke="${palette.accent}" stroke-width="${fmt(1.8 * s)}" stroke-linecap="round"/>${close}`;
+  }
+  if (id === "innovation-claim" || id === "approach-workplan" || id === "deliverable-package") {
+    return `${baseLayer(cx, cy, s, palette, "panel")}${panel(`asset-grant-${id}`)}<path class="asset-innovation-claim-spark" d="M${fmt(cx)},${fmt(cy - 31 * s)} l${fmt(8 * s)},${fmt(22 * s)} l${fmt(24 * s)},${fmt(0)} l${fmt(-20 * s)},${fmt(13 * s)} l${fmt(8 * s)},${fmt(24 * s)} l${fmt(-20 * s)},${fmt(-15 * s)} l${fmt(-20 * s)},${fmt(15 * s)} l${fmt(8 * s)},${fmt(-24 * s)} l${fmt(-20 * s)},${fmt(-13 * s)} l${fmt(24 * s)},${fmt(0)} Z" fill="#ffffff" stroke="${palette.accent}" stroke-width="${fmt(1.7 * s)}" stroke-linejoin="round"/><path class="asset-approach-workplan-lines" d="M${fmt(cx - 30 * s)},${fmt(cy + 28 * s)} h${fmt(60 * s)} M${fmt(cx - 22 * s)},${fmt(cy + 36 * s)} h${fmt(44 * s)}" stroke="${palette.accent}" stroke-width="${fmt(1.5 * s)}" stroke-linecap="round"/>${close}`;
+  }
+  return `${baseLayer(cx, cy, s, palette, "panel")}${panel(`asset-grant-${escapeXml(id)}`)}${miniCard(-35, -24, 70, 48, "asset-grant-default-card", "#ffffff")}${sparkline("asset-grant-default-sparkline")}${close}`;
 }
 
 function workflowBlock(cx, cy, s, palette) {
