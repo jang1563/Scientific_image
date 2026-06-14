@@ -352,6 +352,44 @@ export const HERO_ASSET_IDS = Object.freeze([
   "consulting-one-pager",
   "roadmap-swimlane",
   "priority-scorecard",
+  "clinical-study-overview",
+  "patient-journey-map",
+  "consent-enrollment",
+  "eligibility-criteria",
+  "inclusion-exclusion",
+  "cohort-stratification",
+  "cohort-table",
+  "trial-design-schema",
+  "randomization-schema",
+  "treatment-arm-comparison",
+  "clinical-sample-flow",
+  "biospecimen-collection",
+  "longitudinal-visit-schedule",
+  "clinical-omics-bridge",
+  "translational-readout",
+  "biomarker-discovery",
+  "biomarker-validation",
+  "assay-validation",
+  "companion-diagnostic",
+  "validation-cohort",
+  "endpoint-hierarchy",
+  "primary-endpoint",
+  "secondary-endpoint",
+  "clinical-response-card",
+  "survival-curve",
+  "adverse-event-panel",
+  "safety-monitoring",
+  "clinical-risk-benefit",
+  "regulatory-evidence-brief",
+  "evidence-grade",
+  "ecrf-data-capture",
+  "data-lock",
+  "irb-review",
+  "clinician-review",
+  "site-activation",
+  "patient-reported-outcome",
+  "real-world-evidence",
+  "clinical-decision-support",
   "microgravity",
   "spacecraft",
   "astronaut-sample",
@@ -1062,6 +1100,45 @@ function renderRecipe(asset, width, height, palette) {
     case "roadmap-swimlane":
     case "priority-scorecard":
       return grantConsultingAsset(id, cx, cy, s, palette);
+    case "clinical-study-overview":
+    case "patient-journey-map":
+    case "consent-enrollment":
+    case "eligibility-criteria":
+    case "inclusion-exclusion":
+    case "cohort-stratification":
+    case "cohort-table":
+    case "trial-design-schema":
+    case "randomization-schema":
+    case "treatment-arm-comparison":
+    case "clinical-sample-flow":
+    case "biospecimen-collection":
+    case "longitudinal-visit-schedule":
+    case "clinical-omics-bridge":
+    case "translational-readout":
+    case "biomarker-discovery":
+    case "biomarker-validation":
+    case "assay-validation":
+    case "companion-diagnostic":
+    case "validation-cohort":
+    case "endpoint-hierarchy":
+    case "primary-endpoint":
+    case "secondary-endpoint":
+    case "clinical-response-card":
+    case "survival-curve":
+    case "adverse-event-panel":
+    case "safety-monitoring":
+    case "clinical-risk-benefit":
+    case "regulatory-evidence-brief":
+    case "evidence-grade":
+    case "ecrf-data-capture":
+    case "data-lock":
+    case "irb-review":
+    case "clinician-review":
+    case "site-activation":
+    case "patient-reported-outcome":
+    case "real-world-evidence":
+    case "clinical-decision-support":
+      return clinicalTranslationalAsset(id, cx, cy, s, palette);
     case "microgravity":
       return microgravityAsset(cx, cy, s, palette);
     case "spacecraft":
@@ -3285,6 +3362,67 @@ function methodsProtocolsAsset(id, cx, cy, s, palette) {
     return `${baseLayer(cx, cy, s, palette, "panel")}${panel("asset-methods-method-safety-note")}<rect class="asset-method-safety-note-card" x="${fmt(cx - 38 * s)}" y="${fmt(cy - 27 * s)}" width="${fmt(76 * s)}" height="${fmt(54 * s)}" rx="${fmt(10 * s)}" fill="#ffffff" stroke="${palette.stroke}" stroke-width="${fmt(1.8 * s)}"/><path class="asset-method-safety-note-badge" d="M${fmt(cx - 23 * s)},${fmt(cy - 8 * s)} l${fmt(11 * s)},${fmt(11 * s)} l${fmt(22 * s)},${fmt(-24 * s)}" fill="none" stroke="${palette.accent}" stroke-width="${fmt(3 * s)}" stroke-linecap="round" stroke-linejoin="round"/><path d="M${fmt(cx - 25 * s)},${fmt(cy + 15 * s)} H${fmt(cx + 25 * s)} M${fmt(cx - 25 * s)},${fmt(cy + 23 * s)} H${fmt(cx + 10 * s)}" stroke="${palette.accent}" stroke-width="${fmt(1.6 * s)}" stroke-linecap="round"/>${close}`;
   }
   return `${baseLayer(cx, cy, s, palette, "panel")}${panel(`asset-methods-${escapeXml(id)}`)}${checklist("asset-methods-default-row", 3)}<circle class="asset-methods-status-dot" cx="${fmt(cx + 38 * s)}" cy="${fmt(cy - 28 * s)}" r="${fmt(5 * s)}" fill="${palette.accent}"/>${close}`;
+}
+
+function clinicalTranslationalAsset(id, cx, cy, s, palette) {
+  const panel = (classes) => `<g class="asset-clinical-translational ${classes}" filter="url(#asset-soft-shadow)"><rect x="${fmt(cx - 52 * s)}" y="${fmt(cy - 38 * s)}" width="${fmt(104 * s)}" height="${fmt(76 * s)}" rx="${fmt(17 * s)}" fill="${palette.fill}" stroke="${palette.stroke}" stroke-width="${fmt(2 * s)}"/><path d="M${fmt(cx - 43 * s)},${fmt(cy - 30 * s)} h${fmt(86 * s)}" stroke="#ffffff" stroke-width="${fmt(1.6 * s)}" opacity="0.56" stroke-linecap="round"/>`;
+  const close = "</g>";
+  const miniCard = (x, y, w, h, klass, fill = "#ffffff") => `<rect class="${klass}" x="${fmt(cx + x * s)}" y="${fmt(cy + y * s)}" width="${fmt(w * s)}" height="${fmt(h * s)}" rx="${fmt(6 * s)}" fill="${fill}" stroke="${palette.accent}" stroke-width="${fmt(1 * s)}"/>`;
+  const patient = (x, y, klass = "asset-clinical-patient-node", fill = "#ffffff") => `<g class="${klass}"><circle cx="${fmt(cx + x * s)}" cy="${fmt(cy + y * s)}" r="${fmt(8 * s)}" fill="${fill}" stroke="${palette.stroke}" stroke-width="${fmt(1.2 * s)}"/><path d="M${fmt(cx + x * s)},${fmt(cy + (y + 9) * s)} v${fmt(15 * s)} M${fmt(cx + (x - 10) * s)},${fmt(cy + (y + 16) * s)} h${fmt(20 * s)}" stroke="${palette.accent}" stroke-width="${fmt(1.5 * s)}" stroke-linecap="round"/></g>`;
+  const tube = (x, y, klass = "asset-clinical-sample-tube", fill = "#ffffff") => `<g class="${klass}"><rect x="${fmt(cx + x * s)}" y="${fmt(cy + y * s)}" width="${fmt(15 * s)}" height="${fmt(39 * s)}" rx="${fmt(6 * s)}" fill="${fill}" stroke="${palette.stroke}" stroke-width="${fmt(1.25 * s)}"/><path d="M${fmt(cx + (x + 2) * s)},${fmt(cy + (y + 22) * s)} h${fmt(11 * s)} v${fmt(12 * s)} h${fmt(-11 * s)} Z" fill="${palette.secondary}" stroke="${palette.accent}" stroke-width="${fmt(0.8 * s)}"/></g>`;
+  const check = (x, y, klass = "asset-clinical-check") => `<path class="${klass}" d="M${fmt(cx + x * s)},${fmt(cy + y * s)} l${fmt(8 * s)},${fmt(8 * s)} l${fmt(19 * s)},${fmt(-23 * s)}" fill="none" stroke="${palette.accent}" stroke-width="${fmt(3 * s)}" stroke-linecap="round" stroke-linejoin="round"/>`;
+  const axes = (klass = "asset-clinical-axes") => `<g class="${klass}"><path d="M${fmt(cx - 36 * s)},${fmt(cy + 23 * s)} H${fmt(cx + 38 * s)} M${fmt(cx - 34 * s)},${fmt(cy + 23 * s)} V${fmt(cy - 26 * s)}" stroke="${palette.stroke}" stroke-width="${fmt(1.5 * s)}" stroke-linecap="round" opacity="0.58"/><path d="M${fmt(cx - 29 * s)},${fmt(cy + 16 * s)} C${fmt(cx - 11 * s)},${fmt(cy - 2 * s)} ${fmt(cx + 7 * s)},${fmt(cy - 8 * s)} ${fmt(cx + 32 * s)},${fmt(cy - 22 * s)}" fill="none" stroke="${palette.accent}" stroke-width="${fmt(2.4 * s)}" stroke-linecap="round"/></g>`;
+  const rowLines = (klass = "asset-clinical-row-lines", count = 4) => `<g class="${klass}">${Array.from({ length: count }, (_v, i) => `<path d="M${fmt(cx - 32 * s)},${fmt(cy + (-21 + i * 13) * s)} h${fmt((52 - i * 4) * s)}" stroke="${palette.accent}" stroke-width="${fmt(1.6 * s)}" stroke-linecap="round" opacity="${fmt(0.86 - i * 0.09)}"/>`).join("")}</g>`;
+
+  if (id === "clinical-study-overview" || id === "trial-design-schema") {
+    return `${baseLayer(cx, cy, s, palette, "panel")}${panel(`asset-clinical-${id}`)}<g class="asset-clinical-study-flow">${patient(-35, -14, "asset-clinical-study-patient-node")}${patient(0, -14, "asset-clinical-study-patient-node", palette.secondary)}${patient(35, -14, "asset-clinical-study-patient-node")}<path class="asset-clinical-study-arm" d="M${fmt(cx - 35 * s)},${fmt(cy + 20 * s)} C${fmt(cx - 18 * s)},${fmt(cy + 31 * s)} ${fmt(cx + 18 * s)},${fmt(cy + 31 * s)} ${fmt(cx + 35 * s)},${fmt(cy + 20 * s)}" fill="none" stroke="${palette.accent}" stroke-width="${fmt(2 * s)}" stroke-linecap="round"/></g>${close}`;
+  }
+  if (id === "patient-journey-map" || id === "longitudinal-visit-schedule") {
+    return `${baseLayer(cx, cy, s, palette, "panel")}${panel(`asset-clinical-${id}`)}<g class="asset-patient-journey-map">${[-36, -12, 12, 36].map((x0, i) => `<circle class="asset-visit-timepoint" cx="${fmt(cx + x0 * s)}" cy="${fmt(cy + (i % 2 ? 8 : -9) * s)}" r="${fmt(7 * s)}" fill="${i === 3 ? palette.accent : "#ffffff"}" stroke="${palette.accent}" stroke-width="${fmt(1.2 * s)}"/>`).join("")}<path class="asset-patient-journey-path" d="M${fmt(cx - 36 * s)},${fmt(cy - 9 * s)} C${fmt(cx - 23 * s)},${fmt(cy + 14 * s)} ${fmt(cx - 1 * s)},${fmt(cy + 14 * s)} ${fmt(cx + 12 * s)},${fmt(cy - 9 * s)} S${fmt(cx + 25 * s)},${fmt(cy + 8 * s)} ${fmt(cx + 36 * s)},${fmt(cy + 8 * s)}" fill="none" stroke="${palette.accent}" stroke-width="${fmt(2 * s)}" stroke-linecap="round"/></g>${close}`;
+  }
+  if (id === "consent-enrollment" || id === "irb-review" || id === "clinician-review") {
+    return `${baseLayer(cx, cy, s, palette, "panel")}${panel(`asset-clinical-${id}`)}${miniCard(-36, -28, 72, 56, "asset-clinical-review-card", "#ffffff")}<circle class="asset-clinical-review-person" cx="${fmt(cx - 20 * s)}" cy="${fmt(cy - 8 * s)}" r="${fmt(8 * s)}" fill="${palette.secondary}" stroke="${palette.accent}" stroke-width="${fmt(1.2 * s)}"/>${rowLines("asset-clinical-consent-lines", 3)}${check(12, 10, "asset-clinical-consent-check")}${close}`;
+  }
+  if (id === "eligibility-criteria" || id === "inclusion-exclusion") {
+    return `${baseLayer(cx, cy, s, palette, "panel")}${panel(`asset-clinical-${id}`)}<path class="asset-clinical-criteria-funnel" d="M${fmt(cx - 38 * s)},${fmt(cy - 26 * s)} h${fmt(76 * s)} l${fmt(-26 * s)},${fmt(30 * s)} v${fmt(24 * s)} h${fmt(-24 * s)} v${fmt(-24 * s)} Z" fill="#ffffff" stroke="${palette.stroke}" stroke-width="${fmt(1.6 * s)}"/><g class="asset-clinical-criteria-checklist">${[-18, -4, 10].map((y0, i) => `<path d="M${fmt(cx - 19 * s)},${fmt(cy + y0 * s)} l${fmt(5 * s)},${fmt(5 * s)} l${fmt(9 * s)},${fmt(-11 * s)}" stroke="${palette.accent}" stroke-width="${fmt(1.6 * s)}" fill="none" stroke-linecap="round"/><path d="M${fmt(cx - 2 * s)},${fmt(cy + (y0 + 1) * s)} h${fmt((23 - i * 4) * s)}" stroke="${palette.accent}" stroke-width="${fmt(1.4 * s)}" stroke-linecap="round"/>`).join("")}</g>${close}`;
+  }
+  if (id === "cohort-stratification" || id === "cohort-table") {
+    return `${baseLayer(cx, cy, s, palette, "panel")}${panel(`asset-clinical-${id}`)}<g class="asset-clinical-cohort-stratification">${[-30, -10, 10, 30].map((x0, i) => patient(x0, -16 + (i % 2) * 8, "asset-clinical-cohort-patient", i === 2 ? palette.secondary : "#ffffff")).join("")}<path class="asset-clinical-cohort-table" d="M${fmt(cx - 40 * s)},${fmt(cy + 24 * s)} h${fmt(80 * s)} M${fmt(cx - 40 * s)},${fmt(cy + 12 * s)} h${fmt(80 * s)} M${fmt(cx - 16 * s)},${fmt(cy + 5 * s)} v${fmt(28 * s)} M${fmt(cx + 12 * s)},${fmt(cy + 5 * s)} v${fmt(28 * s)}" stroke="${palette.accent}" stroke-width="${fmt(1.2 * s)}" stroke-linecap="round"/></g>${close}`;
+  }
+  if (id === "randomization-schema" || id === "treatment-arm-comparison") {
+    return `${baseLayer(cx, cy, s, palette, "panel")}${panel(`asset-clinical-${id}`)}<g class="asset-randomization-schema">${patient(-38, -3, "asset-randomization-input")}<path class="asset-randomization-branch" d="M${fmt(cx - 20 * s)},${fmt(cy + 5 * s)} C${fmt(cx - 3 * s)},${fmt(cy - 23 * s)} ${fmt(cx + 13 * s)},${fmt(cy - 23 * s)} ${fmt(cx + 32 * s)},${fmt(cy - 22 * s)} M${fmt(cx - 20 * s)},${fmt(cy + 5 * s)} C${fmt(cx - 3 * s)},${fmt(cy + 30 * s)} ${fmt(cx + 13 * s)},${fmt(cy + 30 * s)} ${fmt(cx + 32 * s)},${fmt(cy + 22 * s)}" fill="none" stroke="${palette.accent}" stroke-width="${fmt(2 * s)}" stroke-linecap="round"/><rect class="asset-treatment-arm" x="${fmt(cx + 24 * s)}" y="${fmt(cy - 34 * s)}" width="${fmt(28 * s)}" height="${fmt(18 * s)}" rx="${fmt(6 * s)}" fill="#ffffff" stroke="${palette.accent}" stroke-width="${fmt(1.2 * s)}"/><rect class="asset-treatment-arm" x="${fmt(cx + 24 * s)}" y="${fmt(cy + 14 * s)}" width="${fmt(28 * s)}" height="${fmt(18 * s)}" rx="${fmt(6 * s)}" fill="${palette.secondary}" stroke="${palette.accent}" stroke-width="${fmt(1.2 * s)}"/></g>${close}`;
+  }
+  if (id === "clinical-sample-flow" || id === "biospecimen-collection") {
+    return `${baseLayer(cx, cy, s, palette, "panel")}${panel(`asset-clinical-${id}`)}<g class="asset-clinical-sample-flow">${patient(-38, -12, "asset-clinical-sample-patient")}${tube(-5, -25, "asset-clinical-biospecimen-tube", palette.secondary)}${tube(18, -22, "asset-clinical-biospecimen-tube", "#ffffff")}<path class="asset-clinical-sample-arrow" d="M${fmt(cx - 20 * s)},${fmt(cy + 7 * s)} H${fmt(cx - 7 * s)} M${fmt(cx + 11 * s)},${fmt(cy + 21 * s)} H${fmt(cx + 36 * s)}" stroke="${palette.accent}" stroke-width="${fmt(2 * s)}" stroke-linecap="round"/><circle class="asset-clinical-sample-badge" cx="${fmt(cx + 39 * s)}" cy="${fmt(cy + 21 * s)}" r="${fmt(7 * s)}" fill="${palette.accent}"/></g>${close}`;
+  }
+  if (id === "clinical-omics-bridge" || id === "translational-readout") {
+    return `${baseLayer(cx, cy, s, palette, "panel")}${panel(`asset-clinical-${id}`)}<g class="asset-clinical-omics-bridge">${tube(-41, -22, "asset-clinical-omics-sample", "#ffffff")}<path class="asset-clinical-omics-bridge-link" d="M${fmt(cx - 20 * s)},${fmt(cy - 2 * s)} C${fmt(cx - 6 * s)},${fmt(cy - 24 * s)} ${fmt(cx + 7 * s)},${fmt(cy + 24 * s)} ${fmt(cx + 22 * s)},${fmt(cy + 2 * s)}" fill="none" stroke="${palette.accent}" stroke-width="${fmt(2 * s)}" stroke-linecap="round"/><rect class="asset-translational-readout-card" x="${fmt(cx + 20 * s)}" y="${fmt(cy - 24 * s)}" width="${fmt(30 * s)}" height="${fmt(48 * s)}" rx="${fmt(7 * s)}" fill="${palette.secondary}" stroke="${palette.accent}" stroke-width="${fmt(1.2 * s)}"/><path d="M${fmt(cx + 26 * s)},${fmt(cy - 10 * s)} h${fmt(17 * s)} M${fmt(cx + 26 * s)},${fmt(cy + 3 * s)} h${fmt(12 * s)} M${fmt(cx + 26 * s)},${fmt(cy + 16 * s)} h${fmt(16 * s)}" stroke="${palette.accent}" stroke-width="${fmt(1.3 * s)}" stroke-linecap="round"/></g>${close}`;
+  }
+  if (id === "biomarker-discovery" || id === "biomarker-validation" || id === "assay-validation" || id === "companion-diagnostic" || id === "validation-cohort") {
+    return `${baseLayer(cx, cy, s, palette, "panel")}${panel(`asset-clinical-${id}`)}<g class="asset-clinical-biomarker-validation">${miniCard(-38, -27, 76, 54, "asset-biomarker-panel-card", "#ffffff")}<circle class="asset-biomarker-marker" cx="${fmt(cx - 19 * s)}" cy="${fmt(cy - 5 * s)}" r="${fmt(8 * s)}" fill="${palette.secondary}" stroke="${palette.accent}" stroke-width="${fmt(1.2 * s)}"/><circle class="asset-biomarker-marker" cx="${fmt(cx + 1 * s)}" cy="${fmt(cy - 5 * s)}" r="${fmt(8 * s)}" fill="${palette.accent}" stroke="${palette.accent}" stroke-width="${fmt(1.2 * s)}"/><circle class="asset-biomarker-marker" cx="${fmt(cx + 21 * s)}" cy="${fmt(cy - 5 * s)}" r="${fmt(8 * s)}" fill="#ffffff" stroke="${palette.accent}" stroke-width="${fmt(1.2 * s)}"/><path class="asset-assay-validation-check" d="M${fmt(cx - 20 * s)},${fmt(cy + 19 * s)} l${fmt(8 * s)},${fmt(8 * s)} l${fmt(20 * s)},${fmt(-23 * s)}" fill="none" stroke="${palette.accent}" stroke-width="${fmt(2.7 * s)}" stroke-linecap="round" stroke-linejoin="round"/></g>${close}`;
+  }
+  if (id === "endpoint-hierarchy" || id === "primary-endpoint" || id === "secondary-endpoint" || id === "clinical-response-card") {
+    return `${baseLayer(cx, cy, s, palette, "panel")}${panel(`asset-clinical-${id}`)}<g class="asset-clinical-endpoint-hierarchy">${miniCard(-40, -28, 80, 56, "asset-endpoint-card", "#ffffff")}<path class="asset-endpoint-hierarchy-tree" d="M${fmt(cx)},${fmt(cy - 20 * s)} v${fmt(18 * s)} M${fmt(cx - 24 * s)},${fmt(cy + 2 * s)} H${fmt(cx + 24 * s)} M${fmt(cx - 24 * s)},${fmt(cy + 2 * s)} v${fmt(19 * s)} M${fmt(cx + 24 * s)},${fmt(cy + 2 * s)} v${fmt(19 * s)}" stroke="${palette.accent}" stroke-width="${fmt(1.8 * s)}" stroke-linecap="round"/><circle class="asset-primary-endpoint" cx="${fmt(cx)}" cy="${fmt(cy - 22 * s)}" r="${fmt(7 * s)}" fill="${palette.accent}"/><circle class="asset-secondary-endpoint" cx="${fmt(cx - 24 * s)}" cy="${fmt(cy + 23 * s)}" r="${fmt(6 * s)}" fill="${palette.secondary}" stroke="${palette.accent}" stroke-width="${fmt(1 * s)}"/><circle class="asset-clinical-response-dot" cx="${fmt(cx + 24 * s)}" cy="${fmt(cy + 23 * s)}" r="${fmt(6 * s)}" fill="#ffffff" stroke="${palette.accent}" stroke-width="${fmt(1 * s)}"/></g>${close}`;
+  }
+  if (id === "survival-curve") {
+    return `${baseLayer(cx, cy, s, palette, "panel")}${panel("asset-clinical-survival-curve")}${axes("asset-survival-curve-axes")}<path class="asset-survival-step-curve" d="M${fmt(cx - 29 * s)},${fmt(cy - 18 * s)} h${fmt(17 * s)} v${fmt(10 * s)} h${fmt(16 * s)} v${fmt(11 * s)} h${fmt(18 * s)} v${fmt(13 * s)} h${fmt(18 * s)}" fill="none" stroke="${palette.accent}" stroke-width="${fmt(2.4 * s)}" stroke-linejoin="round"/><path class="asset-survival-censor-mark" d="M${fmt(cx + 2 * s)},${fmt(cy - 12 * s)} l${fmt(6 * s)},${fmt(6 * s)} M${fmt(cx + 8 * s)},${fmt(cy - 12 * s)} l${fmt(-6 * s)},${fmt(6 * s)}" stroke="${palette.accent}" stroke-width="${fmt(1.4 * s)}" stroke-linecap="round"/>${close}`;
+  }
+  if (id === "adverse-event-panel" || id === "safety-monitoring" || id === "clinical-risk-benefit") {
+    return `${baseLayer(cx, cy, s, palette, "panel")}${panel(`asset-clinical-${id}`)}<g class="asset-clinical-safety-panel">${miniCard(-39, -27, 78, 54, "asset-adverse-event-panel", "#ffffff")}<path class="asset-clinical-safety-shield" d="M${fmt(cx)},${fmt(cy - 24 * s)} l${fmt(24 * s)},${fmt(10 * s)} v${fmt(20 * s)} c0,${fmt(16 * s)} ${fmt(-10 * s)},${fmt(25 * s)} ${fmt(-24 * s)},${fmt(31 * s)} c${fmt(-14 * s)},${fmt(-6 * s)} ${fmt(-24 * s)},${fmt(-15 * s)} ${fmt(-24 * s)},${fmt(-31 * s)} v${fmt(-20 * s)} Z" fill="${palette.secondary}" stroke="${palette.accent}" stroke-width="${fmt(1.4 * s)}"/><path class="asset-safety-monitoring-pulse" d="M${fmt(cx - 31 * s)},${fmt(cy + 20 * s)} h${fmt(16 * s)} l${fmt(6 * s)},${fmt(-14 * s)} l${fmt(7 * s)},${fmt(23 * s)} l${fmt(8 * s)},${fmt(-18 * s)} h${fmt(19 * s)}" fill="none" stroke="${palette.accent}" stroke-width="${fmt(1.8 * s)}" stroke-linecap="round" stroke-linejoin="round"/></g>${close}`;
+  }
+  if (id === "regulatory-evidence-brief" || id === "evidence-grade" || id === "real-world-evidence") {
+    return `${baseLayer(cx, cy, s, palette, "panel")}${panel(`asset-clinical-${id}`)}<g class="asset-clinical-evidence-grade">${[0, 1, 2].map((i) => miniCard(-36 + i * 20, -24 + i * 5, 46, 30, "asset-regulatory-evidence-card", i === 1 ? palette.secondary : "#ffffff")).join("")}<path class="asset-evidence-grade-stars" d="M${fmt(cx - 26 * s)},${fmt(cy + 25 * s)} h${fmt(52 * s)} M${fmt(cx - 26 * s)},${fmt(cy + 33 * s)} h${fmt(35 * s)}" stroke="${palette.accent}" stroke-width="${fmt(1.6 * s)}" stroke-linecap="round"/><circle cx="${fmt(cx + 30 * s)}" cy="${fmt(cy - 20 * s)}" r="${fmt(6 * s)}" fill="${palette.accent}"/></g>${close}`;
+  }
+  if (id === "ecrf-data-capture" || id === "data-lock") {
+    return `${baseLayer(cx, cy, s, palette, "panel")}${panel(`asset-clinical-${id}`)}${miniCard(-38, -28, 76, 56, "asset-ecrf-data-capture-card", "#ffffff")}${rowLines("asset-ecrf-form-lines", 4)}<path class="asset-clinical-data-lock" d="M${fmt(cx + 21 * s)},${fmt(cy + 7 * s)} h${fmt(18 * s)} v${fmt(20 * s)} h${fmt(-18 * s)} Z M${fmt(cx + 25 * s)},${fmt(cy + 7 * s)} v${fmt(-8 * s)} a${fmt(5 * s)},${fmt(5 * s)} 0 0 1 ${fmt(10 * s)},0 v${fmt(8 * s)}" fill="${palette.secondary}" stroke="${palette.accent}" stroke-width="${fmt(1.4 * s)}"/>${close}`;
+  }
+  if (id === "site-activation") {
+    return `${baseLayer(cx, cy, s, palette, "panel")}${panel("asset-clinical-site-activation")}<g class="asset-site-activation-map">${[[-28, -16], [0, -25], [27, -10], [-8, 17], [31, 20]].map(([x0, y0], i) => `<circle class="asset-site-pin" cx="${fmt(cx + x0 * s)}" cy="${fmt(cy + y0 * s)}" r="${fmt(7 * s)}" fill="${i === 1 ? palette.accent : "#ffffff"}" stroke="${palette.accent}" stroke-width="${fmt(1.2 * s)}"/>`).join("")}<path d="M${fmt(cx - 28 * s)},${fmt(cy - 16 * s)} L${fmt(cx)},${fmt(cy - 25 * s)} L${fmt(cx + 27 * s)},${fmt(cy - 10 * s)} L${fmt(cx + 31 * s)},${fmt(cy + 20 * s)} L${fmt(cx - 8 * s)},${fmt(cy + 17 * s)} Z" fill="none" stroke="${palette.accent}" stroke-width="${fmt(1.4 * s)}" stroke-dasharray="${fmt(4 * s)} ${fmt(3 * s)}"/></g>${close}`;
+  }
+  if (id === "patient-reported-outcome" || id === "clinical-decision-support") {
+    return `${baseLayer(cx, cy, s, palette, "panel")}${panel(`asset-clinical-${id}`)}${patient(-31, -12, "asset-patient-reported-outcome-node")}<path class="asset-pro-speech-bubble" d="M${fmt(cx - 8 * s)},${fmt(cy - 28 * s)} h${fmt(48 * s)} v${fmt(32 * s)} h${fmt(-26 * s)} l${fmt(-10 * s)},${fmt(10 * s)} v${fmt(-10 * s)} h${fmt(-12 * s)} Z" fill="#ffffff" stroke="${palette.accent}" stroke-width="${fmt(1.4 * s)}"/><path class="asset-clinical-decision-support-arrow" d="M${fmt(cx - 2 * s)},${fmt(cy + 22 * s)} h${fmt(38 * s)}" stroke="${palette.accent}" stroke-width="${fmt(2 * s)}" stroke-linecap="round"/>${close}`;
+  }
+  return `${baseLayer(cx, cy, s, palette, "panel")}${panel(`asset-clinical-${escapeXml(id)}`)}${miniCard(-36, -28, 72, 56, "asset-clinical-default-card", "#ffffff")}${axes("asset-clinical-default-chart")}${close}`;
 }
 
 function grantConsultingAsset(id, cx, cy, s, palette) {

@@ -562,7 +562,8 @@ export const BROAD_MARKET_PACK_ORDER = [
   "lab-automation",
   "anatomy-organ-systems",
   "methods-and-protocols",
-  "grant-and-consulting-summary"
+  "grant-and-consulting-summary",
+  "clinical-translational"
 ];
 
 const COMMERCIAL_PACK_MINIMUM_CONTRACT = {
@@ -1108,6 +1109,16 @@ export const PREMIUM_WORKFLOW_PACKS: WorkflowPack[] = [
     assetIds: ["grant-summary-board", "problem-statement-card", "scientific-opportunity-map", "hypothesis-aims", "specific-aim-1", "specific-aim-2", "specific-aim-3", "innovation-claim", "approach-workplan", "milestone-roadmap", "quarterly-timeline", "budget-envelope", "resource-allocation", "team-capability-map", "stakeholder-map", "decision-brief", "value-proposition", "impact-metric-card", "outcome-kpi", "market-landscape", "competitive-positioning", "evidence-snapshot", "data-room-index", "risk-matrix", "risk-mitigation-plan", "dependency-map", "go-no-go-gate", "deliverable-package", "proposal-review", "funder-alignment", "recommendation-card", "executive-takeaway", "appendix-evidence", "consulting-one-pager", "roadmap-swimlane", "priority-scorecard", "dataset", "metric-card", "calibration", "risk-gate", "human-review", "audit-log"],
     templates: ["grant-consulting-one-slide", "specific-aims-summary", "milestone-risk-roadmap", "impact-evidence-brief"],
     agentUseHints: ["Use for grant aims pages, biotech strategy one-pagers, funder updates, consulting summaries, and executive scientific recommendation slides.", "Keep problem, opportunity, evidence, roadmap, risk, budget/resource, and recommendation objects separately editable for human review."]
+  },
+  {
+    id: "clinical-translational",
+    name: "Clinical / translational",
+    priority: 3,
+    description: "Translational study overviews linking patient cohorts, consent/enrollment, biospecimens, omics bridges, biomarkers, endpoints, safety, and clinical review.",
+    flagshipTemplateId: "clinical-translational-study-overview",
+    assetIds: ["clinical-study-overview", "patient-journey-map", "consent-enrollment", "eligibility-criteria", "inclusion-exclusion", "cohort-stratification", "cohort-table", "trial-design-schema", "randomization-schema", "treatment-arm-comparison", "clinical-sample-flow", "biospecimen-collection", "longitudinal-visit-schedule", "clinical-omics-bridge", "translational-readout", "biomarker-discovery", "biomarker-validation", "assay-validation", "companion-diagnostic", "validation-cohort", "endpoint-hierarchy", "primary-endpoint", "secondary-endpoint", "clinical-response-card", "survival-curve", "adverse-event-panel", "safety-monitoring", "clinical-risk-benefit", "regulatory-evidence-brief", "evidence-grade", "ecrf-data-capture", "data-lock", "irb-review", "clinician-review", "site-activation", "patient-reported-outcome", "real-world-evidence", "clinical-decision-support", "human-cohort", "patient-organ-cohort", "organ-sample-flow", "tissue-biomarker-panel", "clinical-endpoint-card", "blood-sample", "dataset", "metric-card", "calibration", "human-review", "audit-log"],
+    templates: ["clinical-translational-study-overview", "cohort-to-biomarker-flow", "endpoint-validation-dashboard", "safety-evidence-review"],
+    agentUseHints: ["Use for translational study design, cohort-to-biomarker figures, clinical endpoint summaries, safety evidence reviews, and validation cohort slides.", "Keep enrollment, biospecimen flow, biomarker evidence, endpoint status, safety review, and clinical interpretation as separate editable objects."]
   },
   {
     id: "space-biology-genelab",
@@ -1783,6 +1794,54 @@ export const PREMIUM_WORKFLOW_TEMPLATES: WorkflowTemplate[] = [
     qaChecklist: ["Metric provenance is visible.", "Recommendation does not hide evidence caveats.", "PPTX fallback warnings name exact strategy assets."]
   },
   {
+    id: "clinical-translational-study-overview",
+    workflowPack: "clinical-translational",
+    name: "Clinical translational study overview",
+    description: "Flagship translational evidence bridge from enrollment and biospecimen flow to biomarker validation, endpoints, safety, and clinical review.",
+    layout: "workflow",
+    recommendedStyleProfile: "consulting-2p5d",
+    previewAssetIds: ["clinical-study-overview", "clinical-sample-flow", "biomarker-validation", "clinical-response-card"],
+    nodeKinds: ["shape", "text", "symbol", "plot", "connector"],
+    agentUseHints: ["Use as the flagship clinical/translational slide from notes about patient cohorts, biospecimens, omics, biomarkers, endpoints, safety, or validation.", "Keep cohort, sample, biomarker, endpoint, and review components separately editable for scientific QA."],
+    qaChecklist: ["Cohort and endpoint terms are source-backed.", "Biomarker and clinical interpretation are visually separated.", "Safety and review caveats remain visible before export."]
+  },
+  {
+    id: "cohort-to-biomarker-flow",
+    workflowPack: "clinical-translational",
+    name: "Cohort to biomarker flow",
+    description: "Patient enrollment, eligibility, biospecimen collection, omics bridge, biomarker discovery, and validation cohort workflow.",
+    layout: "workflow",
+    recommendedStyleProfile: "consulting-2p5d",
+    previewAssetIds: ["consent-enrollment", "biospecimen-collection", "clinical-omics-bridge", "biomarker-validation"],
+    nodeKinds: ["shape", "text", "symbol", "connector"],
+    agentUseHints: ["Use when the source describes enrollment, eligibility criteria, sample collection, assay handoff, biomarker discovery, or validation cohorts.", "Do not collapse biospecimen provenance and biomarker interpretation into one object."],
+    qaChecklist: ["Eligibility and consent are not hidden.", "Sample source and assay handoff are clear.", "Validation cohort status is marked source-backed or draft."]
+  },
+  {
+    id: "endpoint-validation-dashboard",
+    workflowPack: "clinical-translational",
+    name: "Endpoint validation dashboard",
+    description: "Clinical endpoint and biomarker validation dashboard with cohort table, response card, survival curve, and evidence grade.",
+    layout: "results",
+    recommendedStyleProfile: "consulting-2p5d",
+    previewAssetIds: ["endpoint-hierarchy", "validation-cohort", "survival-curve", "clinical-response-card"],
+    nodeKinds: ["shape", "text", "symbol", "plot"],
+    agentUseHints: ["Use for clinical endpoint summaries, validation cohort dashboards, biomarker performance, or translational result slides.", "Keep response and survival visuals illustrative unless source data is imported."],
+    qaChecklist: ["Endpoint hierarchy is readable.", "Survival/response plots are marked synthetic or source-backed.", "Evidence grade and validation status remain reviewable."]
+  },
+  {
+    id: "safety-evidence-review",
+    workflowPack: "clinical-translational",
+    name: "Safety evidence review",
+    description: "Safety and translational evidence panel with adverse events, monitoring, risk-benefit review, clinical decision support, and audit trail.",
+    layout: "multi-panel",
+    recommendedStyleProfile: "risk-warning",
+    previewAssetIds: ["adverse-event-panel", "safety-monitoring", "clinical-risk-benefit", "clinician-review"],
+    nodeKinds: ["shape", "text", "symbol", "plot", "connector"],
+    agentUseHints: ["Use for clinical safety monitoring, adverse-event review, translational risk-benefit, and clinician review slides.", "Represent safety conclusions as review items, not decorative warning badges."],
+    qaChecklist: ["Safety claims are cited or marked draft.", "Risk-benefit decision is visually separated from data capture.", "PPTX warnings name exact clinical fallback assets."]
+  },
+  {
     id: "spatial-workflow",
     workflowPack: "spatial-transcriptomics",
     name: "Spatial workflow",
@@ -2221,6 +2280,38 @@ const SIGNATURE_ASSET_IDS = new Set([
   "funder-alignment",
   "recommendation-card",
   "executive-takeaway",
+  "clinical-study-overview",
+  "patient-journey-map",
+  "consent-enrollment",
+  "eligibility-criteria",
+  "cohort-stratification",
+  "trial-design-schema",
+  "randomization-schema",
+  "treatment-arm-comparison",
+  "clinical-sample-flow",
+  "biospecimen-collection",
+  "longitudinal-visit-schedule",
+  "clinical-omics-bridge",
+  "translational-readout",
+  "biomarker-discovery",
+  "biomarker-validation",
+  "assay-validation",
+  "companion-diagnostic",
+  "validation-cohort",
+  "endpoint-hierarchy",
+  "primary-endpoint",
+  "secondary-endpoint",
+  "clinical-response-card",
+  "survival-curve",
+  "adverse-event-panel",
+  "safety-monitoring",
+  "clinical-risk-benefit",
+  "regulatory-evidence-brief",
+  "evidence-grade",
+  "irb-review",
+  "clinician-review",
+  "real-world-evidence",
+  "clinical-decision-support",
   "medicinal-chemistry-cycle",
   "efficacy-model",
   "ind-enabling-package",
@@ -2474,6 +2565,52 @@ const BIOLOGY_SEEDS: AssetSeed[] = [
     ["dependency-map", "Dependency map", "dependency map blockers assumptions"],
     ["go-no-go-gate", "Go/no-go gate", "go no-go gate decision milestone"]
   ], "#dc2626"),
+  ...biology("Clinical translational", "workflowBlock", "process", [
+    ["clinical-study-overview", "Clinical study overview", "clinical translational study overview cohort endpoint biomarker"],
+    ["patient-journey-map", "Patient journey map", "patient journey clinical visit care pathway"],
+    ["trial-design-schema", "Trial design schema", "trial design schema arms endpoint study"],
+    ["randomization-schema", "Randomization schema", "randomization schema treatment arms allocation"],
+    ["treatment-arm-comparison", "Treatment arm comparison", "treatment arm comparison intervention control"],
+    ["clinical-sample-flow", "Clinical sample flow", "clinical sample flow biospecimen assay"],
+    ["biospecimen-collection", "Biospecimen collection", "biospecimen collection blood tissue sample"],
+    ["longitudinal-visit-schedule", "Longitudinal visit schedule", "longitudinal visit schedule timepoints follow up"],
+    ["clinical-omics-bridge", "Clinical omics bridge", "clinical omics bridge sample sequencing analysis"],
+    ["translational-readout", "Translational readout", "translational readout assay to clinic"]
+  ], "#0d9488"),
+  ...biology("Clinical translational", "metricPanel", "evaluation", [
+    ["cohort-stratification", "Cohort stratification", "cohort stratification subgroups clinical phenotype"],
+    ["cohort-table", "Cohort table", "cohort table demographics baseline clinical"],
+    ["biomarker-discovery", "Biomarker discovery", "biomarker discovery omics candidate marker"],
+    ["biomarker-validation", "Biomarker validation", "biomarker validation independent cohort assay"],
+    ["assay-validation", "Assay validation", "assay validation sensitivity specificity reproducibility"],
+    ["companion-diagnostic", "Companion diagnostic", "companion diagnostic biomarker patient selection"],
+    ["validation-cohort", "Validation cohort", "validation cohort external replication"],
+    ["endpoint-hierarchy", "Endpoint hierarchy", "clinical endpoint hierarchy primary secondary"],
+    ["primary-endpoint", "Primary endpoint", "primary endpoint clinical outcome"],
+    ["secondary-endpoint", "Secondary endpoint", "secondary endpoint clinical outcome"],
+    ["clinical-response-card", "Clinical response card", "clinical response responder nonresponder"],
+    ["survival-curve", "Survival curve", "survival curve kaplan meier clinical endpoint"],
+    ["regulatory-evidence-brief", "Regulatory evidence brief", "regulatory evidence brief clinical dossier"],
+    ["evidence-grade", "Evidence grade", "evidence grade confidence level clinical"]
+  ], "#2563eb"),
+  ...biology("Clinical translational", "riskGate", "risk", [
+    ["eligibility-criteria", "Eligibility criteria", "eligibility criteria inclusion exclusion clinical"],
+    ["inclusion-exclusion", "Inclusion/exclusion", "inclusion exclusion criteria clinical trial"],
+    ["adverse-event-panel", "Adverse event panel", "adverse event safety clinical monitoring"],
+    ["safety-monitoring", "Safety monitoring", "safety monitoring clinical trial review"],
+    ["clinical-risk-benefit", "Clinical risk-benefit", "clinical risk benefit decision"],
+    ["data-lock", "Data lock", "data lock clinical database freeze"]
+  ], "#dc2626"),
+  ...biology("Clinical translational", "governance", "governance", [
+    ["consent-enrollment", "Consent and enrollment", "consent enrollment patient recruitment"],
+    ["ecrf-data-capture", "eCRF data capture", "electronic case report form data capture"],
+    ["irb-review", "IRB review", "irb review ethics approval"],
+    ["clinician-review", "Clinician review", "clinician review clinical interpretation"],
+    ["site-activation", "Site activation", "clinical site activation multicenter"],
+    ["patient-reported-outcome", "Patient-reported outcome", "patient reported outcome pro instrument"],
+    ["real-world-evidence", "Real-world evidence", "real world evidence registry claims"],
+    ["clinical-decision-support", "Clinical decision support", "clinical decision support recommendation"]
+  ], "#7c3aed"),
   ...biology("Spatial and imaging", "spatial", "assay", [
     ["spatial-grid", "Spatial transcriptomics grid", "spatial transcriptomics visium"],
     ["visium-spot-array", "Visium spot array", "spatial spot"],
@@ -2994,11 +3131,11 @@ export function getAssetQualityReport(): AssetQualityReport {
     qualityRubric: [...ASSET_QUALITY_RUBRIC],
     priorityGaps: buildPriorityGaps(workflowCoverage, styleCoverage),
     recommendedNextPacks: [
-      "clinical-translational",
       "immunology-oncology",
       "bio-llm-benchmarks",
       "biosafety-permissioning",
-      "space-omics-mission-design"
+      "space-omics-mission-design",
+      "omics-analysis-figures"
     ]
   };
 }
@@ -3073,8 +3210,9 @@ export function getAssetCoverageGapReport(): AssetCoverageGapReport {
       "Use anatomy-organ-systems as the eighth active broad-market pack and audit organ maps, tissue modules, sample flow, biomarker evidence, and clinical endpoint review.",
       "Use methods-and-protocols as the ninth active broad-market pack and audit sample prep, reagent setup, assay readout, controls, QC, and method caveat visual QA.",
       "Use grant-and-consulting-summary as the tenth active workflow pack and audit problem, aims, evidence, roadmap, risk, budget/resource, stakeholder, and recommendation visual QA.",
+      "Use clinical-translational as the eleventh active workflow pack and audit cohort, consent, sample flow, biomarker, endpoint, safety, and clinician-review visual QA.",
       "Promote or add pack-specific signature assets for target validation, compound library, toxicity screen, ADMET, candidate nomination, and assay evidence.",
-      "Add the next broad packs in order: clinical-translational, immunology-oncology.",
+      "Add the next broad packs in order: immunology-oncology, bio-llm-benchmarks.",
       "Keep MCP/API recommendations pack-first so Codex or Claude can request workflowPack, templateId, assetId, styleProfile, semanticSlot, and appearance overrides."
     ]
   };
@@ -4847,6 +4985,38 @@ const WORKFLOW_CORE_ASSET_IDS: Record<string, string[]> = {
     "priority-scorecard",
     "dataset",
     "metric-card"
+  ],
+  "clinical-translational": [
+    "clinical-study-overview",
+    "patient-journey-map",
+    "consent-enrollment",
+    "eligibility-criteria",
+    "cohort-stratification",
+    "cohort-table",
+    "trial-design-schema",
+    "randomization-schema",
+    "treatment-arm-comparison",
+    "clinical-sample-flow",
+    "biospecimen-collection",
+    "longitudinal-visit-schedule",
+    "clinical-omics-bridge",
+    "translational-readout",
+    "biomarker-discovery",
+    "biomarker-validation",
+    "assay-validation",
+    "companion-diagnostic",
+    "validation-cohort",
+    "endpoint-hierarchy",
+    "primary-endpoint",
+    "clinical-response-card",
+    "survival-curve",
+    "adverse-event-panel",
+    "safety-monitoring",
+    "clinical-risk-benefit",
+    "regulatory-evidence-brief",
+    "evidence-grade",
+    "clinician-review",
+    "human-cohort"
   ]
 };
 
@@ -6746,6 +6916,7 @@ function createTemplateFigureNodes(pack: WorkflowPack, template: WorkflowTemplat
   if (template.id === "anatomy-organ-system-overview") return createAnatomyOrganSystemsFlagshipTemplateNodes(template, input);
   if (template.id === "methods-protocol-overview") return createMethodsProtocolsFlagshipTemplateNodes(template, input);
   if (template.id === "grant-consulting-one-slide") return createGrantConsultingFlagshipTemplateNodes(template, input);
+  if (template.id === "clinical-translational-study-overview") return createClinicalTranslationalFlagshipTemplateNodes(template, input);
   if (template.id === "ai-biosecurity-pipeline") return createAiBiosecurityFlagshipTemplateNodes(template, input);
   if (template.id === "permissioning-ladder") return createPermissioningLadderTemplateNodes(template, input);
   if (template.id === "benchmark-dashboard") return createBenchmarkDashboardTemplateNodes(template, input);
@@ -9951,6 +10122,252 @@ function createGrantConsultingFlagshipTemplateNodes(template: WorkflowTemplate, 
   return nodes.map((node, index) => ({ ...node, transform: { ...node.transform, z: index } }));
 }
 
+function createClinicalTranslationalFlagshipTemplateNodes(template: WorkflowTemplate, input: {
+  styleProfile?: AssetStyleProfile;
+  x?: number;
+  y?: number;
+  width?: number;
+}): SceneNode[] {
+  const styleProfile = input.styleProfile ?? template.recommendedStyleProfile;
+  const x = input.x ?? 72;
+  const y = input.y ?? 104;
+  const width = input.width ?? 1064;
+  const theme = flagshipStyleTheme(styleProfile, "blue");
+  const source = curatedProvenance("Synthetic clinical-translational flagship demo data generated by Scientific Image", "Scientific Image clinical-translational workflow pack fixture");
+  const figureText = (text: string, transform: Transform, style: Style = {}): SceneNode => ({
+    ...createTextNode(text, transform, style),
+    claimStatus: "draft-visual"
+  });
+  const figureShape = (shape: "round-rect" | "ellipse" | "rect" | "diamond" | "line", label: string, transform: Transform, style: Style = {}): SceneNode => ({
+    ...createShapeNode(shape, label, transform, style),
+    claimStatus: "draft-visual"
+  });
+  const symbol = (
+    assetId: string,
+    label: string,
+    sx: number,
+    sy: number,
+    sw: number,
+    sh: number,
+    layoutHint: string,
+    appearance: SymbolAppearance = {},
+    profile: AssetStyleProfile = styleProfile
+  ): SceneNode => createCuratedSymbolNode({
+    assetId,
+    label,
+    x: sx,
+    y: sy,
+    width: sw,
+    height: sh,
+    styleProfile: profile,
+    semanticRole: "clinical-translational",
+    layoutHint,
+    appearance: { ...theme.symbolAppearance, ...appearance }
+  });
+
+  const nodes: SceneNode[] = [
+    figureShape("round-rect", "", createTransform(x - 18, y - 44, width + 36, 538), {
+      fill: theme.outerFill,
+      stroke: theme.outerStroke,
+      strokeWidth: 2,
+      depth: theme.outerDepth
+    }),
+    figureText("Clinical translational evidence bridge", createTransform(x, y - 32, 620, 30), {
+      fontSize: 22,
+      fontWeight: 900,
+      color: theme.heading
+    }),
+    figureText("Agent-ready clinical slide keeps enrollment, biospecimen flow, biomarker evidence, endpoints, safety, and review as separate editable objects.", createTransform(x + 626, y - 34, width - 626, 44), {
+      fontSize: 11.2,
+      fontWeight: 650,
+      color: theme.muted
+    }),
+    figureShape("round-rect", "", createTransform(x + 4, y + 12, 246, 28), {
+      fill: theme.chipFill,
+      stroke: theme.chipStroke,
+      strokeWidth: 1,
+      depth: "surface"
+    }),
+    figureText("pack: clinical-translational", createTransform(x + 18, y + 17, 214, 18), {
+      fontSize: 10.2,
+      fontWeight: 850,
+      color: theme.accent
+    }),
+    figureShape("round-rect", "", createTransform(x + 264, y + 12, 382, 28), {
+      fill: theme.chipAltFill,
+      stroke: theme.isLine ? "#111827" : theme.isDark ? "#334155" : "#bbf7d0",
+      strokeWidth: 1,
+      depth: "surface"
+    }),
+    figureText("agent-ready cohort -> biomarker -> endpoint", createTransform(x + 280, y + 17, 350, 18), {
+      fontSize: 10.2,
+      fontWeight: 850,
+      color: theme.accent2
+    })
+  ];
+
+  const stageY = y + 64;
+  const stageH = 164;
+  const stageW = Math.round((width - 64) / 5);
+  const stages: Array<{ assetId: string; label: string; kind: string; note: string; accent: string; profile?: AssetStyleProfile }> = [
+    { assetId: "consent-enrollment", label: "Enroll", kind: "cohort", note: "consent + criteria", accent: theme.accent },
+    { assetId: "clinical-sample-flow", label: "Samples", kind: "specimen", note: "blood/tissue flow", accent: "#0d9488" },
+    { assetId: "biomarker-validation", label: "Biomarker", kind: "evidence", note: "assay + cohort", accent: "#2563eb" },
+    { assetId: "endpoint-hierarchy", label: "Endpoint", kind: "outcome", note: "primary + secondary", accent: "#7c3aed" },
+    { assetId: "clinician-review", label: "Review", kind: "clinical", note: "safety + action", accent: theme.warningText, profile: theme.riskSymbolProfile }
+  ];
+  stages.forEach((stage, index) => {
+    const sx = x + index * (stageW + 16);
+    const reviewStage = index === stages.length - 1;
+    nodes.push(figureShape("round-rect", "", createTransform(sx, stageY, stageW, stageH), {
+      fill: reviewStage ? theme.warningFill : index % 2 ? theme.panelAltFill : theme.panelFill,
+      stroke: reviewStage ? theme.warningStroke : theme.panelStroke,
+      strokeWidth: 1.25,
+      depth: reviewStage ? theme.floatingDepth : theme.panelDepth
+    }));
+    nodes.push(figureShape("round-rect", "", createTransform(sx + 12, stageY + 12, 36, 20), {
+      fill: theme.isDark ? "#0f172a" : "#ffffff",
+      stroke: reviewStage ? theme.warningStroke : theme.panelStroke,
+      strokeWidth: 1,
+      depth: "surface"
+    }));
+    nodes.push(figureText(`0${index + 1}`, createTransform(sx + 21, stageY + 16, 18, 12), {
+      fontSize: 8.8,
+      fontWeight: 950,
+      color: reviewStage ? theme.warningText : stage.accent
+    }));
+    nodes.push(figureShape("round-rect", "", createTransform(sx + stageW - 88, stageY + 12, 74, 20), {
+      fill: reviewStage ? theme.warningFill : theme.chipFill,
+      stroke: reviewStage ? theme.warningStroke : theme.chipStroke,
+      strokeWidth: 1,
+      depth: "surface"
+    }));
+    nodes.push(figureText(stage.kind, createTransform(sx + stageW - 78, stageY + 16, 56, 12), {
+      fontSize: 7.4,
+      fontWeight: 850,
+      color: reviewStage ? theme.warningText : stage.accent
+    }));
+    nodes.push(symbol(stage.assetId, stage.label, sx + Math.round((stageW - 112) / 2), stageY + 34, 112, 86, `${template.id}:stage-${index + 1}`, { accent: stage.accent, stroke: stage.accent, labelVisible: false }, stage.profile ?? styleProfile));
+    nodes.push(figureText(stage.label, createTransform(sx + 14, stageY + 122, stageW - 28, 18), {
+      fontSize: 12,
+      fontWeight: 900,
+      color: reviewStage ? theme.warningText : theme.text
+    }));
+    nodes.push(figureText(stage.note, createTransform(sx + 14, stageY + 142, stageW - 28, 16), {
+      fontSize: 9.2,
+      fontWeight: 720,
+      color: theme.muted
+    }));
+    if (index > 0) {
+      nodes.push(createConnectorNode([
+        { x: sx - 16, y: stageY + 82 },
+        { x: sx - 2, y: stageY + 82 }
+      ], "", { stroke: theme.connector, strokeWidth: 2.3 }));
+    }
+  });
+  nodes.push(figureShape("round-rect", "", createTransform(x + 4, stageY + stageH + 14, width - 8, 28), {
+    fill: theme.isDark ? "#0f172a" : "#f8fafc",
+    stroke: theme.panelStroke,
+    strokeWidth: 1,
+    depth: "surface"
+  }));
+  nodes.push(figureText("Decision spine: enroll cohort -> collect biospecimen -> validate biomarker -> read endpoint -> review safety and action", createTransform(x + 24, stageY + stageH + 20, width - 48, 16), {
+    fontSize: 9.5,
+    fontWeight: 820,
+    color: theme.muted
+  }));
+
+  const lowerY = y + 280;
+  const gap = 22;
+  const panelW = Math.round((width - gap * 2) / 3);
+  const enrollmentTable = {
+    id: createId("table"),
+    name: "Illustrative enrollment trajectory",
+    columns: ["month", "enrolled", "series"],
+    rows: [
+      { month: 1, enrolled: 18, series: "cohort" },
+      { month: 2, enrolled: 34, series: "cohort" },
+      { month: 3, enrolled: 57, series: "cohort" },
+      { month: 4, enrolled: 82, series: "cohort" }
+    ],
+    source
+  };
+  const addPanel = (tag: string, title: string, status: string, px: number, py: number, pw: number, fill = theme.panelFill, tone = theme.text) => {
+    const review = status === "review";
+    nodes.push(figureShape("round-rect", "", createTransform(px, py, pw, 204), {
+      fill,
+      stroke: review ? theme.warningStroke : theme.panelStroke,
+      strokeWidth: 1.25,
+      depth: theme.panelDepth
+    }));
+    nodes.push(figureShape("round-rect", "", createTransform(px + 14, py + 14, 28, 22), {
+      fill: theme.isDark ? "#0f172a" : "#ffffff",
+      stroke: review ? theme.warningStroke : theme.panelStroke,
+      strokeWidth: 1,
+      depth: "surface"
+    }));
+    nodes.push(figureText(tag, createTransform(px + 14, py + 17, 28, 16), {
+      fontSize: 12,
+      fontWeight: 920,
+      color: tone
+    }));
+    nodes.push(figureText(title, createTransform(px + 52, py + 16, pw - 142, 20), {
+      fontSize: 11.6,
+      fontWeight: 850,
+      color: tone
+    }));
+    nodes.push(figureShape("round-rect", "", createTransform(px + pw - 88, py + 14, 74, 22), {
+      fill: review ? theme.warningFill : theme.chipFill,
+      stroke: review ? theme.warningStroke : theme.chipStroke,
+      strokeWidth: 1,
+      depth: "surface"
+    }));
+    nodes.push(figureText(status, createTransform(px + pw - 76, py + 19, 52, 12), {
+      fontSize: 7.9,
+      fontWeight: 850,
+      color: review ? theme.warningText : tone
+    }));
+  };
+  addPanel("A", "Cohort and samples", "source", x, lowerY, panelW, theme.panelFill, theme.accent);
+  addPanel("B", "Biomarker validation", "evidence", x + panelW + gap, lowerY, panelW, theme.panelAltFill, theme.accent2);
+  addPanel("C", "Endpoint and safety", "review", x + (panelW + gap) * 2, lowerY, width - (panelW + gap) * 2, theme.warningFill, theme.warningText);
+  nodes.push(
+    symbol("cohort-stratification", "Cohort", x + 20, lowerY + 52, 60, 72, `${template.id}:cohort`, { accent: theme.accent, stroke: theme.accent, labelVisible: false }),
+    symbol("cohort-table", "Table", x + 88, lowerY + 52, 60, 72, `${template.id}:cohort-table`, { accent: "#2563eb", stroke: "#2563eb", labelVisible: false }),
+    symbol("biospecimen-collection", "Biospecimen", x + 156, lowerY + 52, 60, 72, `${template.id}:biospecimen`, { accent: "#0d9488", stroke: "#0d9488", labelVisible: false }),
+    createPlotNode({
+      id: createId("plot"),
+      plotType: "line",
+      title: "Enrollment",
+      table: enrollmentTable,
+      encodings: { x: "month", y: "enrolled", color: "series" },
+      style: theme.plotStyle
+    }, createTransform(x + 232, lowerY + 50, 92, 88)),
+    figureText("Cohort table, consent, and biospecimen flow stay source-linked.", createTransform(x + 24, lowerY + 160, panelW - 48, 24), { fontSize: 10, fontWeight: 720, color: theme.muted }),
+    symbol("clinical-omics-bridge", "Omics", x + panelW + gap + 18, lowerY + 52, 60, 72, `${template.id}:omics`, { accent: "#0d9488", stroke: "#0d9488", labelVisible: false }),
+    symbol("biomarker-discovery", "Discovery", x + panelW + gap + 88, lowerY + 52, 60, 72, `${template.id}:discovery`, { accent: "#2563eb", stroke: "#2563eb", labelVisible: false }),
+    symbol("assay-validation", "Assay", x + panelW + gap + 158, lowerY + 52, 60, 72, `${template.id}:assay`, { accent: "#7c3aed", stroke: "#7c3aed", labelVisible: false }),
+    symbol("validation-cohort", "Validation", x + panelW + gap + 228, lowerY + 52, 60, 72, `${template.id}:validation`, { accent: "#0891b2", stroke: "#0891b2", labelVisible: false }),
+    figureText("Candidate marker, assay, and validation cohort remain independently editable.", createTransform(x + panelW + gap + 24, lowerY + 160, panelW - 48, 24), { fontSize: 10, fontWeight: 720, color: theme.muted }),
+    symbol("clinical-response-card", "Response", x + (panelW + gap) * 2 + 18, lowerY + 52, 60, 72, `${template.id}:response`, { accent: theme.warningText, stroke: theme.warningText, labelVisible: false }, theme.riskSymbolProfile),
+    symbol("survival-curve", "Survival", x + (panelW + gap) * 2 + 88, lowerY + 52, 60, 72, `${template.id}:survival`, { accent: theme.warningText, stroke: theme.warningText, labelVisible: false }, theme.riskSymbolProfile),
+    symbol("adverse-event-panel", "AE", x + (panelW + gap) * 2 + 158, lowerY + 52, 60, 72, `${template.id}:adverse-event`, { accent: theme.warningText, stroke: theme.warningText, labelVisible: false }, theme.riskSymbolProfile),
+    symbol("clinical-risk-benefit", "Risk benefit", x + (panelW + gap) * 2 + 228, lowerY + 52, 60, 72, `${template.id}:risk-benefit`, { accent: theme.warningText, stroke: theme.warningText, labelVisible: false }, theme.riskSymbolProfile),
+    figureShape("round-rect", "", createTransform(x + (panelW + gap) * 2 + 98, lowerY + 148, 214, 24), {
+      fill: theme.isDark ? "#111827" : "#ffffff",
+      stroke: theme.warningStroke,
+      strokeWidth: 1,
+      depth: "surface"
+    }),
+    figureText("clinical-claims-review", createTransform(x + (panelW + gap) * 2 + 128, lowerY + 154, 154, 13), {
+      fontSize: 8.2,
+      fontWeight: 850,
+      color: theme.warningText
+    })
+  );
+  return nodes.map((node, index) => ({ ...node, transform: { ...node.transform, z: index } }));
+}
+
 function createSpatialResultsFlagshipTemplateNodes(template: WorkflowTemplate, input: {
   styleProfile?: AssetStyleProfile;
   x?: number;
@@ -12107,6 +12524,7 @@ function inferWorkflowPack(text: string): string | undefined {
   if (/protein engineering|protein design|directed evolution|affinity maturation|binding pocket|protein domain|variant library|enzyme kinetics|protein stability|developability|purification column|structure prediction|binder optimization|nanobody|scfv/.test(normalized)) return "protein-engineering";
   if (/lab automation|liquid handler|automated liquid handler|robotic arm|robotic gripper|plate handler|plate stack|plate reader|barcode scanner|lims|assay scheduler|sample tracker|automation qc|qc gate|incubator stack|automated microscope|acoustic dispenser|colony picker|deck layout|tip rack|reagent reservoir|automation orchestrator|robotic rail/.test(normalized)) return "lab-automation";
   if (/drug|compound|hit triage|lead|admet|toxicity|target validation|candidate nomination|pharma|potency|selectivity/.test(normalized)) return "drug-discovery";
+  if (/(?:^|[^a-z0-9])(?:clinical translational|translational|patient cohort|patient journey|consent|enrollment|eligibility|inclusion|exclusion|cohort stratification|cohort table|trial design|randomization|treatment arm|clinical sample|biospecimen|longitudinal visit|clinical omics|translational readout|biomarker discovery|biomarker validation|assay validation|companion diagnostic|validation cohort|endpoint hierarchy|primary endpoint|secondary endpoint|clinical response|survival curve|adverse event|safety monitoring|risk[-\s]?benefit|regulatory evidence|evidence grade|ecrf|data lock|irb|clinician review|site activation|patient[-\s]?reported outcome|real[-\s]?world evidence|clinical decision support)(?:$|[^a-z0-9])/.test(normalized)) return "clinical-translational";
   if (/(?:^|[^a-z0-9])(?:methods?|protocols?|sample prep(?:aration)?|reagent mastermix|mastermix|serial dilution|incubation|wash step|centrifugation|magnetic bead|pcr amplification|qpcr|rt[-\s]?qpcr|elisa|western blot|gel imaging|immunostaining|fixation|permeabilization|library prep(?:aration)?|assay timeline|protocol checklist|protocol qc|replicate layout|control sample|standard curve|sample normalization|aliquot|protocol deviation|method safety)(?:$|[^a-z0-9])/.test(normalized)) return "methods-and-protocols";
   if (/(?:^|[^a-z0-9])(?:grant|specific aims?|proposal|consulting|executive summary|one[-\s]?pager|funder|milestone roadmap|roadmap|workplan|budget|resource allocation|stakeholder|decision brief|value proposition|impact metric|outcome kpi|market landscape|competitive positioning|evidence snapshot|risk matrix|risk mitigation|dependency map|go[-\s]?no[-\s]?go|deliverable|recommendation|executive takeaway|priority scorecard)(?:$|[^a-z0-9])/.test(normalized)) return "grant-and-consulting-summary";
   if (/(?:^|[^a-z0-9])(?:perturb(?:-seq)?|crispr|screens?|screening|guide rnas?|grnas?|lentiviral)(?:$|[^a-z0-9])/.test(normalized)) return "perturb-seq-crispr";

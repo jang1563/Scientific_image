@@ -40,12 +40,12 @@ import { exportProject } from "../packages/export/src/index.ts";
 
 test("premium asset registry has growing complete curated assets", () => {
   const validation = validatePremiumAssetRegistry();
-  assert.equal(CURATED_ASSETS.length, 428);
+  assert.equal(CURATED_ASSETS.length, 466);
   assert.deepEqual(validation.issues, []);
 
   const ids = new Set(CURATED_ASSETS.map((asset) => asset.id));
-  assert.equal(ids.size, 428);
-  assert.equal(CURATED_ASSETS.filter((asset) => asset.category.startsWith("Biology /")).length, 348);
+  assert.equal(ids.size, 466);
+  assert.equal(CURATED_ASSETS.filter((asset) => asset.category.startsWith("Biology /")).length, 386);
   assert.equal(CURATED_ASSETS.filter((asset) => asset.category.startsWith("AI /")).length, 80);
 });
 
@@ -219,9 +219,9 @@ test("commercial signature and hero assets have v2 recipes and quality metadata"
   const premiumIds = new Set(premiumAssets.map((asset) => asset.id));
   const recipes = new Set(premiumAssets.map((asset) => asset.renderSpec.assetRecipe));
 
-  assert.equal(HERO_ASSET_IDS.length, 363);
-  assert.equal(premiumAssets.length, 363);
-  assert.equal(recipes.size, 363);
+  assert.equal(HERO_ASSET_IDS.length, 401);
+  assert.equal(premiumAssets.length, 401);
+  assert.equal(recipes.size, 401);
   assert.ok(CURATED_ASSETS.filter((asset) => asset.qualityTier === "signature").length >= 20);
   for (const assetId of HERO_ASSET_IDS) {
     const asset = getAsset(assetId);
@@ -317,6 +317,14 @@ test("commercial signature and hero assets have v2 recipes and quality metadata"
     assert.ok(asset.qualityTier === "signature" || asset.qualityTier === "hero");
     assert.equal(asset.renderSpec.assetRecipe, `hero-${assetId}`);
     assert.ok(asset.workflowPacks.includes("grant-and-consulting-summary"));
+    assert.match(renderPremiumAssetSvg(assetId, { styleProfile: "consulting-2p5d" }), new RegExp(`data-recipe="hero-${assetId}"`));
+    assert.doesNotMatch(renderPremiumAssetSvg(assetId, { styleProfile: "consulting-2p5d" }), /data-recipe="standard-/);
+  }
+  for (const assetId of ["clinical-study-overview", "patient-journey-map", "consent-enrollment", "eligibility-criteria", "cohort-stratification", "trial-design-schema", "clinical-sample-flow", "biospecimen-collection", "clinical-omics-bridge", "biomarker-discovery", "biomarker-validation", "assay-validation", "validation-cohort", "endpoint-hierarchy", "clinical-response-card", "survival-curve", "adverse-event-panel", "safety-monitoring", "clinical-risk-benefit", "regulatory-evidence-brief", "evidence-grade", "clinician-review", "clinical-decision-support"]) {
+    const asset = getAsset(assetId);
+    assert.ok(asset.qualityTier === "signature" || asset.qualityTier === "hero");
+    assert.equal(asset.renderSpec.assetRecipe, `hero-${assetId}`);
+    assert.ok(asset.workflowPacks.includes("clinical-translational"));
     assert.match(renderPremiumAssetSvg(assetId, { styleProfile: "consulting-2p5d" }), new RegExp(`data-recipe="hero-${assetId}"`));
     assert.doesNotMatch(renderPremiumAssetSvg(assetId, { styleProfile: "consulting-2p5d" }), /data-recipe="standard-/);
   }
@@ -864,6 +872,38 @@ test("grant and consulting summary broad pack assets expose dedicated premium re
   }
 });
 
+test("clinical translational broad pack assets expose dedicated premium recipe markers", () => {
+  const expectedMarkers: Record<string, RegExp[]> = {
+    "clinical-study-overview": [/asset-clinical-clinical-study-overview/, /asset-clinical-study-flow/, /asset-clinical-study-patient-node/],
+    "patient-journey-map": [/asset-clinical-patient-journey-map/, /asset-patient-journey-map/, /asset-visit-timepoint/, /asset-patient-journey-path/],
+    "consent-enrollment": [/asset-clinical-consent-enrollment/, /asset-clinical-review-card/, /asset-clinical-consent-check/],
+    "eligibility-criteria": [/asset-clinical-eligibility-criteria/, /asset-clinical-criteria-funnel/, /asset-clinical-criteria-checklist/],
+    "cohort-stratification": [/asset-clinical-cohort-stratification/, /asset-clinical-cohort-patient/, /asset-clinical-cohort-table/],
+    "randomization-schema": [/asset-clinical-randomization-schema/, /asset-randomization-branch/, /asset-treatment-arm/],
+    "clinical-sample-flow": [/asset-clinical-clinical-sample-flow/, /asset-clinical-sample-flow/, /asset-clinical-biospecimen-tube/, /asset-clinical-sample-arrow/],
+    "clinical-omics-bridge": [/asset-clinical-clinical-omics-bridge/, /asset-clinical-omics-bridge-link/, /asset-translational-readout-card/],
+    "biomarker-validation": [/asset-clinical-biomarker-validation/, /asset-biomarker-panel-card/, /asset-biomarker-marker/, /asset-assay-validation-check/],
+    "endpoint-hierarchy": [/asset-clinical-endpoint-hierarchy/, /asset-endpoint-card/, /asset-primary-endpoint/, /asset-secondary-endpoint/],
+    "survival-curve": [/asset-clinical-survival-curve/, /asset-survival-curve-axes/, /asset-survival-step-curve/],
+    "adverse-event-panel": [/asset-clinical-adverse-event-panel/, /asset-adverse-event-panel/, /asset-clinical-safety-shield/, /asset-safety-monitoring-pulse/],
+    "regulatory-evidence-brief": [/asset-clinical-regulatory-evidence-brief/, /asset-clinical-evidence-grade/, /asset-regulatory-evidence-card/],
+    "ecrf-data-capture": [/asset-clinical-ecrf-data-capture/, /asset-ecrf-data-capture-card/, /asset-clinical-data-lock/],
+    "site-activation": [/asset-clinical-site-activation/, /asset-site-activation-map/, /asset-site-pin/],
+    "clinical-decision-support": [/asset-clinical-clinical-decision-support/, /asset-pro-speech-bubble/, /asset-clinical-decision-support-arrow/]
+  };
+
+  for (const [assetId, markers] of Object.entries(expectedMarkers)) {
+    const asset = getAsset(assetId);
+    const svg = renderPremiumAssetSvg(assetId, { styleProfile: "consulting-2p5d", width: 180, height: 140 });
+    assert.match(svg, /commercial-premium-asset/);
+    assert.match(svg, new RegExp(`data-recipe="hero-${assetId}"`));
+    assert.ok(asset.workflowPacks.includes("clinical-translational"));
+    assert.ok(asset.qualityTier === "signature" || asset.qualityTier === "hero");
+    assert.ok(svg.length > 1800, `${assetId} render is too small to be a premium clinical translational asset`);
+    for (const marker of markers) assert.match(svg, marker);
+  }
+});
+
 test("spatial transcriptomics assets expose premium map and image-analysis markers", () => {
   const expectedMarkers: Record<string, RegExp[]> = {
     "visium-spot-array": [
@@ -962,7 +1002,7 @@ test("spatial results template uses compact copy and roomier heatmap", () => {
 
 test("premium style profiles and workflow packs are queryable", () => {
   const packs = listWorkflowPacks();
-  assert.equal(packs.length, 17);
+  assert.equal(packs.length, 18);
   assert.ok(packs.every((pack) => pack.assetIds.length >= 20));
   assert.ok(packs.every((pack) => pack.templates.length >= 4));
   assert.ok(packs.every((pack) => pack.flagshipTemplateId));
@@ -975,6 +1015,7 @@ test("premium style profiles and workflow packs are queryable", () => {
   assert.ok(packs.some((pack) => pack.id === "lab-automation" && pack.templates.includes("lab-automation-platform")));
   assert.ok(packs.some((pack) => pack.id === "anatomy-organ-systems" && pack.templates.includes("anatomy-organ-system-overview")));
   assert.ok(packs.some((pack) => pack.id === "grant-and-consulting-summary" && pack.templates.includes("grant-consulting-one-slide")));
+  assert.ok(packs.some((pack) => pack.id === "clinical-translational" && pack.templates.includes("clinical-translational-study-overview")));
 
   const templates = listWorkflowTemplates();
   assert.ok(templates.length >= 25);
@@ -1011,6 +1052,9 @@ test("premium style profiles and workflow packs are queryable", () => {
   const grantTemplates = listWorkflowTemplates({ workflowPack: "grant-and-consulting-summary" });
   assert.equal(grantTemplates.length, 4);
   assert.ok(grantTemplates.some((template) => template.id === "grant-consulting-one-slide" && template.layout === "multi-panel"));
+  const clinicalTemplates = listWorkflowTemplates({ workflowPack: "clinical-translational" });
+  assert.equal(clinicalTemplates.length, 4);
+  assert.ok(clinicalTemplates.some((template) => template.id === "clinical-translational-study-overview" && template.layout === "workflow"));
 
   const perturb = searchAssets({ workflowPack: "perturb-seq-crispr", styleProfile: "consulting-2p5d", limit: 10 });
   assert.ok(perturb.length >= 5);
@@ -1061,6 +1105,11 @@ test("premium style profiles and workflow packs are queryable", () => {
   assert.ok(grant.length >= 8);
   assert.ok(grant.every((result) => result.asset.workflowPacks.includes("grant-and-consulting-summary")));
   assert.ok(grant.some((result) => result.asset.id === "grant-summary-board" || result.asset.id === "recommendation-card"));
+
+  const clinical = searchAssets({ workflowPack: "clinical-translational", query: "clinical translational cohort biomarker endpoint validation safety review", styleProfile: "consulting-2p5d", limit: 12 });
+  assert.ok(clinical.length >= 8);
+  assert.ok(clinical.every((result) => result.asset.workflowPacks.includes("clinical-translational")));
+  assert.ok(clinical.some((result) => result.asset.id === "clinical-study-overview" || result.asset.id === "biomarker-validation"));
 
   const lineSvg = renderPremiumAssetSvg("crispr-cas9", { styleProfile: "publication-line" });
   assert.match(lineSvg, /data-style-profile="publication-line"/);
@@ -1123,18 +1172,18 @@ test("workflow pack export snapshots summarize fallbacks and next actions", () =
 
 test("premium coverage roadmap exposes 12 month targets and ontology contracts", () => {
   const coverage = getAssetCoverageGapReport();
-  assert.equal(coverage.baseline.totalAssets, 428);
-  assert.equal(coverage.baseline.signatureHeroAssets, 363);
-  assert.equal(coverage.baseline.workflowPacks, 17);
-  assert.equal(coverage.baseline.templates, 73);
+  assert.equal(coverage.baseline.totalAssets, 466);
+  assert.equal(coverage.baseline.signatureHeroAssets, 401);
+  assert.equal(coverage.baseline.workflowPacks, 18);
+  assert.equal(coverage.baseline.templates, 77);
   assert.equal(coverage.productWedge, "asset-breadth-library");
   assert.equal(coverage.firstWave, "broad-biology-market");
   assert.equal(coverage.qualityGate, "pack-complete-premium");
   assert.deepEqual(coverage.broadMarketPackOrder.slice(0, 5), ["drug-discovery", "protein-engineering", "synthetic-biology", "microbiome-infectious-disease", "cell-therapy"]);
   assert.equal(coverage.packMinimumContract.minSignatureHeroAssets, 12);
   assert.equal(coverage.packMinimumContract.requiresAgentPath, true);
-  assert.ok(coverage.milestones.some((milestone) => milestone.targetAssets === 1200 && milestone.remainingAssets === 772));
-  assert.ok(coverage.milestones.some((milestone) => milestone.targetWorkflowPacks === 24 && milestone.remainingWorkflowPacks === 7));
+  assert.ok(coverage.milestones.some((milestone) => milestone.targetAssets === 1200 && milestone.remainingAssets === 734));
+  assert.ok(coverage.milestones.some((milestone) => milestone.targetWorkflowPacks === 24 && milestone.remainingWorkflowPacks === 6));
   assert.ok(coverage.plannedWorkflowPacks.some((pack) => pack.id === "bio-llm-benchmarks" && pack.wave === "jk-aligned"));
   assert.ok(coverage.plannedWorkflowPacks.some((pack) => pack.id === "drug-discovery" && pack.wave === "commercial-broad"));
   assert.equal(coverage.plannedWorkflowPacks.filter((pack) => pack.wave === "commercial-broad")[0].id, "drug-discovery");
@@ -1574,6 +1623,56 @@ test("agent-facing pack and asset-set recommendations are workflow aware", () =>
   for (const assetId of expectedGrantCore) assert.ok(grantInsertIds.includes(assetId), `${assetId} should be an insert-ready grant and consulting core anchor`);
   assert.ok(grantSet.insertPlan.every((action) => action.tool === "insert_premium_asset" && action.args.styleProfile === "consulting-2p5d"));
 
+  const clinicalPackRecommendations = recommendWorkflowPack({
+    title: "Clinical translational cohort biomarker endpoint validation safety review",
+    narrative: "Patient cohort enrollment, eligibility, biospecimen flow, clinical omics bridge, biomarker validation, endpoint hierarchy, survival response, adverse events, safety monitoring, and clinician review.",
+    limit: 3
+  });
+  assert.equal(clinicalPackRecommendations[0].pack.id, "clinical-translational");
+  assert.equal(clinicalPackRecommendations[0].recommendedTemplateId, "clinical-translational-study-overview");
+
+  const clinicalSet = recommendAssetSet({
+    title: "Clinical translational evidence bridge",
+    sourceText: "Enroll a patient cohort with consent and eligibility criteria, collect biospecimens, run clinical omics bridge, discover and validate biomarkers, compare validation cohort endpoint hierarchy survival response and adverse event safety monitoring with clinician review.",
+    styleProfile: "consulting-2p5d",
+    limit: 40
+  });
+  const clinicalInsertIds = clinicalSet.insertPlan.map((action) => action.args.assetId);
+  const expectedClinicalCore = [
+    "clinical-study-overview",
+    "cohort-stratification",
+    "cohort-table",
+    "clinical-sample-flow",
+    "patient-journey-map",
+    "consent-enrollment",
+    "eligibility-criteria",
+    "clinical-omics-bridge",
+    "translational-readout",
+    "adverse-event-panel",
+    "safety-monitoring",
+    "clinical-risk-benefit",
+    "clinician-review",
+    "human-cohort",
+    "clinical-endpoint-card",
+    "trial-design-schema",
+    "randomization-schema",
+    "treatment-arm-comparison",
+    "biospecimen-collection",
+    "longitudinal-visit-schedule",
+    "biomarker-discovery",
+    "biomarker-validation",
+    "assay-validation",
+    "validation-cohort",
+    "endpoint-hierarchy",
+    "primary-endpoint",
+    "clinical-response-card",
+    "survival-curve"
+  ];
+  assert.equal(clinicalSet.workflowPack, "clinical-translational");
+  assert.equal(clinicalSet.templateId, "clinical-translational-study-overview");
+  for (const assetId of expectedClinicalCore) assert.ok(clinicalInsertIds.includes(assetId), `${assetId} should be an insert-ready clinical translational core anchor`);
+  assert.ok(clinicalSet.insertPlan.every((action) => action.tool === "insert_premium_asset" && action.args.styleProfile === "consulting-2p5d"));
+
   const drugPackRecommendations = recommendWorkflowPack({
     title: "Drug discovery hit validation and lead optimization slide",
     narrative: "Target validation, compound library screen, hit triage, toxicity review, and candidate nomination.",
@@ -1880,6 +1979,18 @@ test("priority flagship templates generate commercial editable figure structures
   assert.ok(grant.some((node) => node.kind === "symbol" && node.payload.layoutHint?.startsWith("grant-consulting-one-slide:stage-")));
   assert.ok(grant.every((node) => node.payload.workflowPack === "grant-and-consulting-summary" && node.payload.templateId === "grant-consulting-one-slide"));
 
+  const clinical = createWorkflowFigureNodes({ templateId: "clinical-translational-study-overview", styleProfile: "consulting-2p5d" });
+  assert.ok(clinical.length >= 80);
+  assert.ok(clinical.some((node) => node.kind === "text" && node.payload.text?.includes("Clinical translational evidence bridge")));
+  assert.ok(clinical.some((node) => node.kind === "text" && node.payload.text?.includes("Decision spine: enroll cohort")));
+  assert.ok(clinical.some((node) => node.kind === "text" && node.payload.text === "clinical-claims-review"));
+  assert.ok(clinical.some((node) => node.kind === "plot" && node.payload.spec.plotType === "line" && node.payload.spec.title === "Enrollment"));
+  for (const assetId of ["consent-enrollment", "clinical-sample-flow", "biomarker-validation", "endpoint-hierarchy", "clinician-review", "cohort-stratification", "cohort-table", "biospecimen-collection", "clinical-omics-bridge", "biomarker-discovery", "assay-validation", "validation-cohort", "clinical-response-card", "survival-curve", "adverse-event-panel", "clinical-risk-benefit"]) {
+    assert.ok(clinical.some((node) => node.kind === "symbol" && node.payload.assetId === assetId), `${assetId} should appear in clinical translational flagship`);
+  }
+  assert.ok(clinical.some((node) => node.kind === "symbol" && node.payload.layoutHint?.startsWith("clinical-translational-study-overview:stage-")));
+  assert.ok(clinical.every((node) => node.payload.workflowPack === "clinical-translational" && node.payload.templateId === "clinical-translational-study-overview"));
+
   const hybridTemplate = getWorkflowTemplate("spatial-realistic-hybrid-panel");
   assert.equal(hybridTemplate.recommendedStyleProfile, "scientific-editorial-realism");
   assert.ok(hybridTemplate.previewAssetIds.includes("realistic-he-tissue-section"));
@@ -1975,16 +2086,16 @@ test("priority flagship templates generate commercial editable figure structures
 
 test("asset quality report captures benchmark-driven coverage gaps", () => {
   const report = getAssetQualityReport();
-  assert.equal(report.summary.totalAssets, 428);
-  assert.equal(report.summary.biologyAssets, 348);
+  assert.equal(report.summary.totalAssets, 466);
+  assert.equal(report.summary.biologyAssets, 386);
   assert.equal(report.summary.aiAssets, 80);
-  assert.equal(report.tierCounts.signature + report.tierCounts.hero, 363);
-  assert.equal(report.workflowCoverage.length, 17);
+  assert.equal(report.tierCounts.signature + report.tierCounts.hero, 401);
+  assert.equal(report.workflowCoverage.length, 18);
   assert.ok(report.workflowCoverage.every((pack) => pack.missingAssetIds.length === 0));
   assert.ok(report.workflowCoverage.every((pack) => pack.missingTemplateIds.length === 0));
   assert.ok(report.workflowCoverage.every((pack) => pack.templateCount >= 4));
   assert.ok(report.workflowCoverage.every((pack) => pack.flagshipTemplateId));
-  assert.ok(report.styleCoverage.every((style) => style.count === 428));
+  assert.ok(report.styleCoverage.every((style) => style.count === 466));
   assert.ok(report.benchmarks.some((benchmark) => benchmark.id === "biorender"));
   assert.ok(report.benchmarks.some((benchmark) => benchmark.id === "figma-components"));
   assert.ok(report.qualityRubric.some((item) => item.includes("Recognizable at 48px")));
@@ -2000,7 +2111,8 @@ test("asset quality report captures benchmark-driven coverage gaps", () => {
   assert.ok(report.workflowCoverage.some((pack) => pack.id === "anatomy-organ-systems" && pack.signatureOrHeroCount >= 12 && pack.qaStatus === "premium"));
   assert.ok(report.workflowCoverage.some((pack) => pack.id === "methods-and-protocols" && pack.signatureOrHeroCount >= 12 && pack.qaStatus === "premium"));
   assert.ok(report.workflowCoverage.some((pack) => pack.id === "grant-and-consulting-summary" && pack.signatureOrHeroCount >= 12 && pack.qaStatus === "premium"));
-  assert.deepEqual(report.recommendedNextPacks.slice(0, 3), ["clinical-translational", "immunology-oncology", "bio-llm-benchmarks"]);
+  assert.ok(report.workflowCoverage.some((pack) => pack.id === "clinical-translational" && pack.signatureOrHeroCount >= 12 && pack.qaStatus === "premium"));
+  assert.deepEqual(report.recommendedNextPacks.slice(0, 3), ["immunology-oncology", "bio-llm-benchmarks", "biosafety-permissioning"]);
 });
 
 test("premium asset appearance overrides survive rendering and export", () => {
