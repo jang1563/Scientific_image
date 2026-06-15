@@ -43,6 +43,8 @@ This repository is a local-first scientific visual communication system. It is m
 
 - `docs/examples/`: Small public SVG examples generated from structured scene nodes for README/reviewer preview.
 
+- `docs/PUBLIC_EXAMPLE_GALLERY.md`: Reviewer-facing gallery map for the public SVG examples, local demo URLs, and the product capability each example demonstrates.
+
 - `docs/AGENT_QUICKSTART.md`: Copy-pasteable MCP/API path for agents that need to create editable figures through compact indexes, workflow templates, review validation, and export QA.
 
 - `docs/REVIEWER_EVIDENCE_MAP.md`: Claim-by-claim evidence map for public portfolio review, linking product claims to source files, tests, local demos, and audit commands.

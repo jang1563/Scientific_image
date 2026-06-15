@@ -64,6 +64,14 @@ These are synthetic public examples generated from structured scene nodes, not s
 | --- | --- | --- |
 | <img src="docs/examples/perturb-seq-workflow.svg" alt="Perturb-seq CRISPR workflow example" width="320"> | <img src="docs/examples/spatial-results-panel.svg" alt="Spatial transcriptomics results panel example" width="320"> | <img src="docs/examples/ai-biosecurity-pipeline.svg" alt="AI biosecurity evaluation pipeline example" width="320"> |
 
+See [docs/PUBLIC_EXAMPLE_GALLERY.md](docs/PUBLIC_EXAMPLE_GALLERY.md) for what each example demonstrates, which template generated it, and which local URL opens the editable scene.
+
+What to look for:
+
+- The examples are generated from workflow templates and premium asset IDs, not manually pasted SVG screenshots.
+- The same scene nodes can be opened in the web workspace through the public demo URLs above.
+- Review/export warnings remain part of the delivery path, so PPTX/DOCX limitations are visible instead of hidden.
+
 ## What Is Included
 
 - Strict scene graph package with validation, provenance, claim status, and deterministic editing helpers.

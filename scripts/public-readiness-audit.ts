@@ -37,6 +37,7 @@ const requiredFiles = [
   "docs/examples/perturb-seq-workflow.svg",
   "docs/examples/spatial-results-panel.svg",
   "docs/examples/ai-biosecurity-pipeline.svg",
+  "docs/PUBLIC_EXAMPLE_GALLERY.md",
   "docs/AGENT_QUICKSTART.md",
   "docs/REPOSITORY_INDEX.md",
   "docs/REVIEWER_EVIDENCE_MAP.md",
@@ -96,6 +97,8 @@ for (const token of [
   "Reviewer Evidence Map",
   "Portfolio Scorecard",
   "Visual Examples",
+  "docs/PUBLIC_EXAMPLE_GALLERY.md",
+  "What to look for",
   "Public demos",
   "?demo=perturb-seq-workflow",
   "?demo=ai-biosecurity-pipeline",
@@ -114,6 +117,7 @@ for (const token of [
   "Reviewer Fast Path",
   "What To Judge",
   "Copy-Paste Reviewer Commands",
+  "docs/PUBLIC_EXAMPLE_GALLERY.md",
   "docs/REVIEWER_EVIDENCE_MAP.md",
   "public demo launching",
   "Can a human edit the same objects that an agent creates through MCP/API tools?",
@@ -133,9 +137,25 @@ for (const token of [
   "?demo=perturb-seq-workflow",
   "node scripts/agent-acceptance-smoke.ts",
   "node scripts/public-readiness-audit.ts",
+  "docs/PUBLIC_EXAMPLE_GALLERY.md",
   "No private source material is required"
 ]) {
   assertTextIncludes(reviewerEvidenceMap, token, "Reviewer evidence map");
+}
+
+const publicExampleGallery = readFileSync("docs/PUBLIC_EXAMPLE_GALLERY.md", "utf8");
+for (const token of [
+  "Public Example Gallery",
+  "Template ID",
+  "Perturb-seq CRISPR workflow",
+  "Spatial transcriptomics results panel",
+  "AI biosecurity evaluation pipeline",
+  "node scripts/generate-public-examples.ts",
+  "git diff --exit-code docs/examples",
+  "?demo=perturb-seq-workflow",
+  "Every example is rendered from editable scene graph nodes"
+]) {
+  assertTextIncludes(publicExampleGallery, token, "Public example gallery");
 }
 
 const webIndex = readFileSync("apps/web/index.html", "utf8");
