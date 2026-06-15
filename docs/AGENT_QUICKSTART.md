@@ -22,6 +22,8 @@ The smoke test follows the same loop an agent should use:
 
 Use this when evaluating whether the agent surface is still working after changes.
 
+For a reviewer-facing map of what this smoke proves, see `docs/AGENT_DEMO_EVIDENCE.md`.
+
 ## MCP Server
 
 Start the stdio MCP server:

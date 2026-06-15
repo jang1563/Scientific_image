@@ -58,6 +58,8 @@ For a reviewer-oriented Repository Index, see [docs/REPOSITORY_INDEX.md](docs/RE
 
 For a claim-by-claim Reviewer Evidence Map, see [docs/REVIEWER_EVIDENCE_MAP.md](docs/REVIEWER_EVIDENCE_MAP.md). It links each portfolio claim to the exact files, tests, commands, and public demos a reviewer can inspect.
 
+For the MCP/agent proof path, see [docs/AGENT_DEMO_EVIDENCE.md](docs/AGENT_DEMO_EVIDENCE.md). It maps the smoke test to agent resources, compact asset indexing, workflow figure generation, review validation, and export QA.
+
 ## Visual Examples
 
 These are synthetic public examples generated from structured scene nodes, not screenshots or private source material. Regenerate them with `node scripts/generate-public-examples.ts`.
@@ -198,6 +200,8 @@ node scripts/agent-acceptance-smoke.ts --write-output
 ```
 
 The smoke follows the same loop an agent should use: read the manifest resource, inspect tools, create a project, insert a premium workflow template, validate review/export QA, and verify SVG/PDF/PPTX output. With `--write-output`, it writes files under `output/agent-smoke`.
+
+For the reviewer-facing agent evidence map, see [docs/AGENT_DEMO_EVIDENCE.md](docs/AGENT_DEMO_EVIDENCE.md).
 
 ## Premium Asset System
 

@@ -33,6 +33,7 @@ Then open `http://127.0.0.1:4173/?demo=perturb-seq-workflow`.
 | Is the asset library broad enough to demonstrate system design rather than a toy icon set? | `docs/PORTFOLIO_SCORECARD.md`, `packages/assets/src/index.ts`, `tests/assets.test.ts` | `node --test tests/assets.test.ts` |
 | Are portfolio metrics fresh and computed from code? | `scripts/portfolio-metrics.ts`, `docs/PORTFOLIO_SCORECARD.md`, `scripts/public-readiness-audit.ts` | `node scripts/portfolio-metrics.ts` and `node scripts/public-readiness-audit.ts` |
 | Can an agent use compact indexes and insert-ready asset recommendations? | `docs/AGENT_QUICKSTART.md`, `packages/agent/src/index.ts`, `packages/mcp/src/server.ts` | `node scripts/agent-acceptance-smoke.ts` |
+| Can an agent create a full editable Perturb-seq figure from source notes? | `docs/AGENT_DEMO_EVIDENCE.md`, `scripts/agent-acceptance-smoke.ts`, `packages/agent/src/index.ts` | `node scripts/agent-acceptance-smoke.ts --workflow-pack perturb-seq-crispr` |
 | Does export QA name fidelity fallbacks and review issues? | `packages/export/src/index.ts`, `packages/deck/src/index.ts`, `tests/export.test.ts`, `tests/deck.test.ts` | `node --test tests/export.test.ts tests/deck.test.ts` |
 | Is the public repository clean enough to share? | `scripts/public-readiness-audit.ts`, `.github/workflows/ci.yml`, `docs/PUBLIC_RELEASE_CHECKLIST.md` | `node scripts/public-readiness-audit.ts` |
 

@@ -39,6 +39,7 @@ const requiredFiles = [
   "docs/examples/ai-biosecurity-pipeline.svg",
   "docs/PUBLIC_EXAMPLE_GALLERY.md",
   "docs/AGENT_QUICKSTART.md",
+  "docs/AGENT_DEMO_EVIDENCE.md",
   "docs/REPOSITORY_INDEX.md",
   "docs/REVIEWER_EVIDENCE_MAP.md",
   "docs/PORTFOLIO_SCORECARD.md",
@@ -98,6 +99,7 @@ for (const token of [
   "Why This Is Technically Interesting",
   "One canonical scene graph drives the web workspace, API, MCP tools, visual examples, and SVG/PDF/PPTX/DOCX exports.",
   "docs/AGENT_QUICKSTART.md",
+  "docs/AGENT_DEMO_EVIDENCE.md",
   "Portfolio Snapshot",
   "Metrics are recomputed from code with `node scripts/portfolio-metrics.ts`.",
   "Repository Index",
@@ -125,6 +127,7 @@ for (const token of [
   "What To Judge",
   "Copy-Paste Reviewer Commands",
   "docs/PUBLIC_EXAMPLE_GALLERY.md",
+  "docs/AGENT_DEMO_EVIDENCE.md",
   "docs/REVIEWER_EVIDENCE_MAP.md",
   "public demo launching",
   "Can a human edit the same objects that an agent creates through MCP/API tools?",
@@ -145,9 +148,27 @@ for (const token of [
   "node scripts/agent-acceptance-smoke.ts",
   "node scripts/public-readiness-audit.ts",
   "docs/PUBLIC_EXAMPLE_GALLERY.md",
+  "docs/AGENT_DEMO_EVIDENCE.md",
   "No private source material is required"
 ]) {
   assertTextIncludes(reviewerEvidenceMap, token, "Reviewer evidence map");
+}
+
+const agentDemoEvidence = readFileSync("docs/AGENT_DEMO_EVIDENCE.md", "utf8");
+for (const token of [
+  "Agent Demo Evidence",
+  "node scripts/agent-acceptance-smoke.ts --workflow-pack perturb-seq-crispr",
+  "scientific-image://agent/manifest",
+  "scientific-image://agent/agent-cookbook",
+  "scientific-image://agent/demo-perturb-seq-crispr",
+  "scientific-image://agent/asset-index-compact",
+  "insertPlan[].args",
+  "generatedNodeIds",
+  "fallbackAssetIds",
+  "structured scene JSON",
+  "does not require private notes"
+]) {
+  assertTextIncludes(agentDemoEvidence, token, "Agent demo evidence");
 }
 
 const publicExampleGallery = readFileSync("docs/PUBLIC_EXAMPLE_GALLERY.md", "utf8");
@@ -184,6 +205,7 @@ for (const token of [
 const agentQuickstart = readFileSync("docs/AGENT_QUICKSTART.md", "utf8");
 for (const token of [
   "Agent Quickstart",
+  "docs/AGENT_DEMO_EVIDENCE.md",
   "node packages/mcp/src/server.ts",
   "get_asset_index",
   "recommend_asset_set",
