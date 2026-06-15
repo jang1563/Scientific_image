@@ -21,6 +21,7 @@ This scorecard is the public, reviewer-facing snapshot for the repository. It sh
 
 ## Portfolio Signals
 
+- Product prototype that joins a human web workspace with agent-addressable API/MCP workflows over one structured scene JSON artifact.
 - Structured scene graph with validation, provenance, review state, deterministic edits, and export-aware rendering.
 - Premium scientific asset registry with workflow packs, semantic search, editable part metadata, and shared SVG rendering.
 - Agent-first interface for Codex, Claude, and other MCP clients to create editable scientific figures from asset IDs, templates, semantic slots, and style profiles.

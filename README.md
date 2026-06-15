@@ -6,6 +6,17 @@ Local-first scientific visual communication MVP: a structured SVG-first editor f
 
 The repo is intentionally usable with only Node 24 in this environment. The current MVP core runs without installing packages and keeps structured scene JSON as the canonical artifact.
 
+## Project Brief
+
+Scientific Image is a portfolio-grade local product prototype for scientific visual communication. It combines a static web workspace, structured SVG scientific asset library, export-aware scene graph, local API, and MCP server so both humans and agents can create editable biology/AI figures from the same source of truth.
+
+What this repo is meant to demonstrate:
+
+- Product engineering for a BioRender-like local-first workflow, with editable scene JSON instead of opaque screenshots.
+- Scientific design-system work: workflow packs, premium asset metadata, style profiles, provenance, review queues, and export QA.
+- Agent-facing infrastructure: compact asset indexes, insert-ready recommendations, deterministic workflow figure creation, and MCP resources for Codex/Claude-style clients.
+- Portfolio discipline: public examples, reproducible metrics, CI checks, and a public-readiness audit that guards against stale claims or private material.
+
 ## 30-Second Reviewer Path
 
 1. Look at the generated SVG examples below; they are produced from editable scene nodes, not screenshots.

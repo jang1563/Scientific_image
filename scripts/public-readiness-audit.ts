@@ -92,6 +92,11 @@ function assertTextIncludes(text: string, token: string, label: string): void {
 }
 
 for (const token of [
+  "Project Brief",
+  "portfolio-grade local product prototype",
+  "static web workspace, structured SVG scientific asset library, export-aware scene graph, local API, and MCP server",
+  "BioRender-like local-first workflow",
+  "Agent-facing infrastructure",
   "30-Second Reviewer Path",
   "Copy-Paste Reviewer Commands",
   "No package install is required",
@@ -249,6 +254,7 @@ for (const token of [
   `\`${templates.length}\` workflow templates`,
   `\`${styleProfileCount}\`: consulting, publication-line, minimal-flat, dark-talk, risk-warning, realism`,
   "Copy-paste MCP/API path in `docs/AGENT_QUICKSTART.md`",
+  "Product prototype that joins a human web workspace with agent-addressable API/MCP workflows over one structured scene JSON artifact.",
   "Copy-pasteable agent quickstart that demonstrates compact indexing",
   "`3` generated SVG examples under `docs/examples/`",
   "Metrics freshness",
