@@ -66,6 +66,8 @@ node packages/mcp/src/server.ts
 
 Then open `http://127.0.0.1:4173`.
 
+The right-side Insert panel includes a `Public demos` launcher for the same Perturb-seq, spatial transcriptomics, and AI biosecurity examples shown above.
+
 ## Premium Deck Flow
 
 1. Paste markdown notes, paper summary text, or extracted PDF text into the source panel.

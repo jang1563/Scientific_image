@@ -92,6 +92,7 @@ for (const token of [
   "Repository Index",
   "Portfolio Scorecard",
   "Visual Examples",
+  "Public demos",
   "scripts/generate-public-examples.ts",
   "public-readiness-audit",
   "actions/workflows/ci.yml",
@@ -106,10 +107,24 @@ const repositoryIndex = readFileSync("docs/REPOSITORY_INDEX.md", "utf8");
 for (const token of [
   "Reviewer Fast Path",
   "What To Judge",
+  "public demo launching",
   "Can a human edit the same objects that an agent creates through MCP/API tools?",
   "Do exports report exact PPTX/DOCX fidelity fallbacks"
 ]) {
   assertTextIncludes(repositoryIndex, token, "Repository index");
+}
+
+const webIndex = readFileSync("apps/web/index.html", "utf8");
+const webApp = readFileSync("apps/web/src/app.js", "utf8");
+for (const token of [
+  "publicDemoLauncher",
+  "Public demos",
+  "launchPublicDemo",
+  "perturb-seq-workflow",
+  "spatial-results-panel",
+  "ai-biosecurity-pipeline"
+]) {
+  assertGate(webIndex.includes(token) || webApp.includes(token), `Web workspace is missing public demo launcher signal: ${token}`);
 }
 
 const agentQuickstart = readFileSync("docs/AGENT_QUICKSTART.md", "utf8");

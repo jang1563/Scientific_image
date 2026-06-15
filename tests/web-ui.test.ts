@@ -18,6 +18,10 @@ test("web inspector exposes premium asset contract and part-level controls", asy
   assert.match(app, /agent-review-row/);
   assert.match(app, /agent-fallback-row/);
   assert.match(app, /asset-preview-scale-strip/);
+  assert.match(app, /publicDemos/);
+  assert.match(app, /renderPublicDemoLauncher/);
+  assert.match(app, /launchPublicDemo/);
+  assert.match(app, /ai-biosecurity-pipeline/);
   assert.match(app, /48/);
   assert.match(app, /120/);
   assert.match(app, /slide/);
@@ -29,6 +33,8 @@ test("web inspector exposes premium asset contract and part-level controls", asy
   assert.match(css, /\.agent-chip\.fallback/);
   assert.match(css, /\.asset-preview-svg/);
   assert.match(css, /\.asset-preview-scale-strip/);
+  assert.match(css, /\.public-demo-launcher/);
+  assert.match(css, /\.public-demo-card/);
 });
 
 test("static web server exposes the premium asset catalog without the API server", async () => {

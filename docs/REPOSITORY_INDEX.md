@@ -23,7 +23,7 @@ This repository is a local-first scientific visual communication system. It is m
 
 ## Product Surface
 
-- `apps/web/`: Static local scientific deck workspace. It demonstrates asset browsing, slide canvas editing, inspector controls, review/export affordances, and visual QA surfaces.
+- `apps/web/`: Static local scientific deck workspace. It demonstrates asset browsing, public demo launching, slide canvas editing, inspector controls, review/export affordances, and visual QA surfaces.
 
 - `apps/api/src/server.ts`: Local HTTP API for assets, workflow packs, deck generation, review queues, export QA, and transient exports.
 

@@ -33,6 +33,7 @@ const packTabs = document.querySelector("#packTabs");
 const packQualitySummary = document.querySelector("#packQualitySummary");
 const selectedTemplateSummary = document.querySelector("#selectedTemplateSummary");
 const templateGallery = document.querySelector("#templateGallery");
+const publicDemoLauncher = document.querySelector("#publicDemoLauncher");
 const assetQualityFilters = document.querySelector("#assetQualityFilters");
 const assetFilters = document.querySelector("#assetFilters");
 const assetList = document.querySelector("#assetList");
@@ -121,6 +122,33 @@ CDKN1A\t2.4\t0.0002\t11.2\tCell cycle
 STAT1\t1.1\t0.03\t4.1\tInterferon
 CXCL10\t2.8\t0.00001\t14.0\tInterferon
 ISG15\t2.1\t0.0004\t10.0\tInterferon`;
+
+const publicDemos = [
+  {
+    id: "perturb-seq-workflow",
+    title: "Perturb-seq",
+    subtitle: "CRISPR source-to-hit workflow",
+    workflowPack: "perturb-seq-crispr",
+    templateId: "perturb-seq-workflow",
+    styleProfile: "consulting-2p5d"
+  },
+  {
+    id: "spatial-results-panel",
+    title: "Spatial",
+    subtitle: "Tissue, spots, segmentation, evidence",
+    workflowPack: "spatial-transcriptomics",
+    templateId: "spatial-results-panel",
+    styleProfile: "consulting-2p5d"
+  },
+  {
+    id: "ai-biosecurity-pipeline",
+    title: "AI biosecurity",
+    subtitle: "Risk gate, review, audit pipeline",
+    workflowPack: "ai-biosecurity-eval",
+    templateId: "ai-biosecurity-pipeline",
+    styleProfile: "risk-warning"
+  }
+];
 
 let project = createProject("Premium scientific deck");
 let activePageId = project.pages[0].id;
@@ -590,6 +618,7 @@ function renderAll() {
   renderInspector();
   renderPackTabs();
   renderPackQualitySummary();
+  renderPublicDemoLauncher();
   renderAssets();
   renderTemplateGallery();
   renderWorkflowInsertButton();
@@ -1539,6 +1568,53 @@ function renderPackQualitySummary() {
   const exportMarkup = packExportSnapshotMarkup(exportSnapshot, quality);
   const visualQa = packVisualQaMarkup(packId);
   packQualitySummary.innerHTML = `<div class="pack-summary-head"><div><strong>${escapeXml(pack?.name ?? workflowLabel(packId))}</strong><span>${quality.assetCount} assets / ${quality.signatureOrHeroCount} premium / ${quality.templateCount} templates${escapeXml(flagshipSummary)}</span></div><div class="pack-qa-status ${escapeAttr(quality.qaStatus)}">${escapeXml(status)}</div></div>${exportMarkup}${visualQa}`;
+}
+
+function renderPublicDemoLauncher() {
+  if (!publicDemoLauncher) return;
+  const styleProfile = currentAssetStyleProfile();
+  publicDemoLauncher.innerHTML = `
+    <div class="public-demo-head">
+      <div>
+        <strong>Public demos</strong>
+        <span>Open the same structured examples shown in README</span>
+      </div>
+      <span class="public-demo-count">${publicDemos.length}</span>
+    </div>
+    <div class="public-demo-grid">
+      ${publicDemos.map((demo) => {
+        const template = workflowTemplates.find((candidate) => candidate.id === demo.templateId);
+        const isActive = selectedWorkflowTemplateId === demo.templateId;
+        return `<button class="public-demo-card ${isActive ? "active" : ""}" type="button" data-public-demo-id="${escapeAttr(demo.id)}" title="Open ${escapeAttr(demo.title)} demo">
+          <div class="public-demo-preview">${template ? templatePreviewSvg(template, demo.styleProfile ?? styleProfile) : ""}</div>
+          <div class="public-demo-copy">
+            <strong>${escapeXml(demo.title)}</strong>
+            <span>${escapeXml(demo.subtitle)}</span>
+          </div>
+        </button>`;
+      }).join("")}
+    </div>`;
+  publicDemoLauncher.querySelectorAll("[data-public-demo-id]").forEach((button) => {
+    button.addEventListener("click", () => launchPublicDemo(button.dataset.publicDemoId));
+  });
+}
+
+function launchPublicDemo(demoId) {
+  const demo = publicDemos.find((candidate) => candidate.id === demoId);
+  if (!demo) return;
+  selectedWorkflowTemplateId = demo.templateId;
+  if (assetWorkflowPack) assetWorkflowPack.value = demo.workflowPack;
+  if (workflowTemplate) workflowTemplate.value = demo.workflowPack;
+  if (assetStyleProfile) assetStyleProfile.value = demo.styleProfile;
+  workflowPackGalleries.clear();
+  workflowPackVisualQaGalleries.clear();
+  loadWorkflowPackGallery(demo.workflowPack);
+  loadWorkflowPackVisualQaGallery(demo.workflowPack);
+  addWorkflowFigure({
+    mode: "public-demo",
+    replaceCurrentPage: true,
+    replaceExistingNotes: true
+  });
 }
 
 function packVisualQaMarkup(packId) {
