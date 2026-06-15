@@ -2,6 +2,24 @@
 
 This map keeps the public portfolio claims testable. It points reviewers to concrete files, commands, and demos instead of private context or planning history.
 
+## Fast Command Path
+
+No package install is required in the intended Node 24 environment.
+
+```bash
+node --test tests/*.test.ts
+node scripts/public-readiness-audit.ts
+node scripts/agent-acceptance-smoke.ts
+```
+
+To inspect the editable demos:
+
+```bash
+node scripts/serve-static.ts apps/web 4173
+```
+
+Then open `http://127.0.0.1:4173/?demo=perturb-seq-workflow`.
+
 ## Evidence To Inspect
 
 | Reviewer question | Evidence | Verification |

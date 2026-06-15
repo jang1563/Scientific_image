@@ -6,13 +6,10 @@ This repository is a local-first scientific visual communication system. It is m
 
 1. Inspect generated public examples in `docs/examples/`.
 2. Read the `30-Second Reviewer Path` and `Why This Is Technically Interesting` sections in `README.md`.
-3. Use `docs/REVIEWER_EVIDENCE_MAP.md` to map each portfolio claim to files and commands.
-4. Run `node --test tests/*.test.ts`.
-5. Run `node scripts/public-readiness-audit.ts`.
-6. Start the static web workspace with `node scripts/serve-static.ts apps/web 4173`.
-7. Run the agent smoke with `node scripts/agent-acceptance-smoke.ts`.
-8. Follow the MCP/API sequence in `docs/AGENT_QUICKSTART.md`.
-9. Inspect the core packages listed below.
+3. Run the `Copy-Paste Reviewer Commands` in `README.md`.
+4. Use `docs/REVIEWER_EVIDENCE_MAP.md` to map each portfolio claim to files and commands.
+5. Follow the MCP/API sequence in `docs/AGENT_QUICKSTART.md`.
+6. Inspect the core packages listed below.
 
 ## What To Judge
 

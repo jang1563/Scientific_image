@@ -14,6 +14,28 @@ The repo is intentionally usable with only Node 24 in this environment. The curr
 4. Start the local workspace with `node scripts/serve-static.ts apps/web 4173`.
 5. Inspect the agent path with `node scripts/agent-acceptance-smoke.ts`.
 
+## Copy-Paste Reviewer Commands
+
+No package install is required in the intended Node 24 environment. Run the verification path first:
+
+```bash
+node --test tests/*.test.ts
+node scripts/public-readiness-audit.ts
+node scripts/agent-acceptance-smoke.ts
+```
+
+Then start the local static workspace:
+
+```bash
+node scripts/serve-static.ts apps/web 4173
+```
+
+Open one of the editable public demos:
+
+- `http://127.0.0.1:4173/?demo=perturb-seq-workflow`
+- `http://127.0.0.1:4173/?demo=spatial-results-panel`
+- `http://127.0.0.1:4173/?demo=ai-biosecurity-pipeline`
+
 ## Why This Is Technically Interesting
 
 - One canonical scene graph drives the web workspace, API, MCP tools, visual examples, and SVG/PDF/PPTX/DOCX exports.

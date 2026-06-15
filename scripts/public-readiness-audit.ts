@@ -86,6 +86,8 @@ function assertTextIncludes(text: string, token: string, label: string): void {
 
 for (const token of [
   "30-Second Reviewer Path",
+  "Copy-Paste Reviewer Commands",
+  "No package install is required",
   "Why This Is Technically Interesting",
   "One canonical scene graph drives the web workspace, API, MCP tools, visual examples, and SVG/PDF/PPTX/DOCX exports.",
   "docs/AGENT_QUICKSTART.md",
@@ -111,6 +113,7 @@ const repositoryIndex = readFileSync("docs/REPOSITORY_INDEX.md", "utf8");
 for (const token of [
   "Reviewer Fast Path",
   "What To Judge",
+  "Copy-Paste Reviewer Commands",
   "docs/REVIEWER_EVIDENCE_MAP.md",
   "public demo launching",
   "Can a human edit the same objects that an agent creates through MCP/API tools?",
@@ -122,7 +125,10 @@ for (const token of [
 const reviewerEvidenceMap = readFileSync("docs/REVIEWER_EVIDENCE_MAP.md", "utf8");
 for (const token of [
   "Evidence To Inspect",
+  "Fast Command Path",
+  "No package install is required",
   "Reviewer question",
+  "node --test tests/*.test.ts",
   "node scripts/serve-static.ts apps/web 4173",
   "?demo=perturb-seq-workflow",
   "node scripts/agent-acceptance-smoke.ts",
