@@ -106,6 +106,8 @@ for (const token of [
   "Reviewer Evidence Map",
   "Portfolio Scorecard",
   "Visual Examples",
+  "Local Workspace And Servers",
+  "Agent Proof Path",
   "docs/PUBLIC_EXAMPLE_GALLERY.md",
   "What to look for",
   "Public demos",
@@ -200,6 +202,16 @@ for (const token of [
   "ai-biosecurity-pipeline"
 ]) {
   assertGate(webIndex.includes(token) || webApp.includes(token), `Web workspace is missing public demo launcher signal: ${token}`);
+}
+
+for (const token of [
+  "scientific-image://agent/agent-cookbook",
+  "scientific-image://agent/demo-perturb-seq-crispr",
+  "scientific-image://agent/asset-index-compact",
+  "node scripts/agent-acceptance-smoke.ts --workflow-pack perturb-seq-crispr",
+  "resources/read` for `scientific-image://agent/agent-cookbook"
+]) {
+  assertTextIncludes(readme, token, "README agent proof path");
 }
 
 const agentQuickstart = readFileSync("docs/AGENT_QUICKSTART.md", "utf8");

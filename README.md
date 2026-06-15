@@ -89,18 +89,29 @@ What to look for:
 - Static local premium deck workspace using the same project schema.
 - Node tests for schema, deck workflow, plotting, export, and API/MCP-facing operations.
 
-## Run
+## Local Workspace And Servers
+
+Use the copy-paste reviewer commands above for verification. For local inspection, start only the surface you need.
+
+Web workspace:
 
 ```bash
-node --test tests/*.test.ts
-node scripts/public-readiness-audit.ts
-node scripts/agent-acceptance-smoke.ts
 node scripts/serve-static.ts apps/web 4173
-node apps/api/src/server.ts
-node packages/mcp/src/server.ts
 ```
 
 Then open `http://127.0.0.1:4173`.
+
+Optional API server:
+
+```bash
+node apps/api/src/server.ts
+```
+
+Optional MCP server:
+
+```bash
+node packages/mcp/src/server.ts
+```
 
 The right-side Insert panel includes a `Public demos` launcher for the same Perturb-seq, spatial transcriptomics, and AI biosecurity examples shown above.
 Direct local demo links also work after the static server is running:
@@ -167,12 +178,24 @@ Important MCP resources:
 - `scientific-image://agent/manifest`
 - `scientific-image://agent/quickstart`
 - `scientific-image://agent/workflow-recipes`
+- `scientific-image://agent/agent-cookbook`
+- `scientific-image://agent/demo-perturb-seq-crispr`
+- `scientific-image://agent/asset-index-compact`
 - `scientific-image://agent/client-configs`
 - `scientific-image://agent/review-export-checklist`
 
-## Agent Setup
+## Agent Proof Path
 
-For a copy-pasteable MCP/API flow, start with [docs/AGENT_QUICKSTART.md](docs/AGENT_QUICKSTART.md).
+For a copy-pasteable MCP/API flow, start with [docs/AGENT_QUICKSTART.md](docs/AGENT_QUICKSTART.md). For the reviewer-facing proof map, see [docs/AGENT_DEMO_EVIDENCE.md](docs/AGENT_DEMO_EVIDENCE.md).
+
+Quick local proof:
+
+```bash
+node scripts/agent-acceptance-smoke.ts
+node scripts/agent-acceptance-smoke.ts --workflow-pack perturb-seq-crispr
+```
+
+The smoke follows the same loop an agent should use: read MCP resources, inspect tools, choose a workflow pack, create an editable workflow figure, validate review/export QA, and verify SVG/PDF/PPTX output.
 
 Claude Code, Codex, and other MCP clients should connect to the local stdio server:
 
@@ -180,28 +203,17 @@ Claude Code, Codex, and other MCP clients should connect to the local stdio serv
 node packages/mcp/src/server.ts
 ```
 
-Recommended first calls:
+Recommended first calls are:
 
 1. `resources/list`
 2. `resources/read` for `scientific-image://agent/manifest`
-3. `tools/list`
+3. `resources/read` for `scientific-image://agent/agent-cookbook`
+4. `resources/read` for `scientific-image://agent/demo-perturb-seq-crispr`
+5. `tools/list`
 
 Agents should prefer workflow-pack templates and asset IDs over raw SVG strings, keep scene JSON as the canonical artifact, run review/export QA before delivery, and surface exact PPTX fallback assets when Office export cannot preserve native editability.
 
-For review resolution, agents should call `summarize_review_queue` after `validate_deck`. The summary returns delivery readiness, next action, claim/citation queues, exact export fallback assets, and batchable review item IDs. Use `resolve_review_items` only after human approval, typically with `status: "resolved"` for citations/layout fixes or `status: "accepted-risk"` for reviewed Office fallback limitations.
-
 The web workspace includes a Delivery panel that mirrors this gate for humans. It keeps scene JSON as the canonical source export, allows SVG/PNG local exports, and uses the local API for PDF/PPTX delivery exports when `node apps/api/src/server.ts` is running.
-
-Agent acceptance smoke:
-
-```bash
-node scripts/agent-acceptance-smoke.ts
-node scripts/agent-acceptance-smoke.ts --write-output
-```
-
-The smoke follows the same loop an agent should use: read the manifest resource, inspect tools, create a project, insert a premium workflow template, validate review/export QA, and verify SVG/PDF/PPTX output. With `--write-output`, it writes files under `output/agent-smoke`.
-
-For the reviewer-facing agent evidence map, see [docs/AGENT_DEMO_EVIDENCE.md](docs/AGENT_DEMO_EVIDENCE.md).
 
 ## Premium Asset System
 
