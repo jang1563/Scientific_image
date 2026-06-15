@@ -9190,9 +9190,9 @@ function createMicroscopyImageAnalysisFlagshipTemplateNodes(template: WorkflowTe
       fontWeight: 900,
       color: theme.heading
     }),
-    figureText("Editable pack separates image evidence, preprocessing, segmentation, features, model output, and QA review.", createTransform(x + 668, y - 34, width - 668, 44), {
-      fontSize: 11.2,
-      fontWeight: 650,
+    figureText("Raw image evidence, channel QC, segmentation masks, morphology features, model output, and human review as editable layers.", createTransform(x + 668, y - 34, width - 668, 44), {
+      fontSize: 11.1,
+      fontWeight: 700,
       color: theme.muted
     }),
     figureShape("round-rect", "", createTransform(x + 4, y + 12, 238, 28), {
@@ -9206,93 +9206,27 @@ function createMicroscopyImageAnalysisFlagshipTemplateNodes(template: WorkflowTe
       fontWeight: 850,
       color: theme.accent
     }),
-    figureShape("round-rect", "", createTransform(x + 256, y + 12, 302, 28), {
+    figureShape("round-rect", "", createTransform(x + 256, y + 12, 342, 28), {
       fill: theme.chipAltFill,
       stroke: theme.isLine ? "#111827" : theme.isDark ? "#334155" : "#bbf7d0",
       strokeWidth: 1,
       depth: "surface"
     }),
-    figureText("agent-ready image -> mask -> phenotype path", createTransform(x + 272, y + 17, 266, 18), {
+    figureText("editable brief: image / mask / phenotype / QA", createTransform(x + 272, y + 17, 306, 18), {
       fontSize: 10.2,
       fontWeight: 850,
       color: theme.accent2
     })
   ];
 
-  const stageY = y + 64;
-  const stageH = 164;
-  const stageW = Math.round((width - 64) / 5);
-  const stages: Array<{ assetId: string; label: string; kind: string; note: string; accent: string; profile?: AssetStyleProfile }> = [
-    { assetId: "microscope-field", label: "Acquire", kind: "image", note: "field + channels", accent: theme.accent },
-    { assetId: "tile-stitching", label: "Preprocess", kind: "pre-QC", note: "tiles + z-stack", accent: theme.accent },
-    { assetId: "nuclei-segmentation", label: "Segment", kind: "mask", note: "nuclei + membrane", accent: theme.accent2 },
-    { assetId: "phenotype-feature-vector", label: "Extract", kind: "features", note: "morphology vector", accent: theme.accent2 },
-    { assetId: "image-qc-dashboard", label: "Review", kind: "QA", note: "model + human check", accent: theme.isLine ? "#111827" : theme.isDark ? "#fdba74" : "#dc2626", profile: theme.riskSymbolProfile }
-  ];
-  stages.forEach((stage, index) => {
-    const sx = x + index * (stageW + 16);
-    const reviewStage = index === stages.length - 1;
-    nodes.push(figureShape("round-rect", "", createTransform(sx, stageY, stageW, stageH), {
-      fill: reviewStage ? theme.warningFill : index % 2 ? theme.panelAltFill : theme.panelFill,
-      stroke: reviewStage ? theme.warningStroke : theme.panelStroke,
-      strokeWidth: 1.25,
-      depth: reviewStage ? theme.floatingDepth : theme.panelDepth
-    }));
-    nodes.push(figureShape("round-rect", "", createTransform(sx + 12, stageY + 12, 36, 20), {
-      fill: theme.isDark ? "#0f172a" : "#ffffff",
-      stroke: reviewStage ? theme.warningStroke : theme.panelStroke,
-      strokeWidth: 1,
-      depth: "surface"
-    }));
-    nodes.push(figureText(`0${index + 1}`, createTransform(sx + 21, stageY + 16, 18, 12), {
-      fontSize: 8.8,
-      fontWeight: 950,
-      color: reviewStage ? theme.warningText : stage.accent
-    }));
-    nodes.push(figureShape("round-rect", "", createTransform(sx + stageW - 88, stageY + 12, 74, 20), {
-      fill: reviewStage ? theme.warningFill : theme.chipFill,
-      stroke: reviewStage ? theme.warningStroke : theme.chipStroke,
-      strokeWidth: 1,
-      depth: "surface"
-    }));
-    nodes.push(figureText(stage.kind, createTransform(sx + stageW - 76, stageY + 16, 54, 12), {
-      fontSize: 7.6,
-      fontWeight: 850,
-      color: reviewStage ? theme.warningText : stage.accent
-    }));
-    nodes.push(symbol(stage.assetId, stage.label, sx + Math.round((stageW - 112) / 2), stageY + 34, 112, 86, `${template.id}:stage-${index + 1}`, { accent: stage.accent, stroke: stage.accent, labelVisible: false }, stage.profile ?? styleProfile));
-    nodes.push(figureText(stage.label, createTransform(sx + 14, stageY + 122, stageW - 28, 18), {
-      fontSize: 12,
-      fontWeight: 900,
-      color: reviewStage ? theme.warningText : theme.text
-    }));
-    nodes.push(figureText(stage.note, createTransform(sx + 14, stageY + 142, stageW - 28, 16), {
-      fontSize: 9.2,
-      fontWeight: 720,
-      color: theme.muted
-    }));
-    if (index > 0) {
-      nodes.push(createConnectorNode([
-        { x: sx - 16, y: stageY + 82 },
-        { x: sx - 2, y: stageY + 82 }
-      ], "", { stroke: theme.connector, strokeWidth: 2.3 }));
-    }
-  });
-  nodes.push(figureShape("round-rect", "", createTransform(x + 4, stageY + stageH + 14, width - 8, 28), {
-    fill: theme.isDark ? "#0f172a" : "#f8fafc",
-    stroke: theme.panelStroke,
-    strokeWidth: 1,
-    depth: "surface"
-  }));
-  nodes.push(figureText("Decision spine: image evidence -> preprocessing QC -> segmentation -> phenotype features -> model and human review", createTransform(x + 24, stageY + stageH + 20, width - 48, 16), {
-    fontSize: 9.5,
-    fontWeight: 820,
-    color: theme.muted
-  }));
-
-  const lowerY = y + 280;
-  const gap = 22;
-  const panelW = Math.round((width - gap * 2) / 3);
+  const panelTop = y + 58;
+  const panelGap = 18;
+  const leftW = 352;
+  const centerW = 352;
+  const rightW = width - leftW - centerW - panelGap * 2;
+  const panelH = 210;
+  const bottomY = y + 294;
+  const bottomH = 184;
   const focusTable = {
     id: createId("table"),
     name: "Illustrative microscopy focus QC",
@@ -9308,16 +9242,16 @@ function createMicroscopyImageAnalysisFlagshipTemplateNodes(template: WorkflowTe
   const maskTable = {
     id: createId("table"),
     name: "Illustrative segmentation QC",
-	    columns: ["metric", "score", "class"],
-	    rows: [
-	      { metric: "IoU", score: 84, class: "mask" },
-	      { metric: "Edge", score: 76, class: "boundary" }
-	    ],
-	    source
-	  };
-  const addPanel = (tag: string, title: string, status: string, px: number, py: number, pw: number, fill = theme.panelFill, tone = theme.text) => {
+    columns: ["metric", "score", "class"],
+    rows: [
+      { metric: "IoU", score: 84, class: "mask" },
+      { metric: "Edge", score: 76, class: "boundary" }
+    ],
+    source
+  };
+  const addPanel = (tag: string, title: string, status: string, px: number, py: number, pw: number, ph: number, fill = theme.panelFill, tone = theme.text) => {
     const review = status === "review";
-    nodes.push(figureShape("round-rect", "", createTransform(px, py, pw, 196), {
+    nodes.push(figureShape("round-rect", "", createTransform(px, py, pw, ph), {
       fill,
       stroke: review ? theme.warningStroke : theme.panelStroke,
       strokeWidth: 1.25,
@@ -9351,13 +9285,16 @@ function createMicroscopyImageAnalysisFlagshipTemplateNodes(template: WorkflowTe
       color: review ? theme.warningText : tone
     }));
   };
-  addPanel("A", "Image evidence", "source", x, lowerY, panelW, theme.panelFill, theme.accent);
-  addPanel("B", "Segmentation QC", "editable", x + panelW + gap, lowerY, panelW, theme.panelAltFill, theme.accent2);
-  addPanel("C", "Phenotyping review", "review", x + (panelW + gap) * 2, lowerY, width - (panelW + gap) * 2, theme.warningFill, theme.warningText);
+  addPanel("A", "Image acquisition and channel QC", "source", x, panelTop, leftW, panelH, theme.panelFill, theme.accent);
+  addPanel("B", "Segmentation and mask evidence", "editable", x + leftW + panelGap, panelTop, centerW, panelH, theme.panelAltFill, theme.accent2);
+  addPanel("C", "Model output and review", "review", x + leftW + centerW + panelGap * 2, panelTop, rightW, panelH, theme.warningFill, theme.warningText);
+  addPanel("D", "Phenotype feature layer", "features", x, bottomY, Math.round(width * 0.62), bottomH, theme.panelFill, theme.accent);
+  addPanel("E", "Export QA and annotation handoff", "review", x + Math.round(width * 0.62) + panelGap, bottomY, width - Math.round(width * 0.62) - panelGap, bottomH, theme.warningFill, theme.warningText);
   nodes.push(
-    symbol("fluorescence-channel", "Channels", x + 20, lowerY + 52, 74, 76, `${template.id}:channels`, { accent: theme.accent, stroke: theme.accent, labelVisible: false }),
-    symbol("z-stack", "Z-stack", x + 100, lowerY + 52, 70, 76, `${template.id}:zstack`, { accent: theme.accent, stroke: theme.accent, labelVisible: false }),
-    symbol("illumination-correction", "Flat field", x + 176, lowerY + 54, 66, 74, `${template.id}:illumination`, { accent: "#f59e0b", stroke: "#f59e0b", labelVisible: false }),
+    symbol("microscope-field", "Field", x + 22, panelTop + 56, 76, 78, `${template.id}:microscope-field`, { accent: theme.accent, stroke: theme.accent, labelVisible: false }),
+    symbol("fluorescence-channel", "Channels", x + 104, panelTop + 56, 76, 78, `${template.id}:channels`, { accent: "#2563eb", stroke: "#2563eb", labelVisible: false }),
+    symbol("z-stack", "Z-stack", x + 186, panelTop + 56, 72, 78, `${template.id}:zstack`, { accent: theme.accent, stroke: theme.accent, labelVisible: false }),
+    symbol("illumination-correction", "Flat field", x + 264, panelTop + 58, 64, 76, `${template.id}:illumination`, { accent: "#f59e0b", stroke: "#f59e0b", labelVisible: false }),
     createPlotNode({
       id: createId("plot"),
       plotType: "line",
@@ -9365,31 +9302,41 @@ function createMicroscopyImageAnalysisFlagshipTemplateNodes(template: WorkflowTe
       table: focusTable,
       encodings: { x: "tile", y: "score", color: "series" },
       style: theme.plotStyle
-    }, createTransform(x + 250, lowerY + 52, 92, 88)),
-    figureText("Raw evidence and preprocessing stay separate.", createTransform(x + 24, lowerY + 154, panelW - 48, 24), { fontSize: 10, fontWeight: 720, color: theme.muted }),
-	    symbol("membrane-segmentation", "Membrane", x + panelW + gap + 20, lowerY + 54, 58, 68, `${template.id}:membrane`, { accent: theme.accent2, stroke: theme.accent2, labelVisible: false }),
-	    symbol("instance-mask", "Instances", x + panelW + gap + 84, lowerY + 54, 58, 68, `${template.id}:instances`, { accent: "#7c3aed", stroke: "#7c3aed", labelVisible: false }),
-	    symbol("segmentation-model", "Model", x + panelW + gap + 148, lowerY + 54, 58, 68, `${template.id}:model`, { accent: "#4f46e5", stroke: "#4f46e5", labelVisible: false }),
-	    createPlotNode({
-	      id: createId("plot"),
-	      plotType: "bar",
-	      title: "Mask QC",
-	      table: maskTable,
-	      encodings: { x: "metric", y: "score", color: "class" },
-	      style: theme.plotStyle
-	    }, createTransform(x + panelW + gap + 218, lowerY + 48, 112, 96)),
-    figureText("Mask quality remains reviewable before interpretation.", createTransform(x + panelW + gap + 24, lowerY + 154, panelW - 48, 24), { fontSize: 10, fontWeight: 720, color: theme.muted }),
-    symbol("morphology-embedding", "Embedding", x + (panelW + gap) * 2 + 20, lowerY + 52, 76, 78, `${template.id}:embedding`, { accent: theme.warningText, stroke: theme.warningText, labelVisible: false }, theme.riskSymbolProfile),
-    symbol("classifier-heatmap", "Classifier", x + (panelW + gap) * 2 + 104, lowerY + 52, 72, 78, `${template.id}:classifier`, { accent: theme.warningText, stroke: theme.warningText, labelVisible: false }, theme.riskSymbolProfile),
-    symbol("cell-tracking", "Tracking", x + (panelW + gap) * 2 + 184, lowerY + 52, 72, 78, `${template.id}:tracking`, { accent: theme.warningText, stroke: theme.warningText, labelVisible: false }, theme.riskSymbolProfile),
-    symbol("annotation-brush", "Review", x + (panelW + gap) * 2 + 264, lowerY + 52, 72, 78, `${template.id}:annotation`, { accent: theme.warningText, stroke: theme.warningText, labelVisible: false }, theme.riskSymbolProfile),
-    figureShape("round-rect", "", createTransform(x + (panelW + gap) * 2 + 142, lowerY + 140, 214, 24), {
+    }, createTransform(x + 222, panelTop + 142, 106, 48)),
+    figureText("Raw image evidence, focus score, and acquisition channels stay separate.", createTransform(x + 24, panelTop + 150, 178, 34), { fontSize: 9.5, fontWeight: 720, color: theme.muted }),
+    symbol("tile-stitching", "Tiles", x + leftW + panelGap + 24, panelTop + 56, 72, 76, `${template.id}:tile-stitching`, { accent: "#2563eb", stroke: "#2563eb", labelVisible: false }),
+    symbol("nuclei-segmentation", "Nuclei", x + leftW + panelGap + 104, panelTop + 56, 72, 76, `${template.id}:nuclei-segmentation`, { accent: theme.accent2, stroke: theme.accent2, labelVisible: false }),
+    symbol("membrane-segmentation", "Membrane", x + leftW + panelGap + 184, panelTop + 56, 72, 76, `${template.id}:membrane`, { accent: "#7c3aed", stroke: "#7c3aed", labelVisible: false }),
+    symbol("instance-mask", "Instances", x + leftW + panelGap + 264, panelTop + 56, 64, 76, `${template.id}:instances`, { accent: "#4f46e5", stroke: "#4f46e5", labelVisible: false }),
+    createPlotNode({
+      id: createId("plot"),
+      plotType: "bar",
+      title: "Mask QC",
+      table: maskTable,
+      encodings: { x: "metric", y: "score", color: "class" },
+      style: theme.plotStyle
+    }, createTransform(x + leftW + panelGap + 222, panelTop + 142, 106, 48)),
+    figureText("Segmentation model outputs and mask quality stay reviewable before interpretation.", createTransform(x + leftW + panelGap + 24, panelTop + 150, 178, 34), { fontSize: 9.4, fontWeight: 720, color: theme.muted }),
+    symbol("segmentation-model", "Model", x + leftW + centerW + panelGap * 2 + 24, panelTop + 56, 76, 78, `${template.id}:model`, { accent: theme.warningText, stroke: theme.warningText, labelVisible: false }, theme.riskSymbolProfile),
+    symbol("classifier-heatmap", "Classifier", x + leftW + centerW + panelGap * 2 + 108, panelTop + 56, 76, 78, `${template.id}:classifier`, { accent: theme.warningText, stroke: theme.warningText, labelVisible: false }, theme.riskSymbolProfile),
+    symbol("image-qc-dashboard", "QC", x + leftW + centerW + panelGap * 2 + 192, panelTop + 56, 76, 78, `${template.id}:image-qc`, { accent: theme.warningText, stroke: theme.warningText, labelVisible: false }, theme.riskSymbolProfile),
+    figureText("Model calls and image QC require human signoff before phenotype claims.", createTransform(x + leftW + centerW + panelGap * 2 + 24, panelTop + 150, rightW - 48, 34), { fontSize: 9.3, fontWeight: 720, color: theme.muted }),
+    symbol("phenotype-feature-vector", "Features", x + 30, bottomY + 54, 82, 78, `${template.id}:feature-vector`, { accent: theme.accent, stroke: theme.accent, labelVisible: false }),
+    symbol("morphology-embedding", "Embedding", x + 120, bottomY + 54, 82, 78, `${template.id}:embedding`, { accent: "#2563eb", stroke: "#2563eb", labelVisible: false }),
+    symbol("cell-tracking", "Tracking", x + 210, bottomY + 54, 82, 78, `${template.id}:tracking`, { accent: "#0d9488", stroke: "#0d9488", labelVisible: false }),
+    symbol("classifier-heatmap", "Heatmap", x + 300, bottomY + 54, 82, 78, `${template.id}:feature-heatmap`, { accent: "#7c3aed", stroke: "#7c3aed", labelVisible: false }),
+    symbol("cell-neighborhood", "Context", x + 390, bottomY + 54, 82, 78, `${template.id}:cell-neighborhood`, { accent: "#0891b2", stroke: "#0891b2", labelVisible: false }),
+    figureText("Morphology vectors, embeddings, tracking, and neighborhood context stay editable.", createTransform(x + 30, bottomY + 142, Math.round(width * 0.62) - 60, 26), { fontSize: 9.7, fontWeight: 720, color: theme.muted }),
+    symbol("annotation-brush", "Annotation", x + Math.round(width * 0.62) + panelGap + 30, bottomY + 54, 82, 78, `${template.id}:annotation`, { accent: theme.warningText, stroke: theme.warningText, labelVisible: false }, theme.riskSymbolProfile),
+    symbol("image-qc-dashboard", "Dashboard", x + Math.round(width * 0.62) + panelGap + 120, bottomY + 54, 82, 78, `${template.id}:review-dashboard`, { accent: theme.warningText, stroke: theme.warningText, labelVisible: false }, theme.riskSymbolProfile),
+    symbol("error-analysis", "Errors", x + Math.round(width * 0.62) + panelGap + 210, bottomY + 54, 82, 78, `${template.id}:error-analysis`, { accent: theme.warningText, stroke: theme.warningText, labelVisible: false }, theme.riskSymbolProfile),
+    figureShape("round-rect", "", createTransform(x + Math.round(width * 0.62) + panelGap + 78, bottomY + 140, 224, 24), {
       fill: theme.isDark ? "#111827" : "#ffffff",
       stroke: theme.warningStroke,
       strokeWidth: 1,
       depth: "surface"
     }),
-    figureText("model-and-annotation-review", createTransform(x + (panelW + gap) * 2 + 160, lowerY + 146, 178, 13), {
+    figureText("model-and-annotation-review", createTransform(x + Math.round(width * 0.62) + panelGap + 104, bottomY + 146, 176, 13), {
       fontSize: 9.2,
       fontWeight: 850,
       color: theme.warningText

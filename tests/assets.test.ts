@@ -1937,16 +1937,17 @@ test("priority flagship templates generate commercial editable figure structures
   assert.ok(cellTherapy.every((node) => node.payload.workflowPack === "cell-therapy" && node.payload.templateId === "cell-therapy-manufacturing-platform"));
 
   const microscopy = createWorkflowFigureNodes({ templateId: "microscopy-image-analysis-pipeline", styleProfile: "consulting-2p5d" });
-  assert.ok(microscopy.length >= 80);
+  assert.ok(microscopy.length >= 60);
   assert.ok(microscopy.some((node) => node.kind === "text" && node.payload.text?.includes("Microscopy image analysis to phenotype workflow")));
-  assert.ok(microscopy.some((node) => node.kind === "text" && node.payload.text?.includes("Decision spine: image evidence")));
+  assert.ok(microscopy.some((node) => node.kind === "text" && node.payload.text?.includes("Raw image evidence, focus score")));
   assert.ok(microscopy.some((node) => node.kind === "text" && node.payload.text === "model-and-annotation-review"));
   assert.ok(microscopy.some((node) => node.kind === "plot" && node.payload.spec.plotType === "line" && node.payload.spec.title === "Focus QC"));
   assert.ok(microscopy.some((node) => node.kind === "plot" && node.payload.spec.plotType === "bar" && node.payload.spec.title === "Mask QC"));
-  for (const assetId of ["microscope-field", "tile-stitching", "nuclei-segmentation", "phenotype-feature-vector", "image-qc-dashboard", "fluorescence-channel", "z-stack", "membrane-segmentation", "instance-mask", "segmentation-model", "morphology-embedding", "classifier-heatmap", "cell-tracking", "annotation-brush"]) {
+  for (const assetId of ["microscope-field", "tile-stitching", "nuclei-segmentation", "phenotype-feature-vector", "image-qc-dashboard", "fluorescence-channel", "z-stack", "illumination-correction", "membrane-segmentation", "instance-mask", "segmentation-model", "morphology-embedding", "classifier-heatmap", "cell-tracking", "annotation-brush", "cell-neighborhood", "error-analysis"]) {
     assert.ok(microscopy.some((node) => node.kind === "symbol" && node.payload.assetId === assetId), `${assetId} should appear in microscopy image-analysis flagship`);
   }
-  assert.ok(microscopy.some((node) => node.kind === "symbol" && node.payload.layoutHint?.startsWith("microscopy-image-analysis-pipeline:stage-")));
+  assert.ok(microscopy.some((node) => node.kind === "symbol" && node.payload.layoutHint === "microscopy-image-analysis-pipeline:microscope-field"));
+  assert.ok(microscopy.every((node) => !String(node.payload.text ?? "").includes("Decision spine: image evidence")));
   assert.ok(microscopy.every((node) => node.payload.workflowPack === "microscopy-image-analysis" && node.payload.templateId === "microscopy-image-analysis-pipeline"));
 
   const labAutomation = createWorkflowFigureNodes({ templateId: "lab-automation-platform", styleProfile: "consulting-2p5d" });
