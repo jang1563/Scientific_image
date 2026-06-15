@@ -1999,15 +1999,17 @@ test("priority flagship templates generate commercial editable figure structures
   assert.ok(grant.every((node) => node.payload.workflowPack === "grant-and-consulting-summary" && node.payload.templateId === "grant-consulting-one-slide"));
 
   const clinical = createWorkflowFigureNodes({ templateId: "clinical-translational-study-overview", styleProfile: "consulting-2p5d" });
-  assert.ok(clinical.length >= 80);
+  assert.ok(clinical.length >= 65);
   assert.ok(clinical.some((node) => node.kind === "text" && node.payload.text?.includes("Clinical translational evidence bridge")));
-  assert.ok(clinical.some((node) => node.kind === "text" && node.payload.text?.includes("Decision spine: enroll cohort")));
+  assert.ok(clinical.some((node) => node.kind === "text" && node.payload.text?.includes("Cohort source, eligibility, and trial schema")));
   assert.ok(clinical.some((node) => node.kind === "text" && node.payload.text === "clinical-claims-review"));
   assert.ok(clinical.some((node) => node.kind === "plot" && node.payload.spec.plotType === "line" && node.payload.spec.title === "Enrollment"));
-  for (const assetId of ["consent-enrollment", "clinical-sample-flow", "biomarker-validation", "endpoint-hierarchy", "clinician-review", "cohort-stratification", "cohort-table", "biospecimen-collection", "clinical-omics-bridge", "biomarker-discovery", "assay-validation", "validation-cohort", "clinical-response-card", "survival-curve", "adverse-event-panel", "clinical-risk-benefit"]) {
+  assert.ok(clinical.some((node) => node.kind === "plot" && node.payload.spec.plotType === "line" && node.payload.spec.title === "Safety"));
+  for (const assetId of ["patient-journey-map", "consent-enrollment", "eligibility-criteria", "randomization-schema", "clinical-sample-flow", "biomarker-validation", "endpoint-hierarchy", "clinician-review", "clinical-decision-support", "cohort-stratification", "cohort-table", "biospecimen-collection", "clinical-omics-bridge", "biomarker-discovery", "assay-validation", "validation-cohort", "clinical-response-card", "survival-curve", "adverse-event-panel", "clinical-risk-benefit", "regulatory-evidence-brief"]) {
     assert.ok(clinical.some((node) => node.kind === "symbol" && node.payload.assetId === assetId), `${assetId} should appear in clinical translational flagship`);
   }
-  assert.ok(clinical.some((node) => node.kind === "symbol" && node.payload.layoutHint?.startsWith("clinical-translational-study-overview:stage-")));
+  assert.ok(clinical.some((node) => node.kind === "symbol" && node.payload.layoutHint === "clinical-translational-study-overview:cohort-schema"));
+  assert.ok(clinical.every((node) => !String(node.payload.text ?? "").includes("Decision spine: enroll cohort")));
   assert.ok(clinical.every((node) => node.payload.workflowPack === "clinical-translational" && node.payload.templateId === "clinical-translational-study-overview"));
 
   const hybridTemplate = getWorkflowTemplate("spatial-realistic-hybrid-panel");

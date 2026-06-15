@@ -10466,9 +10466,9 @@ function createClinicalTranslationalFlagshipTemplateNodes(template: WorkflowTemp
       fontWeight: 900,
       color: theme.heading
     }),
-    figureText("Agent-ready clinical slide keeps enrollment, biospecimen flow, biomarker evidence, endpoints, safety, and review as separate editable objects.", createTransform(x + 626, y - 34, width - 626, 44), {
-      fontSize: 11.2,
-      fontWeight: 650,
+    figureText("Patient journey, biospecimen chain, biomarker validation, endpoints, safety, and clinician review as editable evidence layers.", createTransform(x + 626, y - 34, width - 626, 44), {
+      fontSize: 11.1,
+      fontWeight: 700,
       color: theme.muted
     }),
     figureShape("round-rect", "", createTransform(x + 4, y + 12, 246, 28), {
@@ -10482,93 +10482,27 @@ function createClinicalTranslationalFlagshipTemplateNodes(template: WorkflowTemp
       fontWeight: 850,
       color: theme.accent
     }),
-    figureShape("round-rect", "", createTransform(x + 264, y + 12, 382, 28), {
+    figureShape("round-rect", "", createTransform(x + 264, y + 12, 356, 28), {
       fill: theme.chipAltFill,
       stroke: theme.isLine ? "#111827" : theme.isDark ? "#334155" : "#bbf7d0",
       strokeWidth: 1,
       depth: "surface"
     }),
-    figureText("agent-ready cohort -> biomarker -> endpoint", createTransform(x + 280, y + 17, 350, 18), {
+    figureText("editable brief: cohort / assay / endpoint / safety", createTransform(x + 280, y + 17, 322, 18), {
       fontSize: 10.2,
       fontWeight: 850,
       color: theme.accent2
     })
   ];
 
-  const stageY = y + 64;
-  const stageH = 164;
-  const stageW = Math.round((width - 64) / 5);
-  const stages: Array<{ assetId: string; label: string; kind: string; note: string; accent: string; profile?: AssetStyleProfile }> = [
-    { assetId: "consent-enrollment", label: "Enroll", kind: "cohort", note: "consent + criteria", accent: theme.accent },
-    { assetId: "clinical-sample-flow", label: "Samples", kind: "specimen", note: "blood/tissue flow", accent: "#0d9488" },
-    { assetId: "biomarker-validation", label: "Biomarker", kind: "evidence", note: "assay + cohort", accent: "#2563eb" },
-    { assetId: "endpoint-hierarchy", label: "Endpoint", kind: "outcome", note: "primary + secondary", accent: "#7c3aed" },
-    { assetId: "clinician-review", label: "Review", kind: "clinical", note: "safety + action", accent: theme.warningText, profile: theme.riskSymbolProfile }
-  ];
-  stages.forEach((stage, index) => {
-    const sx = x + index * (stageW + 16);
-    const reviewStage = index === stages.length - 1;
-    nodes.push(figureShape("round-rect", "", createTransform(sx, stageY, stageW, stageH), {
-      fill: reviewStage ? theme.warningFill : index % 2 ? theme.panelAltFill : theme.panelFill,
-      stroke: reviewStage ? theme.warningStroke : theme.panelStroke,
-      strokeWidth: 1.25,
-      depth: reviewStage ? theme.floatingDepth : theme.panelDepth
-    }));
-    nodes.push(figureShape("round-rect", "", createTransform(sx + 12, stageY + 12, 36, 20), {
-      fill: theme.isDark ? "#0f172a" : "#ffffff",
-      stroke: reviewStage ? theme.warningStroke : theme.panelStroke,
-      strokeWidth: 1,
-      depth: "surface"
-    }));
-    nodes.push(figureText(`0${index + 1}`, createTransform(sx + 21, stageY + 16, 18, 12), {
-      fontSize: 8.8,
-      fontWeight: 950,
-      color: reviewStage ? theme.warningText : stage.accent
-    }));
-    nodes.push(figureShape("round-rect", "", createTransform(sx + stageW - 88, stageY + 12, 74, 20), {
-      fill: reviewStage ? theme.warningFill : theme.chipFill,
-      stroke: reviewStage ? theme.warningStroke : theme.chipStroke,
-      strokeWidth: 1,
-      depth: "surface"
-    }));
-    nodes.push(figureText(stage.kind, createTransform(sx + stageW - 78, stageY + 16, 56, 12), {
-      fontSize: 7.4,
-      fontWeight: 850,
-      color: reviewStage ? theme.warningText : stage.accent
-    }));
-    nodes.push(symbol(stage.assetId, stage.label, sx + Math.round((stageW - 112) / 2), stageY + 34, 112, 86, `${template.id}:stage-${index + 1}`, { accent: stage.accent, stroke: stage.accent, labelVisible: false }, stage.profile ?? styleProfile));
-    nodes.push(figureText(stage.label, createTransform(sx + 14, stageY + 122, stageW - 28, 18), {
-      fontSize: 12,
-      fontWeight: 900,
-      color: reviewStage ? theme.warningText : theme.text
-    }));
-    nodes.push(figureText(stage.note, createTransform(sx + 14, stageY + 142, stageW - 28, 16), {
-      fontSize: 9.2,
-      fontWeight: 720,
-      color: theme.muted
-    }));
-    if (index > 0) {
-      nodes.push(createConnectorNode([
-        { x: sx - 16, y: stageY + 82 },
-        { x: sx - 2, y: stageY + 82 }
-      ], "", { stroke: theme.connector, strokeWidth: 2.3 }));
-    }
-  });
-  nodes.push(figureShape("round-rect", "", createTransform(x + 4, stageY + stageH + 14, width - 8, 28), {
-    fill: theme.isDark ? "#0f172a" : "#f8fafc",
-    stroke: theme.panelStroke,
-    strokeWidth: 1,
-    depth: "surface"
-  }));
-  nodes.push(figureText("Decision spine: enroll cohort -> collect biospecimen -> validate biomarker -> read endpoint -> review safety and action", createTransform(x + 24, stageY + stageH + 20, width - 48, 16), {
-    fontSize: 9.5,
-    fontWeight: 820,
-    color: theme.muted
-  }));
-
-  const lowerY = y + 280;
-  const gap = 22;
-  const panelW = Math.round((width - gap * 2) / 3);
+  const panelTop = y + 58;
+  const panelGap = 18;
+  const leftW = 338;
+  const centerW = 352;
+  const rightW = width - leftW - centerW - panelGap * 2;
+  const panelH = 210;
+  const bottomY = y + 294;
+  const bottomH = 186;
   const enrollmentTable = {
     id: createId("table"),
     name: "Illustrative enrollment trajectory",
@@ -10581,9 +10515,21 @@ function createClinicalTranslationalFlagshipTemplateNodes(template: WorkflowTemp
     ],
     source
   };
-  const addPanel = (tag: string, title: string, status: string, px: number, py: number, pw: number, fill = theme.panelFill, tone = theme.text) => {
+  const safetyTable = {
+    id: createId("table"),
+    name: "Illustrative safety signal trend",
+    columns: ["visit", "rate", "series"],
+    rows: [
+      { visit: "V1", rate: 0.22, series: "AE rate" },
+      { visit: "V2", rate: 0.18, series: "AE rate" },
+      { visit: "V3", rate: 0.16, series: "AE rate" },
+      { visit: "V4", rate: 0.12, series: "AE rate" }
+    ],
+    source
+  };
+  const addPanel = (tag: string, title: string, status: string, px: number, py: number, pw: number, ph: number, fill = theme.panelFill, tone = theme.text) => {
     const review = status === "review";
-    nodes.push(figureShape("round-rect", "", createTransform(px, py, pw, 204), {
+    nodes.push(figureShape("round-rect", "", createTransform(px, py, pw, ph), {
       fill,
       stroke: review ? theme.warningStroke : theme.panelStroke,
       strokeWidth: 1.25,
@@ -10617,13 +10563,16 @@ function createClinicalTranslationalFlagshipTemplateNodes(template: WorkflowTemp
       color: review ? theme.warningText : tone
     }));
   };
-  addPanel("A", "Cohort and samples", "source", x, lowerY, panelW, theme.panelFill, theme.accent);
-  addPanel("B", "Biomarker validation", "evidence", x + panelW + gap, lowerY, panelW, theme.panelAltFill, theme.accent2);
-  addPanel("C", "Endpoint and safety", "review", x + (panelW + gap) * 2, lowerY, width - (panelW + gap) * 2, theme.warningFill, theme.warningText);
+  addPanel("A", "Cohort and trial schema", "source", x, panelTop, leftW, panelH, theme.panelFill, theme.accent);
+  addPanel("B", "Biospecimen to biomarker", "evidence", x + leftW + panelGap, panelTop, centerW, panelH, theme.panelAltFill, theme.accent2);
+  addPanel("C", "Endpoint and safety review", "review", x + leftW + centerW + panelGap * 2, panelTop, rightW, panelH, theme.warningFill, theme.warningText);
+  addPanel("D", "Validation and evidence grade", "validation", x, bottomY, Math.round(width * 0.62), bottomH, theme.panelFill, theme.accent);
+  addPanel("E", "Clinical decision handoff", "review", x + Math.round(width * 0.62) + panelGap, bottomY, width - Math.round(width * 0.62) - panelGap, bottomH, theme.warningFill, theme.warningText);
   nodes.push(
-    symbol("cohort-stratification", "Cohort", x + 20, lowerY + 52, 60, 72, `${template.id}:cohort`, { accent: theme.accent, stroke: theme.accent, labelVisible: false }),
-    symbol("cohort-table", "Table", x + 88, lowerY + 52, 60, 72, `${template.id}:cohort-table`, { accent: "#2563eb", stroke: "#2563eb", labelVisible: false }),
-    symbol("biospecimen-collection", "Biospecimen", x + 156, lowerY + 52, 60, 72, `${template.id}:biospecimen`, { accent: "#0d9488", stroke: "#0d9488", labelVisible: false }),
+    symbol("patient-journey-map", "Journey", x + 22, panelTop + 56, 70, 76, `${template.id}:patient-journey`, { accent: theme.accent, stroke: theme.accent, labelVisible: false }),
+    symbol("consent-enrollment", "Consent", x + 98, panelTop + 56, 70, 76, `${template.id}:consent`, { accent: "#2563eb", stroke: "#2563eb", labelVisible: false }),
+    symbol("eligibility-criteria", "Eligibility", x + 174, panelTop + 56, 70, 76, `${template.id}:eligibility`, { accent: "#0d9488", stroke: "#0d9488", labelVisible: false }),
+    symbol("randomization-schema", "Design", x + 250, panelTop + 56, 70, 76, `${template.id}:cohort-schema`, { accent: "#7c3aed", stroke: "#7c3aed", labelVisible: false }),
     createPlotNode({
       id: createId("plot"),
       plotType: "line",
@@ -10631,24 +10580,42 @@ function createClinicalTranslationalFlagshipTemplateNodes(template: WorkflowTemp
       table: enrollmentTable,
       encodings: { x: "month", y: "enrolled", color: "series" },
       style: theme.plotStyle
-    }, createTransform(x + 232, lowerY + 50, 92, 88)),
-    figureText("Cohort table, consent, and biospecimen flow stay source-linked.", createTransform(x + 24, lowerY + 160, panelW - 48, 24), { fontSize: 10, fontWeight: 720, color: theme.muted }),
-    symbol("clinical-omics-bridge", "Omics", x + panelW + gap + 18, lowerY + 52, 60, 72, `${template.id}:omics`, { accent: "#0d9488", stroke: "#0d9488", labelVisible: false }),
-    symbol("biomarker-discovery", "Discovery", x + panelW + gap + 88, lowerY + 52, 60, 72, `${template.id}:discovery`, { accent: "#2563eb", stroke: "#2563eb", labelVisible: false }),
-    symbol("assay-validation", "Assay", x + panelW + gap + 158, lowerY + 52, 60, 72, `${template.id}:assay`, { accent: "#7c3aed", stroke: "#7c3aed", labelVisible: false }),
-    symbol("validation-cohort", "Validation", x + panelW + gap + 228, lowerY + 52, 60, 72, `${template.id}:validation`, { accent: "#0891b2", stroke: "#0891b2", labelVisible: false }),
-    figureText("Candidate marker, assay, and validation cohort remain independently editable.", createTransform(x + panelW + gap + 24, lowerY + 160, panelW - 48, 24), { fontSize: 10, fontWeight: 720, color: theme.muted }),
-    symbol("clinical-response-card", "Response", x + (panelW + gap) * 2 + 18, lowerY + 52, 60, 72, `${template.id}:response`, { accent: theme.warningText, stroke: theme.warningText, labelVisible: false }, theme.riskSymbolProfile),
-    symbol("survival-curve", "Survival", x + (panelW + gap) * 2 + 88, lowerY + 52, 60, 72, `${template.id}:survival`, { accent: theme.warningText, stroke: theme.warningText, labelVisible: false }, theme.riskSymbolProfile),
-    symbol("adverse-event-panel", "AE", x + (panelW + gap) * 2 + 158, lowerY + 52, 60, 72, `${template.id}:adverse-event`, { accent: theme.warningText, stroke: theme.warningText, labelVisible: false }, theme.riskSymbolProfile),
-    symbol("clinical-risk-benefit", "Risk benefit", x + (panelW + gap) * 2 + 228, lowerY + 52, 60, 72, `${template.id}:risk-benefit`, { accent: theme.warningText, stroke: theme.warningText, labelVisible: false }, theme.riskSymbolProfile),
-    figureShape("round-rect", "", createTransform(x + (panelW + gap) * 2 + 98, lowerY + 148, 214, 24), {
+    }, createTransform(x + 220, panelTop + 142, 96, 48)),
+    figureText("Cohort source, eligibility, and trial schema remain editable before claims.", createTransform(x + 24, panelTop + 148, 178, 34), { fontSize: 9.2, fontWeight: 720, color: theme.muted }),
+    symbol("clinical-sample-flow", "Sample flow", x + leftW + panelGap + 24, panelTop + 56, 76, 80, `${template.id}:sample-flow`, { accent: "#0d9488", stroke: "#0d9488", labelVisible: false }),
+    symbol("biospecimen-collection", "Biospecimen", x + leftW + panelGap + 106, panelTop + 56, 76, 80, `${template.id}:biospecimen`, { accent: "#0891b2", stroke: "#0891b2", labelVisible: false }),
+    symbol("clinical-omics-bridge", "Omics bridge", x + leftW + panelGap + 188, panelTop + 56, 76, 80, `${template.id}:omics-bridge`, { accent: "#2563eb", stroke: "#2563eb", labelVisible: false }),
+    symbol("biomarker-validation", "Biomarker", x + leftW + panelGap + 270, panelTop + 56, 62, 80, `${template.id}:biomarker`, { accent: "#7c3aed", stroke: "#7c3aed", labelVisible: false }),
+    figureText("Specimen chain, omics readout, and biomarker evidence are separate scene nodes for review.", createTransform(x + leftW + panelGap + 26, panelTop + 154, centerW - 52, 30), { fontSize: 9.7, fontWeight: 720, color: theme.muted }),
+    symbol("endpoint-hierarchy", "Endpoint", x + leftW + centerW + panelGap * 2 + 22, panelTop + 56, 72, 78, `${template.id}:endpoint`, { accent: theme.warningText, stroke: theme.warningText, labelVisible: false }, theme.riskSymbolProfile),
+    symbol("clinical-response-card", "Response", x + leftW + centerW + panelGap * 2 + 102, panelTop + 56, 72, 78, `${template.id}:response`, { accent: theme.warningText, stroke: theme.warningText, labelVisible: false }, theme.riskSymbolProfile),
+    symbol("survival-curve", "Survival", x + leftW + centerW + panelGap * 2 + 182, panelTop + 56, 72, 78, `${template.id}:survival`, { accent: theme.warningText, stroke: theme.warningText, labelVisible: false }, theme.riskSymbolProfile),
+    createPlotNode({
+      id: createId("plot"),
+      plotType: "line",
+      title: "Safety",
+      table: safetyTable,
+      encodings: { x: "visit", y: "rate", color: "series" },
+      style: theme.plotStyle
+    }, createTransform(x + leftW + centerW + panelGap * 2 + 70, panelTop + 144, 132, 48)),
+    symbol("adverse-event-panel", "AE", x + Math.round(width * 0.62) + panelGap + 22, bottomY + 54, 74, 78, `${template.id}:adverse-event`, { accent: theme.warningText, stroke: theme.warningText, labelVisible: false }, theme.riskSymbolProfile),
+    symbol("clinical-risk-benefit", "Risk benefit", x + Math.round(width * 0.62) + panelGap + 104, bottomY + 54, 74, 78, `${template.id}:risk-benefit`, { accent: theme.warningText, stroke: theme.warningText, labelVisible: false }, theme.riskSymbolProfile),
+    symbol("clinician-review", "Review", x + Math.round(width * 0.62) + panelGap + 186, bottomY + 54, 74, 78, `${template.id}:clinician-review`, { accent: theme.warningText, stroke: theme.warningText, labelVisible: false }, theme.riskSymbolProfile),
+    symbol("clinical-decision-support", "Decision", x + Math.round(width * 0.62) + panelGap + 268, bottomY + 54, 74, 78, `${template.id}:decision-support`, { accent: theme.warningText, stroke: theme.warningText, labelVisible: false }, theme.riskSymbolProfile),
+    symbol("cohort-stratification", "Cohort", x + 26, bottomY + 54, 72, 76, `${template.id}:cohort`, { accent: theme.accent, stroke: theme.accent, labelVisible: false }),
+    symbol("cohort-table", "Table", x + 106, bottomY + 54, 72, 76, `${template.id}:cohort-table`, { accent: "#2563eb", stroke: "#2563eb", labelVisible: false }),
+    symbol("biomarker-discovery", "Discovery", x + 206, bottomY + 54, 72, 76, `${template.id}:discovery`, { accent: "#2563eb", stroke: "#2563eb", labelVisible: false }),
+    symbol("assay-validation", "Assay", x + 286, bottomY + 54, 72, 76, `${template.id}:assay`, { accent: "#7c3aed", stroke: "#7c3aed", labelVisible: false }),
+    symbol("validation-cohort", "Validation", x + 366, bottomY + 54, 72, 76, `${template.id}:validation`, { accent: "#0891b2", stroke: "#0891b2", labelVisible: false }),
+    symbol("regulatory-evidence-brief", "Evidence", x + 466, bottomY + 54, 72, 76, `${template.id}:regulatory-evidence`, { accent: "#0d9488", stroke: "#0d9488", labelVisible: false }),
+    figureText("Cohort stratification, assay validation, and evidence grade are reviewable before endpoint claims.", createTransform(x + 26, bottomY + 142, Math.round(width * 0.62) - 52, 26), { fontSize: 9.7, fontWeight: 720, color: theme.muted }),
+    figureShape("round-rect", "", createTransform(x + Math.round(width * 0.62) + panelGap + 78, bottomY + 140, 224, 24), {
       fill: theme.isDark ? "#111827" : "#ffffff",
       stroke: theme.warningStroke,
       strokeWidth: 1,
       depth: "surface"
     }),
-    figureText("clinical-claims-review", createTransform(x + (panelW + gap) * 2 + 128, lowerY + 154, 154, 13), {
+    figureText("clinical-claims-review", createTransform(x + Math.round(width * 0.62) + panelGap + 112, bottomY + 146, 154, 13), {
       fontSize: 8.2,
       fontWeight: 850,
       color: theme.warningText
