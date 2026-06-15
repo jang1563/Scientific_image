@@ -74,7 +74,7 @@ Open one of the editable public demos:
 - Export-aware pipeline: SVG/PDF/PPTX/DOCX paths emit exact fallback and provenance warnings.
 - Verification target: `node --test tests/*.test.ts` and `node scripts/public-readiness-audit.ts`.
 
-For a reviewer-oriented Repository Index, see [docs/REPOSITORY_INDEX.md](docs/REPOSITORY_INDEX.md). For MCP/Codex/Claude usage, see [docs/AGENT_QUICKSTART.md](docs/AGENT_QUICKSTART.md). For a metrics-based Portfolio Scorecard, see [docs/PORTFOLIO_SCORECARD.md](docs/PORTFOLIO_SCORECARD.md). For public release rules, see [docs/PUBLIC_RELEASE_CHECKLIST.md](docs/PUBLIC_RELEASE_CHECKLIST.md).
+For a reviewer-oriented Repository Index, see [docs/REPOSITORY_INDEX.md](docs/REPOSITORY_INDEX.md). For MCP/Codex/Claude setup, see [docs/MCP_CLIENT_SETUP.md](docs/MCP_CLIENT_SETUP.md) and [docs/AGENT_QUICKSTART.md](docs/AGENT_QUICKSTART.md). For a metrics-based Portfolio Scorecard, see [docs/PORTFOLIO_SCORECARD.md](docs/PORTFOLIO_SCORECARD.md). For public release rules, see [docs/PUBLIC_RELEASE_CHECKLIST.md](docs/PUBLIC_RELEASE_CHECKLIST.md).
 
 For a claim-by-claim Reviewer Evidence Map, see [docs/REVIEWER_EVIDENCE_MAP.md](docs/REVIEWER_EVIDENCE_MAP.md). It links each portfolio claim to the exact files, tests, commands, and public demos a reviewer can inspect.
 
@@ -132,6 +132,24 @@ Optional MCP server:
 ```bash
 node packages/mcp/src/server.ts
 ```
+
+## Use As An MCP Server
+
+Scientific Image can be connected to Claude Code, Codex, or another MCP client as a local stdio server. It is public and usable from a cloned repo, but it is not packaged as an npm-distributed MCP server yet.
+
+Copy one of the root example configs and replace `cwd` with your local repo path:
+
+- `.mcp.json.example` for Claude Code projects.
+- `codex.mcp.example.toml` for Codex config.
+
+Then restart the client and start with these MCP resources:
+
+- `scientific-image://agent/manifest`
+- `scientific-image://agent/agent-cookbook`
+- `scientific-image://agent/demo-perturb-seq-crispr`
+- `scientific-image://agent/asset-index-compact`
+
+Full setup instructions are in [docs/MCP_CLIENT_SETUP.md](docs/MCP_CLIENT_SETUP.md). The copy-paste agent workflow is in [docs/AGENT_QUICKSTART.md](docs/AGENT_QUICKSTART.md).
 
 The right-side Insert panel includes a `Public demos` launcher for the same Perturb-seq, spatial transcriptomics, and AI biosecurity examples shown above.
 Direct local demo links also work after the static server is running:

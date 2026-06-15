@@ -32,6 +32,13 @@ Start the stdio MCP server:
 node packages/mcp/src/server.ts
 ```
 
+For client setup, see [MCP_CLIENT_SETUP.md](MCP_CLIENT_SETUP.md). Root examples are provided for common clients:
+
+- `.mcp.json.example` for Claude Code.
+- `codex.mcp.example.toml` for Codex.
+
+Copy the relevant file into your client config, replace `cwd` with the absolute path to this repository, then restart the client.
+
 Recommended first calls:
 
 1. `resources/list`

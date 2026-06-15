@@ -47,6 +47,8 @@ This repository is a local-first scientific visual communication system. It is m
 
 - `docs/AGENT_QUICKSTART.md`: Copy-pasteable MCP/API path for agents that need to create editable figures through compact indexes, workflow templates, review validation, and export QA.
 
+- `docs/MCP_CLIENT_SETUP.md`: Claude Code and Codex setup guide for connecting this repository as a local stdio MCP server.
+
 - `docs/AGENT_DEMO_EVIDENCE.md`: Reviewer-facing map of the agent smoke path, expected JSON handoff fields, MCP resources, and export/review QA contract.
 
 - `docs/REVIEWER_EVIDENCE_MAP.md`: Claim-by-claim evidence map for public portfolio review, linking product claims to source files, tests, local demos, and audit commands.

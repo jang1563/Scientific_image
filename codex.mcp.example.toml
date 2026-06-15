@@ -1,0 +1,6 @@
+[mcp_servers.scientific-image]
+command = "node"
+args = ["packages/mcp/src/server.ts"]
+cwd = "/absolute/path/to/Scientific_image"
+startup_timeout_sec = 20
+tool_timeout_sec = 120

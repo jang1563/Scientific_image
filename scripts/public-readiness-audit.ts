@@ -33,10 +33,13 @@ const requiredFiles = [
   "README.md",
   "LICENSE",
   ".github/workflows/ci.yml",
+  ".mcp.json.example",
+  "codex.mcp.example.toml",
   "docs/examples/manifest.json",
   "docs/examples/perturb-seq-workflow.svg",
   "docs/examples/spatial-results-panel.svg",
   "docs/examples/ai-biosecurity-pipeline.svg",
+  "docs/MCP_CLIENT_SETUP.md",
   "docs/PUBLIC_EXAMPLE_GALLERY.md",
   "docs/AGENT_QUICKSTART.md",
   "docs/AGENT_DEMO_EVIDENCE.md",
@@ -111,6 +114,10 @@ for (const token of [
   "Why This Is Technically Interesting",
   "One canonical scene graph drives the web workspace, API, MCP tools, visual examples, and SVG/PDF/PPTX/DOCX exports.",
   "docs/AGENT_QUICKSTART.md",
+  "docs/MCP_CLIENT_SETUP.md",
+  "Use As An MCP Server",
+  ".mcp.json.example",
+  "codex.mcp.example.toml",
   "docs/AGENT_DEMO_EVIDENCE.md",
   "Portfolio Snapshot",
   "Metrics are recomputed from code with `node scripts/portfolio-metrics.ts`.",
@@ -146,6 +153,7 @@ for (const token of [
   "Copy-Paste Reviewer Commands",
   "docs/PUBLIC_EXAMPLE_GALLERY.md",
   "docs/AGENT_DEMO_EVIDENCE.md",
+  "docs/MCP_CLIENT_SETUP.md",
   "docs/REVIEWER_EVIDENCE_MAP.md",
   "public demo launching",
   "Can a human edit the same objects that an agent creates through MCP/API tools?",
@@ -233,6 +241,9 @@ for (const token of [
 const agentQuickstart = readFileSync("docs/AGENT_QUICKSTART.md", "utf8");
 for (const token of [
   "Agent Quickstart",
+  "MCP_CLIENT_SETUP.md",
+  ".mcp.json.example",
+  "codex.mcp.example.toml",
   "docs/AGENT_DEMO_EVIDENCE.md",
   "node packages/mcp/src/server.ts",
   "get_asset_index",
@@ -245,6 +256,41 @@ for (const token of [
   "Do not use raw SVG as the editable source."
 ]) {
   assertTextIncludes(agentQuickstart, token, "Agent quickstart");
+}
+
+const mcpClientSetup = readFileSync("docs/MCP_CLIENT_SETUP.md", "utf8");
+for (const token of [
+  "MCP Client Setup",
+  "Scientific Image is exposed as a local stdio MCP server",
+  ".mcp.json.example",
+  "Claude Code",
+  "codex.mcp.example.toml",
+  "Codex",
+  "scientific-image://agent/manifest",
+  "scientific-image://agent/demo-perturb-seq-crispr",
+  "node scripts/agent-acceptance-smoke.ts --workflow-pack perturb-seq-crispr",
+  "Do not use raw SVG"
+]) {
+  assertTextIncludes(mcpClientSetup, token, "MCP client setup");
+}
+
+const claudeMcpExample = readFileSync(".mcp.json.example", "utf8");
+const codexMcpExample = readFileSync("codex.mcp.example.toml", "utf8");
+for (const token of [
+  "\"scientific-image\"",
+  "\"command\": \"node\"",
+  "\"args\": [\"packages/mcp/src/server.ts\"]",
+  "\"cwd\": \"/absolute/path/to/Scientific_image\""
+]) {
+  assertTextIncludes(claudeMcpExample, token, "Claude MCP example");
+}
+for (const token of [
+  "[mcp_servers.scientific-image]",
+  "command = \"node\"",
+  "args = [\"packages/mcp/src/server.ts\"]",
+  "cwd = \"/absolute/path/to/Scientific_image\""
+]) {
+  assertTextIncludes(codexMcpExample, token, "Codex MCP example");
 }
 
 const currentMetricTokens = [
