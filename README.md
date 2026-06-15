@@ -2,14 +2,25 @@
 
 Local-first scientific visual communication MVP: a structured SVG-first editor for biology and AI diagrams, figures, plots, posters, and premium slide decks.
 
-The repo is intentionally usable with only Node 24 in this environment. The root `package.json` documents the intended TypeScript monorepo dependencies for a richer Next.js/Fastify setup, while the current MVP core runs without installing packages.
+The repo is intentionally usable with only Node 24 in this environment. The current MVP core runs without installing packages and keeps structured scene JSON as the canonical artifact.
+
+## Portfolio Snapshot
+
+- `466` curated visual assets: `386` biology and `80` AI assets.
+- `401` signature/hero assets across `18` workflow packs and `77` templates.
+- Local-first web workspace, API, and MCP server share the same scene graph.
+- Agent-ready contract: agents use `workflowPack`, `templateId`, `assetId`, `styleProfile`, semantic slots, and editable appearance overrides instead of raw screenshots.
+- Export-aware pipeline: SVG/PDF/PPTX/DOCX paths emit exact fallback and provenance warnings.
+- Verification target: `node --test tests/*.test.ts` and `node scripts/public-readiness-audit.ts`.
+
+For a reviewer-oriented Repository Index, see [docs/REPOSITORY_INDEX.md](docs/REPOSITORY_INDEX.md). For public release rules, see [docs/PUBLIC_RELEASE_CHECKLIST.md](docs/PUBLIC_RELEASE_CHECKLIST.md).
 
 ## What Is Included
 
 - Strict scene graph package with validation, provenance, claim status, and deterministic editing helpers.
 - Premium deck layer with source documents, deck outlines, slide metadata, review queues, and agent run history.
 - Outline-first agent workflow for source import, deck outline drafting, approved slide generation, deterministic operations, and deck validation.
-- Premium structured SVG asset system with exactly 200 curated biology and AI assets, semantic search, variants, provenance, and reusable renderer families.
+- Premium structured SVG asset system with curated biology and AI assets, semantic search, variants, provenance, and reusable renderer families.
 - CSV/TSV parser and editable `PlotSpec` generation for common bio plots.
 - Multi-slide SVG, PDF, PNG-helper, and minimal editable PPTX export primitives.
 - Local HTTP API covering project, source, outline, deck generation, review, node, plot, validation, and export operations.
@@ -21,6 +32,7 @@ The repo is intentionally usable with only Node 24 in this environment. The root
 
 ```bash
 node --test tests/*.test.ts
+node scripts/public-readiness-audit.ts
 node scripts/agent-acceptance-smoke.ts
 node scripts/serve-static.ts apps/web 4173
 node apps/api/src/server.ts
@@ -121,12 +133,22 @@ The smoke follows the same loop an agent should use: read the manifest resource,
 
 ## Premium Asset System
 
-The curated registry contains 200 structured SVG assets:
+The curated registry contains `466` structured visual assets:
 
-- 120 biology assets across cells/tissues, genomics, perturbation, assays, spatial imaging, molecules/pathways, model systems, pathogens/biosafety, and space biology.
-- 80 AI assets across data/model systems, LLM/RAG/agents, evaluation, safety/permissioning, biosecurity workflows, and governance/monitoring.
+- `386` biology assets across cells/tissues, genomics, perturbation, assays, spatial imaging, molecules/pathways, model systems, pathogens/biosafety, clinical/translational, drug discovery, protein engineering, synthetic biology, microscopy, lab automation, organ systems, methods, and space biology.
+- `80` AI assets across data/model systems, LLM/RAG/agents, evaluation, safety/permissioning, biosecurity workflows, and governance/monitoring.
 - Every asset includes semantic metadata, aliases, tags, provenance, variants, editable parts, recommended size, and a reusable render family.
 - The renderer is used by web previews, scene SVG export, API rendering, and MCP previews.
+
+## Public Repo Hygiene
+
+Generated files under `output/` and `.playwright-cli/` are local QA artifacts and are ignored by git. Do not commit private notes, internal chat logs, application-specific personal context, API keys, proprietary source documents, or generated decks containing non-public data. Run:
+
+```bash
+node scripts/public-readiness-audit.ts
+```
+
+before sharing the repository or changing GitHub visibility.
 
 ## V1 Boundaries
 
