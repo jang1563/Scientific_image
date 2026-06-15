@@ -10246,9 +10246,9 @@ function createGrantConsultingFlagshipTemplateNodes(template: WorkflowTemplate, 
       fontWeight: 900,
       color: theme.heading
     }),
-    figureText("Agent-ready one-pager keeps problem, evidence, aims, roadmap, risk, resources, and recommendation as separate editable objects.", createTransform(x + 664, y - 34, width - 664, 44), {
-      fontSize: 11.2,
-      fontWeight: 650,
+    figureText("Source-linked one-pager for funder updates, biotech strategy, and specific-aims review.", createTransform(x + 656, y - 34, width - 656, 38), {
+      fontSize: 11.4,
+      fontWeight: 700,
       color: theme.muted
     }),
     figureShape("round-rect", "", createTransform(x + 4, y + 12, 274, 28), {
@@ -10262,93 +10262,27 @@ function createGrantConsultingFlagshipTemplateNodes(template: WorkflowTemplate, 
       fontWeight: 850,
       color: theme.accent
     }),
-    figureShape("round-rect", "", createTransform(x + 292, y + 12, 344, 28), {
+    figureShape("round-rect", "", createTransform(x + 292, y + 12, 304, 28), {
       fill: theme.chipAltFill,
       stroke: theme.isLine ? "#111827" : theme.isDark ? "#334155" : "#bbf7d0",
       strokeWidth: 1,
       depth: "surface"
     }),
-    figureText("agent-ready problem -> evidence -> ask", createTransform(x + 308, y + 17, 310, 18), {
+    figureText("editable brief: thesis / aims / risk / ask", createTransform(x + 308, y + 17, 268, 18), {
       fontSize: 10.2,
       fontWeight: 850,
       color: theme.accent2
     })
   ];
 
-  const stageY = y + 64;
-  const stageH = 164;
-  const stageW = Math.round((width - 64) / 5);
-  const stages: Array<{ assetId: string; label: string; kind: string; note: string; accent: string; profile?: AssetStyleProfile }> = [
-    { assetId: "problem-statement-card", label: "Problem", kind: "need", note: "unmet gap", accent: theme.accent },
-    { assetId: "scientific-opportunity-map", label: "Opportunity", kind: "wedge", note: "why now", accent: "#0d9488" },
-    { assetId: "hypothesis-aims", label: "Aims", kind: "plan", note: "hypothesis + aims", accent: "#7c3aed" },
-    { assetId: "milestone-roadmap", label: "Roadmap", kind: "path", note: "milestones", accent: theme.accent2 },
-    { assetId: "recommendation-card", label: "Decision", kind: "ask", note: "review + action", accent: theme.warningText, profile: theme.riskSymbolProfile }
-  ];
-  stages.forEach((stage, index) => {
-    const sx = x + index * (stageW + 16);
-    const reviewStage = index === stages.length - 1;
-    nodes.push(figureShape("round-rect", "", createTransform(sx, stageY, stageW, stageH), {
-      fill: reviewStage ? theme.warningFill : index % 2 ? theme.panelAltFill : theme.panelFill,
-      stroke: reviewStage ? theme.warningStroke : theme.panelStroke,
-      strokeWidth: 1.25,
-      depth: reviewStage ? theme.floatingDepth : theme.panelDepth
-    }));
-    nodes.push(figureShape("round-rect", "", createTransform(sx + 12, stageY + 12, 36, 20), {
-      fill: theme.isDark ? "#0f172a" : "#ffffff",
-      stroke: reviewStage ? theme.warningStroke : theme.panelStroke,
-      strokeWidth: 1,
-      depth: "surface"
-    }));
-    nodes.push(figureText(`0${index + 1}`, createTransform(sx + 21, stageY + 16, 18, 12), {
-      fontSize: 8.8,
-      fontWeight: 950,
-      color: reviewStage ? theme.warningText : stage.accent
-    }));
-    nodes.push(figureShape("round-rect", "", createTransform(sx + stageW - 84, stageY + 12, 70, 20), {
-      fill: reviewStage ? theme.warningFill : theme.chipFill,
-      stroke: reviewStage ? theme.warningStroke : theme.chipStroke,
-      strokeWidth: 1,
-      depth: "surface"
-    }));
-    nodes.push(figureText(stage.kind, createTransform(sx + stageW - 72, stageY + 16, 48, 12), {
-      fontSize: 7.4,
-      fontWeight: 850,
-      color: reviewStage ? theme.warningText : stage.accent
-    }));
-    nodes.push(symbol(stage.assetId, stage.label, sx + Math.round((stageW - 112) / 2), stageY + 34, 112, 86, `${template.id}:stage-${index + 1}`, { accent: stage.accent, stroke: stage.accent, labelVisible: false }, stage.profile ?? styleProfile));
-    nodes.push(figureText(stage.label, createTransform(sx + 14, stageY + 122, stageW - 28, 18), {
-      fontSize: 12,
-      fontWeight: 900,
-      color: reviewStage ? theme.warningText : theme.text
-    }));
-    nodes.push(figureText(stage.note, createTransform(sx + 14, stageY + 142, stageW - 28, 16), {
-      fontSize: 9.2,
-      fontWeight: 720,
-      color: theme.muted
-    }));
-    if (index > 0) {
-      nodes.push(createConnectorNode([
-        { x: sx - 16, y: stageY + 82 },
-        { x: sx - 2, y: stageY + 82 }
-      ], "", { stroke: theme.connector, strokeWidth: 2.3 }));
-    }
-  });
-  nodes.push(figureShape("round-rect", "", createTransform(x + 4, stageY + stageH + 14, width - 8, 28), {
-    fill: theme.isDark ? "#0f172a" : "#f8fafc",
-    stroke: theme.panelStroke,
-    strokeWidth: 1,
-    depth: "surface"
-  }));
-  nodes.push(figureText("Decision spine: define need -> show evidence -> commit aims -> de-risk roadmap -> make recommendation", createTransform(x + 24, stageY + stageH + 20, width - 48, 16), {
-    fontSize: 9.5,
-    fontWeight: 820,
-    color: theme.muted
-  }));
-
-  const lowerY = y + 280;
-  const gap = 22;
-  const panelW = Math.round((width - gap * 2) / 3);
+  const panelTop = y + 58;
+  const panelGap = 18;
+  const leftW = 330;
+  const centerW = 346;
+  const rightW = width - leftW - centerW - panelGap * 2;
+  const panelH = 208;
+  const bottomY = y + 292;
+  const bottomH = 188;
   const impactTable = {
     id: createId("table"),
     name: "Illustrative impact trajectory",
@@ -10361,9 +10295,21 @@ function createGrantConsultingFlagshipTemplateNodes(template: WorkflowTemplate, 
     ],
     source
   };
-  const addPanel = (tag: string, title: string, status: string, px: number, py: number, pw: number, fill = theme.panelFill, tone = theme.text) => {
+  const riskTable = {
+    id: createId("table"),
+    name: "Illustrative risk retirement",
+    columns: ["quarter", "risk", "series"],
+    rows: [
+      { quarter: "Q1", risk: 0.72, series: "open risk" },
+      { quarter: "Q2", risk: 0.54, series: "open risk" },
+      { quarter: "Q3", risk: 0.31, series: "open risk" },
+      { quarter: "Q4", risk: 0.18, series: "open risk" }
+    ],
+    source
+  };
+  const addPanel = (tag: string, title: string, status: string, px: number, py: number, pw: number, ph: number, fill = theme.panelFill, tone = theme.text) => {
     const review = status === "review";
-    nodes.push(figureShape("round-rect", "", createTransform(px, py, pw, 204), {
+    nodes.push(figureShape("round-rect", "", createTransform(px, py, pw, ph), {
       fill,
       stroke: review ? theme.warningStroke : theme.panelStroke,
       strokeWidth: 1.25,
@@ -10397,13 +10343,25 @@ function createGrantConsultingFlagshipTemplateNodes(template: WorkflowTemplate, 
       color: review ? theme.warningText : tone
     }));
   };
-  addPanel("A", "Evidence and impact", "proof", x, lowerY, panelW, theme.panelFill, theme.accent);
-  addPanel("B", "Plan and resources", "roadmap", x + panelW + gap, lowerY, panelW, theme.panelAltFill, theme.accent2);
-  addPanel("C", "Risk and decision", "review", x + (panelW + gap) * 2, lowerY, width - (panelW + gap) * 2, theme.warningFill, theme.warningText);
+  addPanel("A", "Executive recommendation", "decision", x, panelTop, leftW, panelH, theme.panelFill, theme.accent);
+  addPanel("B", "Evidence wedge", "source", x + leftW + panelGap, panelTop, centerW, panelH, theme.panelAltFill, theme.accent2);
+  addPanel("C", "Funding ask and risk", "review", x + leftW + centerW + panelGap * 2, panelTop, rightW, panelH, theme.warningFill, theme.warningText);
+  addPanel("D", "Specific aims and delivery path", "roadmap", x, bottomY, Math.round(width * 0.62), bottomH, theme.panelFill, theme.accent);
+  addPanel("E", "Evidence ledger", "review", x + Math.round(width * 0.62) + panelGap, bottomY, width - Math.round(width * 0.62) - panelGap, bottomH, theme.warningFill, theme.warningText);
   nodes.push(
-    symbol("evidence-snapshot", "Evidence", x + 20, lowerY + 52, 62, 74, `${template.id}:evidence`, { accent: theme.accent, stroke: theme.accent, labelVisible: false }),
-    symbol("impact-metric-card", "Impact", x + 88, lowerY + 52, 62, 74, `${template.id}:impact`, { accent: "#0d9488", stroke: "#0d9488", labelVisible: false }),
-    symbol("outcome-kpi", "KPI", x + 156, lowerY + 52, 62, 74, `${template.id}:kpi`, { accent: "#2563eb", stroke: "#2563eb", labelVisible: false }),
+    symbol("recommendation-card", "Recommendation", x + 24, panelTop + 56, 108, 104, `${template.id}:recommendation`, { accent: theme.accent, stroke: theme.accent, labelVisible: false }),
+    figureText("Recommended ask", createTransform(x + 144, panelTop + 60, 150, 18), { fontSize: 13.5, fontWeight: 900, color: theme.heading }),
+    figureText("Fund a focused validation wedge with explicit go/no-go criteria, source-linked evidence, and reviewable risk assumptions.", createTransform(x + 144, panelTop + 84, 156, 62), { fontSize: 10.4, fontWeight: 680, color: theme.text }),
+    figureShape("round-rect", "", createTransform(x + 144, panelTop + 154, 148, 28), {
+      fill: theme.isDark ? "#111827" : "#ffffff",
+      stroke: theme.chipStroke,
+      strokeWidth: 1,
+      depth: "surface"
+    }),
+    figureText("human approval required", createTransform(x + 158, panelTop + 162, 120, 12), { fontSize: 8.2, fontWeight: 850, color: theme.accent }),
+    symbol("problem-statement-card", "Problem", x + leftW + panelGap + 22, panelTop + 56, 72, 78, `${template.id}:problem`, { accent: theme.accent, stroke: theme.accent, labelVisible: false }),
+    symbol("scientific-opportunity-map", "Opportunity", x + leftW + panelGap + 102, panelTop + 56, 72, 78, `${template.id}:opportunity`, { accent: "#0d9488", stroke: "#0d9488", labelVisible: false }),
+    symbol("evidence-snapshot", "Evidence", x + leftW + panelGap + 182, panelTop + 56, 72, 78, `${template.id}:evidence`, { accent: "#2563eb", stroke: "#2563eb", labelVisible: false }),
     createPlotNode({
       id: createId("plot"),
       plotType: "line",
@@ -10411,25 +10369,40 @@ function createGrantConsultingFlagshipTemplateNodes(template: WorkflowTemplate, 
       table: impactTable,
       encodings: { x: "milestone", y: "impact", color: "series" },
       style: theme.plotStyle
-    }, createTransform(x + 232, lowerY + 50, 92, 88)),
-    figureText("Evidence, impact metric, and KPI stay distinct from the recommendation.", createTransform(x + 24, lowerY + 160, panelW - 48, 24), { fontSize: 10, fontWeight: 720, color: theme.muted }),
-    symbol("specific-aim-1", "Aim 1", x + panelW + gap + 18, lowerY + 52, 56, 72, `${template.id}:aim1`, { accent: "#2563eb", stroke: "#2563eb", labelVisible: false }),
-    symbol("specific-aim-2", "Aim 2", x + panelW + gap + 82, lowerY + 52, 56, 72, `${template.id}:aim2`, { accent: "#0d9488", stroke: "#0d9488", labelVisible: false }),
-    symbol("specific-aim-3", "Aim 3", x + panelW + gap + 146, lowerY + 52, 56, 72, `${template.id}:aim3`, { accent: "#7c3aed", stroke: "#7c3aed", labelVisible: false }),
-    symbol("budget-envelope", "Budget", x + panelW + gap + 210, lowerY + 52, 56, 72, `${template.id}:budget`, { accent: "#f59e0b", stroke: "#f59e0b", labelVisible: false }),
-    symbol("team-capability-map", "Team", x + panelW + gap + 274, lowerY + 52, 56, 72, `${template.id}:team`, { accent: "#0891b2", stroke: "#0891b2", labelVisible: false }),
-    figureText("Aims, budget, team, and milestones remain individually selectable.", createTransform(x + panelW + gap + 24, lowerY + 160, panelW - 48, 24), { fontSize: 10, fontWeight: 720, color: theme.muted }),
-    symbol("risk-matrix", "Risk", x + (panelW + gap) * 2 + 20, lowerY + 52, 66, 76, `${template.id}:risk`, { accent: theme.warningText, stroke: theme.warningText, labelVisible: false }, theme.riskSymbolProfile),
-    symbol("risk-mitigation-plan", "Mitigation", x + (panelW + gap) * 2 + 92, lowerY + 52, 66, 76, `${template.id}:mitigation`, { accent: theme.warningText, stroke: theme.warningText, labelVisible: false }, theme.riskSymbolProfile),
-    symbol("go-no-go-gate", "Gate", x + (panelW + gap) * 2 + 164, lowerY + 52, 66, 76, `${template.id}:gate`, { accent: theme.warningText, stroke: theme.warningText, labelVisible: false }, theme.riskSymbolProfile),
-    symbol("executive-takeaway", "Takeaway", x + (panelW + gap) * 2 + 236, lowerY + 52, 66, 76, `${template.id}:takeaway`, { accent: theme.warningText, stroke: theme.warningText, labelVisible: false }, theme.riskSymbolProfile),
-    figureShape("round-rect", "", createTransform(x + (panelW + gap) * 2 + 104, lowerY + 148, 210, 24), {
+    }, createTransform(x + leftW + panelGap + 258, panelTop + 58, 74, 76)),
+    figureText("Problem, opportunity, evidence, and impact remain source-linked.", createTransform(x + leftW + panelGap + 24, panelTop + 154, centerW - 48, 28), { fontSize: 9.8, fontWeight: 720, color: theme.muted }),
+    symbol("budget-envelope", "Budget", x + leftW + centerW + panelGap * 2 + 24, panelTop + 56, 74, 78, `${template.id}:budget`, { accent: "#f59e0b", stroke: "#f59e0b", labelVisible: false }),
+    symbol("resource-allocation", "Resources", x + leftW + centerW + panelGap * 2 + 102, panelTop + 56, 74, 78, `${template.id}:resources`, { accent: "#0891b2", stroke: "#0891b2", labelVisible: false }),
+    symbol("go-no-go-gate", "Gate", x + leftW + centerW + panelGap * 2 + 180, panelTop + 56, 74, 78, `${template.id}:gate`, { accent: theme.warningText, stroke: theme.warningText, labelVisible: false }, theme.riskSymbolProfile),
+    figureText("Budget, team capacity, and review gate are separated from the scientific claim.", createTransform(x + leftW + centerW + panelGap * 2 + 24, panelTop + 154, rightW - 48, 32), { fontSize: 9.6, fontWeight: 720, color: theme.muted }),
+    symbol("specific-aim-1", "Aim 1", x + 28, bottomY + 56, 72, 76, `${template.id}:aim-1`, { accent: "#2563eb", stroke: "#2563eb", labelVisible: false }),
+    symbol("specific-aim-2", "Aim 2", x + 112, bottomY + 56, 72, 76, `${template.id}:aim-2`, { accent: "#0d9488", stroke: "#0d9488", labelVisible: false }),
+    symbol("specific-aim-3", "Aim 3", x + 196, bottomY + 56, 72, 76, `${template.id}:aim-3`, { accent: "#7c3aed", stroke: "#7c3aed", labelVisible: false }),
+    symbol("milestone-roadmap", "Milestones", x + 306, bottomY + 52, 94, 82, `${template.id}:milestone-roadmap`, { accent: theme.accent2, stroke: theme.accent2, labelVisible: false }),
+    symbol("team-capability-map", "Team", x + 416, bottomY + 54, 78, 78, `${template.id}:team`, { accent: "#0891b2", stroke: "#0891b2", labelVisible: false }),
+    symbol("deliverable-package", "Deliverable", x + 504, bottomY + 54, 78, 78, `${template.id}:deliverable`, { accent: "#f59e0b", stroke: "#f59e0b", labelVisible: false }),
+    createConnectorNode([
+      { x: x + 276, y: bottomY + 94 },
+      { x: x + 300, y: bottomY + 94 }
+    ], "", { stroke: theme.connector, strokeWidth: 2 }),
+    figureText("Aim 1 validates the signal, Aim 2 scales the assay, Aim 3 packages decision evidence.", createTransform(x + 28, bottomY + 142, Math.round(width * 0.62) - 56, 26), { fontSize: 9.8, fontWeight: 720, color: theme.muted }),
+    symbol("risk-matrix", "Risk", x + Math.round(width * 0.62) + panelGap + 24, bottomY + 54, 76, 78, `${template.id}:risk`, { accent: theme.warningText, stroke: theme.warningText, labelVisible: false }, theme.riskSymbolProfile),
+    symbol("risk-mitigation-plan", "Mitigation", x + Math.round(width * 0.62) + panelGap + 106, bottomY + 54, 76, 78, `${template.id}:mitigation`, { accent: theme.warningText, stroke: theme.warningText, labelVisible: false }, theme.riskSymbolProfile),
+    createPlotNode({
+      id: createId("plot"),
+      plotType: "line",
+      title: "Risk",
+      table: riskTable,
+      encodings: { x: "quarter", y: "risk", color: "series" },
+      style: theme.plotStyle
+    }, createTransform(x + Math.round(width * 0.62) + panelGap + 198, bottomY + 54, 96, 78)),
+    figureShape("round-rect", "", createTransform(x + Math.round(width * 0.62) + panelGap + 72, bottomY + 140, 218, 24), {
       fill: theme.isDark ? "#111827" : "#ffffff",
       stroke: theme.warningStroke,
       strokeWidth: 1,
       depth: "surface"
     }),
-    figureText("executive-recommendation-review", createTransform(x + (panelW + gap) * 2 + 124, lowerY + 154, 170, 13), {
+    figureText("executive-recommendation-review", createTransform(x + Math.round(width * 0.62) + panelGap + 98, bottomY + 146, 166, 13), {
       fontSize: 8.2,
       fontWeight: 850,
       color: theme.warningText

@@ -858,7 +858,7 @@ test("methods and protocols broad pack assets expose dedicated premium recipe ma
 
 test("grant and consulting summary broad pack assets expose dedicated premium recipe markers", () => {
   const expectedMarkers: Record<string, RegExp[]> = {
-    "grant-summary-board": [/asset-grant-grant-summary-board/, /asset-grant-summary-kpi-card/, /asset-grant-summary-decision-band/, /asset-grant-summary-board-layout/],
+    "grant-summary-board": [/asset-grant-executive-brief/, /asset-grant-impact-lens/, /asset-grant-recommendation-ribbon/, /asset-grant-thesis-arc/],
     "problem-statement-card": [/asset-grant-problem-statement-card/, /asset-problem-gap-marker/, /asset-problem-statement-lines/],
     "scientific-opportunity-map": [/asset-grant-scientific-opportunity-map/, /asset-opportunity-map-axes/, /asset-opportunity-zone/, /asset-opportunity-position/],
     "hypothesis-aims": [/asset-grant-hypothesis-aims/, /asset-hypothesis-aims/, /asset-aim-node/, /asset-hypothesis-arrow/],
@@ -867,7 +867,7 @@ test("grant and consulting summary broad pack assets expose dedicated premium re
     "budget-envelope": [/asset-grant-budget-envelope/, /asset-budget-envelope/, /asset-budget-envelope-card/, /asset-budget-stack/],
     "team-capability-map": [/asset-grant-team-capability-map/, /asset-stakeholder-map/, /asset-stakeholder-node/, /asset-team-node/],
     "impact-metric-card": [/asset-grant-impact-metric-card/, /asset-impact-metric-card/, /asset-impact-sparkline/, /asset-priority-score-dots/],
-    "evidence-snapshot": [/asset-grant-evidence-snapshot/, /asset-evidence-snapshot/, /asset-evidence-snapshot-card/],
+    "evidence-snapshot": [/asset-evidence-dossier/, /asset-evidence-primary-sheet/, /asset-evidence-figure-window/, /asset-evidence-source-seal/],
     "risk-matrix": [/asset-grant-risk-matrix/, /asset-risk-matrix-grid/, /asset-risk-cell/],
     "risk-mitigation-plan": [/asset-grant-risk-mitigation-plan/, /asset-go-no-go-gate/, /asset-risk-mitigation-arrow/],
     "recommendation-card": [/asset-grant-recommendation-card/, /asset-recommendation-card/, /asset-recommendation-check/, /asset-takeaway-headline/],
@@ -1985,15 +1985,17 @@ test("priority flagship templates generate commercial editable figure structures
   assert.ok(methods.every((node) => node.payload.workflowPack === "methods-and-protocols" && node.payload.templateId === "methods-protocol-overview"));
 
   const grant = createWorkflowFigureNodes({ templateId: "grant-consulting-one-slide", styleProfile: "consulting-2p5d" });
-  assert.ok(grant.length >= 80);
+  assert.ok(grant.length >= 60);
   assert.ok(grant.some((node) => node.kind === "text" && node.payload.text?.includes("Grant and consulting executive summary")));
-  assert.ok(grant.some((node) => node.kind === "text" && node.payload.text?.includes("Decision spine: define need")));
+  assert.ok(grant.some((node) => node.kind === "text" && node.payload.text?.includes("Recommended ask")));
   assert.ok(grant.some((node) => node.kind === "text" && node.payload.text === "executive-recommendation-review"));
   assert.ok(grant.some((node) => node.kind === "plot" && node.payload.spec.plotType === "line" && node.payload.spec.title === "Impact"));
-  for (const assetId of ["problem-statement-card", "scientific-opportunity-map", "hypothesis-aims", "milestone-roadmap", "recommendation-card", "evidence-snapshot", "impact-metric-card", "outcome-kpi", "specific-aim-1", "specific-aim-2", "specific-aim-3", "budget-envelope", "team-capability-map", "risk-matrix", "risk-mitigation-plan", "go-no-go-gate", "executive-takeaway"]) {
+  assert.ok(grant.some((node) => node.kind === "plot" && node.payload.spec.plotType === "line" && node.payload.spec.title === "Risk"));
+  for (const assetId of ["recommendation-card", "problem-statement-card", "scientific-opportunity-map", "evidence-snapshot", "budget-envelope", "resource-allocation", "go-no-go-gate", "specific-aim-1", "specific-aim-2", "specific-aim-3", "milestone-roadmap", "team-capability-map", "deliverable-package", "risk-matrix", "risk-mitigation-plan"]) {
     assert.ok(grant.some((node) => node.kind === "symbol" && node.payload.assetId === assetId), `${assetId} should appear in grant and consulting flagship`);
   }
-  assert.ok(grant.some((node) => node.kind === "symbol" && node.payload.layoutHint?.startsWith("grant-consulting-one-slide:stage-")));
+  assert.ok(grant.some((node) => node.kind === "symbol" && node.payload.layoutHint === "grant-consulting-one-slide:recommendation"));
+  assert.ok(grant.every((node) => !String(node.payload.text ?? "").includes("Decision spine: define need")));
   assert.ok(grant.every((node) => node.payload.workflowPack === "grant-and-consulting-summary" && node.payload.templateId === "grant-consulting-one-slide"));
 
   const clinical = createWorkflowFigureNodes({ templateId: "clinical-translational-study-overview", styleProfile: "consulting-2p5d" });
