@@ -1849,7 +1849,7 @@ function relatedAssetText(asset) {
 
 async function loadPremiumAssets() {
   try {
-    const response = await fetch("http://127.0.0.1:8787/assets?limit=500");
+    const response = await fetch("/assets?limit=500");
     if (!response.ok) return;
     const payload = await response.json();
     if (Array.isArray(payload.assets) && payload.assets.length >= 100) {
@@ -1863,7 +1863,7 @@ async function loadPremiumAssets() {
 
 async function loadWorkflowTemplates() {
   try {
-    const response = await fetch("http://127.0.0.1:8787/assets/workflow-templates");
+    const response = await fetch("/assets/workflow-templates");
     if (!response.ok) return;
     const payload = await response.json();
     if (Array.isArray(payload.templates) && payload.templates.length) {
@@ -1899,7 +1899,7 @@ function mergeWorkflowTemplates(remoteTemplates, localTemplates) {
 
 async function loadWorkflowPacks() {
   try {
-    const response = await fetch("http://127.0.0.1:8787/assets/workflow-packs");
+    const response = await fetch("/assets/workflow-packs");
     if (!response.ok) return;
     const payload = await response.json();
     if (Array.isArray(payload.workflowPacks) && payload.workflowPacks.length) {
@@ -1929,8 +1929,8 @@ async function loadWorkflowPackGallery(packId) {
   try {
     const styleProfile = encodeURIComponent(currentAssetStyleProfile());
     const url = packId.startsWith("realistic-")
-      ? `http://127.0.0.1:8787/assets/realistic/gallery?workflowPack=${encodeURIComponent(packId)}&styleProfile=${styleProfile}`
-      : `http://127.0.0.1:8787/assets/workflow-packs/${encodeURIComponent(packId)}/gallery?styleProfile=${styleProfile}`;
+      ? `/assets/realistic/gallery?workflowPack=${encodeURIComponent(packId)}&styleProfile=${styleProfile}`
+      : `/assets/workflow-packs/${encodeURIComponent(packId)}/gallery?styleProfile=${styleProfile}`;
     const response = await fetch(url);
     if (!response.ok) return;
     const payload = await response.json();
@@ -1952,7 +1952,7 @@ async function loadWorkflowPackVisualQaGallery(packId) {
     return;
   }
   try {
-    const response = await fetch(`http://127.0.0.1:8787/assets/workflow-packs/${encodeURIComponent(packId)}/visual-qa-gallery?styleProfile=${encodeURIComponent(currentAssetStyleProfile())}&limit=12`);
+    const response = await fetch(`/assets/workflow-packs/${encodeURIComponent(packId)}/visual-qa-gallery?styleProfile=${encodeURIComponent(currentAssetStyleProfile())}&limit=12`);
     if (!response.ok) return;
     const payload = await response.json();
     if (payload.gallery) {
@@ -1966,7 +1966,7 @@ async function loadWorkflowPackVisualQaGallery(packId) {
 
 async function loadAssetCoverageReport() {
   try {
-    const response = await fetch("http://127.0.0.1:8787/assets/coverage-gap-report");
+    const response = await fetch("/assets/coverage-gap-report");
     if (!response.ok) return;
     const payload = await response.json();
     if (payload.report) {

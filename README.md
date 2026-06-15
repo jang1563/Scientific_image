@@ -6,8 +6,8 @@ The repo is intentionally usable with only Node 24 in this environment. The curr
 
 ## Portfolio Snapshot
 
-- `466` curated visual assets: `386` biology and `80` AI assets.
-- `401` signature/hero assets across `18` workflow packs and `77` templates.
+- `496` browseable assets in the local gallery: `466` curated structured assets plus `30` realistic fixtures.
+- `429` signature/hero assets across `18` workflow packs and `77` templates.
 - Local-first web workspace, API, and MCP server share the same scene graph.
 - Agent-ready contract: agents use `workflowPack`, `templateId`, `assetId`, `styleProfile`, semantic slots, and editable appearance overrides instead of raw screenshots.
 - Export-aware pipeline: SVG/PDF/PPTX/DOCX paths emit exact fallback and provenance warnings.
@@ -133,7 +133,7 @@ The smoke follows the same loop an agent should use: read the manifest resource,
 
 ## Premium Asset System
 
-The curated registry contains `466` structured visual assets:
+The local gallery contains `496` browseable assets: `466` curated structured visual assets plus `30` realistic editorial fixtures.
 
 - `386` biology assets across cells/tissues, genomics, perturbation, assays, spatial imaging, molecules/pathways, model systems, pathogens/biosafety, clinical/translational, drug discovery, protein engineering, synthetic biology, microscopy, lab automation, organ systems, methods, and space biology.
 - `80` AI assets across data/model systems, LLM/RAG/agents, evaluation, safety/permissioning, biosecurity workflows, and governance/monitoring.

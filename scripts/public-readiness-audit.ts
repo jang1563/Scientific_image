@@ -1,7 +1,7 @@
 import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { relative } from "node:path";
-import { getAssetQualityReport, getCommercialVisualAudit, listWorkflowPacks, listWorkflowTemplates } from "../packages/assets/src/index.ts";
+import { getAssetQualityReport, getCommercialVisualAudit, listAssets, listRealisticAssets, listWorkflowPacks, listWorkflowTemplates } from "../packages/assets/src/index.ts";
 
 type Finding = {
   level: "error" | "warning";
@@ -51,13 +51,17 @@ for (const file of requiredFiles) {
 }
 
 const quality = getAssetQualityReport();
+const browseableAssets = listAssets();
+const realisticAssets = listRealisticAssets();
 const packs = listWorkflowPacks();
 const templates = listWorkflowTemplates();
 const audit = getCommercialVisualAudit({ limit: 20 });
 const signatureHeroAssets = quality.summary.signatureAssets + quality.summary.heroAssets;
+const browseableSignatureHeroAssets = browseableAssets.filter((asset) => asset.qualityTier === "signature" || asset.qualityTier === "hero").length;
 const styleProfileCount = quality.summary.styleProfiles.length;
 
 assertGate(quality.summary.totalAssets >= 450, `Expected at least 450 assets, found ${quality.summary.totalAssets}.`);
+assertGate(browseableAssets.length >= quality.summary.totalAssets, "Browseable asset index is smaller than the curated registry.");
 assertGate(quality.summary.workflowPacks >= 18, `Expected at least 18 workflow packs, found ${quality.summary.workflowPacks}.`);
 assertGate(templates.length >= 70, `Expected at least 70 templates, found ${templates.length}.`);
 assertGate(signatureHeroAssets >= 380, "Expected at least 380 signature/hero assets.");
@@ -83,9 +87,9 @@ for (const token of [
 }
 
 const currentMetricTokens = [
-  `\`${quality.summary.totalAssets}\` curated visual assets: \`${quality.summary.biologyAssets}\` biology and \`${quality.summary.aiAssets}\` AI assets.`,
-  `\`${signatureHeroAssets}\` signature/hero assets across \`${quality.summary.workflowPacks}\` workflow packs and \`${templates.length}\` templates.`,
-  `The curated registry contains \`${quality.summary.totalAssets}\` structured visual assets:`
+  `\`${browseableAssets.length}\` browseable assets in the local gallery: \`${quality.summary.totalAssets}\` curated structured assets plus \`${realisticAssets.length}\` realistic fixtures.`,
+  `\`${browseableSignatureHeroAssets}\` signature/hero assets across \`${quality.summary.workflowPacks}\` workflow packs and \`${templates.length}\` templates.`,
+  `The local gallery contains \`${browseableAssets.length}\` browseable assets: \`${quality.summary.totalAssets}\` curated structured visual assets plus \`${realisticAssets.length}\` realistic editorial fixtures.`
 ];
 
 for (const token of currentMetricTokens) {
@@ -93,8 +97,9 @@ for (const token of currentMetricTokens) {
 }
 
 for (const token of [
+  `\`${browseableAssets.length}\` total: \`${quality.summary.totalAssets}\` curated structured assets, \`${realisticAssets.length}\` realistic fixtures`,
   `\`${quality.summary.totalAssets}\` total: \`${quality.summary.biologyAssets}\` biology, \`${quality.summary.aiAssets}\` AI`,
-  `\`${signatureHeroAssets}\` signature/hero assets`,
+  `\`${browseableSignatureHeroAssets}\` signature/hero assets`,
   `\`${quality.summary.workflowPacks}\` workflow packs`,
   `\`${templates.length}\` workflow templates`,
   `\`${styleProfileCount}\`: consulting, publication-line, minimal-flat, dark-talk, risk-warning, realism`,
@@ -148,8 +153,11 @@ assertGate(trackedGenerated.length === 0, `Generated local artifacts are tracked
 const cwd = process.cwd();
 const summary = {
   repo: relative(cwd, cwd) || ".",
+  browseableAssets: browseableAssets.length,
   totalAssets: quality.summary.totalAssets,
-  signatureHeroAssets,
+  realisticAssets: realisticAssets.length,
+  signatureHeroAssets: browseableSignatureHeroAssets,
+  curatedSignatureHeroAssets: signatureHeroAssets,
   workflowPacks: quality.summary.workflowPacks,
   templates: templates.length,
   styleProfiles: styleProfileCount,

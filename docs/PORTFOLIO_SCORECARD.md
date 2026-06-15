@@ -6,8 +6,9 @@ This scorecard is the public, reviewer-facing snapshot for the repository. It sh
 
 | Area | Current status |
 | --- | --- |
-| Curated assets | `466` total: `386` biology, `80` AI |
-| Premium assets | `401` signature/hero assets |
+| Browseable assets | `496` total: `466` curated structured assets, `30` realistic fixtures |
+| Curated structured assets | `466` total: `386` biology, `80` AI |
+| Premium assets | `429` signature/hero assets |
 | Workflow packs | `18` workflow packs |
 | Templates | `77` workflow templates |
 | Style profiles | `6`: consulting, publication-line, minimal-flat, dark-talk, risk-warning, realism |
