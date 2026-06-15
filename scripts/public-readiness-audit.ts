@@ -37,6 +37,7 @@ const requiredFiles = [
   "docs/examples/perturb-seq-workflow.svg",
   "docs/examples/spatial-results-panel.svg",
   "docs/examples/ai-biosecurity-pipeline.svg",
+  "docs/AGENT_QUICKSTART.md",
   "docs/REPOSITORY_INDEX.md",
   "docs/PORTFOLIO_SCORECARD.md",
   "docs/PUBLIC_RELEASE_CHECKLIST.md",
@@ -86,6 +87,7 @@ for (const token of [
   "30-Second Reviewer Path",
   "Why This Is Technically Interesting",
   "One canonical scene graph drives the web workspace, API, MCP tools, visual examples, and SVG/PDF/PPTX/DOCX exports.",
+  "docs/AGENT_QUICKSTART.md",
   "Portfolio Snapshot",
   "Repository Index",
   "Portfolio Scorecard",
@@ -110,6 +112,22 @@ for (const token of [
   assertTextIncludes(repositoryIndex, token, "Repository index");
 }
 
+const agentQuickstart = readFileSync("docs/AGENT_QUICKSTART.md", "utf8");
+for (const token of [
+  "Agent Quickstart",
+  "node packages/mcp/src/server.ts",
+  "get_asset_index",
+  "recommend_asset_set",
+  "create_workflow_figure",
+  "validate_deck",
+  "summarize_review_queue",
+  "export_deck",
+  "POST /projects/:id/workflow-figures",
+  "Do not use raw SVG as the editable source."
+]) {
+  assertTextIncludes(agentQuickstart, token, "Agent quickstart");
+}
+
 const currentMetricTokens = [
   `\`${browseableAssets.length}\` browseable assets in the local gallery: \`${quality.summary.totalAssets}\` curated structured assets plus \`${realisticAssets.length}\` realistic fixtures.`,
   `\`${browseableSignatureHeroAssets}\` signature/hero assets across \`${quality.summary.workflowPacks}\` workflow packs and \`${templates.length}\` templates.`,
@@ -127,6 +145,8 @@ for (const token of [
   `\`${quality.summary.workflowPacks}\` workflow packs`,
   `\`${templates.length}\` workflow templates`,
   `\`${styleProfileCount}\`: consulting, publication-line, minimal-flat, dark-talk, risk-warning, realism`,
+  "Copy-paste MCP/API path in `docs/AGENT_QUICKSTART.md`",
+  "Copy-pasteable agent quickstart that demonstrates compact indexing",
   "`3` generated SVG examples under `docs/examples/`",
   "Generated local artifacts are not tracked.",
   "Public SVG examples are generated from structured scene nodes",

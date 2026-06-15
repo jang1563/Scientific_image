@@ -10,7 +10,8 @@ This repository is a local-first scientific visual communication system. It is m
 4. Run `node scripts/public-readiness-audit.ts`.
 5. Start the static web workspace with `node scripts/serve-static.ts apps/web 4173`.
 6. Run the agent smoke with `node scripts/agent-acceptance-smoke.ts`.
-7. Inspect the core packages listed below.
+7. Follow the MCP/API sequence in `docs/AGENT_QUICKSTART.md`.
+8. Inspect the core packages listed below.
 
 ## What To Judge
 
@@ -43,6 +44,8 @@ This repository is a local-first scientific visual communication system. It is m
 - `packages/agent/`: Agent resources, onboarding manifests, cookbook examples, and compact workflow guidance.
 
 - `docs/examples/`: Small public SVG examples generated from structured scene nodes for README/reviewer preview.
+
+- `docs/AGENT_QUICKSTART.md`: Copy-pasteable MCP/API path for agents that need to create editable figures through compact indexes, workflow templates, review validation, and export QA.
 
 ## Tests And QA
 

@@ -30,7 +30,7 @@ The repo is intentionally usable with only Node 24 in this environment. The curr
 - Export-aware pipeline: SVG/PDF/PPTX/DOCX paths emit exact fallback and provenance warnings.
 - Verification target: `node --test tests/*.test.ts` and `node scripts/public-readiness-audit.ts`.
 
-For a reviewer-oriented Repository Index, see [docs/REPOSITORY_INDEX.md](docs/REPOSITORY_INDEX.md). For a metrics-based Portfolio Scorecard, see [docs/PORTFOLIO_SCORECARD.md](docs/PORTFOLIO_SCORECARD.md). For public release rules, see [docs/PUBLIC_RELEASE_CHECKLIST.md](docs/PUBLIC_RELEASE_CHECKLIST.md).
+For a reviewer-oriented Repository Index, see [docs/REPOSITORY_INDEX.md](docs/REPOSITORY_INDEX.md). For MCP/Codex/Claude usage, see [docs/AGENT_QUICKSTART.md](docs/AGENT_QUICKSTART.md). For a metrics-based Portfolio Scorecard, see [docs/PORTFOLIO_SCORECARD.md](docs/PORTFOLIO_SCORECARD.md). For public release rules, see [docs/PUBLIC_RELEASE_CHECKLIST.md](docs/PUBLIC_RELEASE_CHECKLIST.md).
 
 ## Visual Examples
 
@@ -128,6 +128,8 @@ Important MCP resources:
 - `scientific-image://agent/review-export-checklist`
 
 ## Agent Setup
+
+For a copy-pasteable MCP/API flow, start with [docs/AGENT_QUICKSTART.md](docs/AGENT_QUICKSTART.md).
 
 Claude Code, Codex, and other MCP clients should connect to the local stdio server:
 

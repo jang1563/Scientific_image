@@ -14,6 +14,7 @@ This scorecard is the public, reviewer-facing snapshot for the repository. It sh
 | Style profiles | `6`: consulting, publication-line, minimal-flat, dark-talk, risk-warning, realism |
 | Export surfaces | SVG, PDF, PPTX, DOCX |
 | Agent surfaces | Local API, MCP resources, MCP tools, compact asset index |
+| Agent quickstart | Copy-paste MCP/API path in `docs/AGENT_QUICKSTART.md` |
 | Public visual examples | `3` generated SVG examples under `docs/examples/` |
 | Canonical artifact | Structured scene JSON |
 
@@ -22,6 +23,7 @@ This scorecard is the public, reviewer-facing snapshot for the repository. It sh
 - Structured scene graph with validation, provenance, review state, deterministic edits, and export-aware rendering.
 - Premium scientific asset registry with workflow packs, semantic search, editable part metadata, and shared SVG rendering.
 - Agent-first interface for Codex, Claude, and other MCP clients to create editable scientific figures from asset IDs, templates, semantic slots, and style profiles.
+- Copy-pasteable agent quickstart that demonstrates compact indexing, workflow figure generation, review validation, and export QA.
 - Review and export QA that names exact fallback assets instead of hiding limitations behind screenshots.
 - Local-first architecture that keeps generated artifacts, private notes, and source documents out of git by default.
 - Public SVG examples are generated from structured scene nodes and checked for freshness in CI.
