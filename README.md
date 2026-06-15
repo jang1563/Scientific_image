@@ -17,6 +17,14 @@ The repo is intentionally usable with only Node 24 in this environment. The curr
 
 For a reviewer-oriented Repository Index, see [docs/REPOSITORY_INDEX.md](docs/REPOSITORY_INDEX.md). For a metrics-based Portfolio Scorecard, see [docs/PORTFOLIO_SCORECARD.md](docs/PORTFOLIO_SCORECARD.md). For public release rules, see [docs/PUBLIC_RELEASE_CHECKLIST.md](docs/PUBLIC_RELEASE_CHECKLIST.md).
 
+## Visual Examples
+
+These are synthetic public examples generated from structured scene nodes, not screenshots or private source material. Regenerate them with `node scripts/generate-public-examples.ts`.
+
+| Perturb-seq workflow | Spatial transcriptomics panel | AI biosecurity pipeline |
+| --- | --- | --- |
+| <img src="docs/examples/perturb-seq-workflow.svg" alt="Perturb-seq CRISPR workflow example" width="320"> | <img src="docs/examples/spatial-results-panel.svg" alt="Spatial transcriptomics results panel example" width="320"> | <img src="docs/examples/ai-biosecurity-pipeline.svg" alt="AI biosecurity evaluation pipeline example" width="320"> |
+
 ## What Is Included
 
 - Strict scene graph package with validation, provenance, claim status, and deterministic editing helpers.

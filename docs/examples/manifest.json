@@ -1,0 +1,24 @@
+{
+  "generatedBy": "scripts/generate-public-examples.ts",
+  "artifactType": "public synthetic portfolio examples",
+  "examples": [
+    {
+      "filename": "perturb-seq-workflow.svg",
+      "title": "Perturb-seq CRISPR Workflow",
+      "templateId": "perturb-seq-workflow",
+      "styleProfile": "consulting-2p5d"
+    },
+    {
+      "filename": "spatial-results-panel.svg",
+      "title": "Spatial Transcriptomics Results Panel",
+      "templateId": "spatial-results-panel",
+      "styleProfile": "consulting-2p5d"
+    },
+    {
+      "filename": "ai-biosecurity-pipeline.svg",
+      "title": "AI Biosecurity Evaluation Pipeline",
+      "templateId": "ai-biosecurity-pipeline",
+      "styleProfile": "risk-warning"
+    }
+  ]
+}

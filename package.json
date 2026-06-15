@@ -7,6 +7,7 @@
   "scripts": {
     "test": "node --test tests/*.test.ts",
     "agent:smoke": "node scripts/agent-acceptance-smoke.ts",
+    "examples:public": "node scripts/generate-public-examples.ts",
     "public:audit": "node scripts/public-readiness-audit.ts",
     "dev:web": "node scripts/serve-static.ts apps/web 4173",
     "dev:api": "node apps/api/src/server.ts",

@@ -30,5 +30,10 @@ jobs:
       - name: Public readiness audit
         run: node scripts/public-readiness-audit.ts
 
+      - name: Public example freshness
+        run: |
+          node scripts/generate-public-examples.ts
+          git diff --exit-code docs/examples
+
       - name: Test suite
         run: node --test tests/*.test.ts

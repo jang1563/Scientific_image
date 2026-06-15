@@ -33,6 +33,10 @@ const requiredFiles = [
   "README.md",
   "LICENSE",
   ".github/workflows/ci.yml",
+  "docs/examples/manifest.json",
+  "docs/examples/perturb-seq-workflow.svg",
+  "docs/examples/spatial-results-panel.svg",
+  "docs/examples/ai-biosecurity-pipeline.svg",
   "docs/REPOSITORY_INDEX.md",
   "docs/PORTFOLIO_SCORECARD.md",
   "docs/PUBLIC_RELEASE_CHECKLIST.md",
@@ -43,6 +47,7 @@ const requiredFiles = [
   "packages/assets/src/index.ts",
   "packages/scene/src/index.ts",
   "packages/export/src/index.ts",
+  "scripts/generate-public-examples.ts",
   "tests/assets.test.ts",
   "tests/api-mcp.test.ts",
   "tests/export.test.ts"
@@ -81,6 +86,8 @@ for (const token of [
   "Portfolio Snapshot",
   "Repository Index",
   "Portfolio Scorecard",
+  "Visual Examples",
+  "scripts/generate-public-examples.ts",
   "public-readiness-audit",
   "actions/workflows/ci.yml",
   "License And Reuse",
@@ -107,7 +114,9 @@ for (const token of [
   `\`${quality.summary.workflowPacks}\` workflow packs`,
   `\`${templates.length}\` workflow templates`,
   `\`${styleProfileCount}\`: consulting, publication-line, minimal-flat, dark-talk, risk-warning, realism`,
+  "`3` generated SVG examples under `docs/examples/`",
   "Generated local artifacts are not tracked.",
+  "Public SVG examples are generated from structured scene nodes",
   "obvious credentials, local paths, private notes, or planning transcripts"
 ]) {
   assertTextIncludes(scorecard, token, "Portfolio scorecard");
@@ -127,9 +136,22 @@ for (const token of [
   "node-version: \"24\"",
   "node --check apps/web/src/app.js",
   "node scripts/public-readiness-audit.ts",
+  "node scripts/generate-public-examples.ts",
+  "git diff --exit-code docs/examples",
   "node --test tests/*.test.ts"
 ]) {
   assertTextIncludes(ciWorkflow, token, "GitHub Actions workflow");
+}
+
+const exampleManifest = JSON.parse(readFileSync("docs/examples/manifest.json", "utf8")) as {
+  generatedBy?: string;
+  examples?: Array<{ filename?: string; templateId?: string; styleProfile?: string }>;
+};
+assertGate(exampleManifest.generatedBy === "scripts/generate-public-examples.ts", "Public example manifest has an unexpected generator.");
+for (const filename of ["perturb-seq-workflow.svg", "spatial-results-panel.svg", "ai-biosecurity-pipeline.svg"]) {
+  assertGate(exampleManifest.examples?.some((example) => example.filename === filename) ?? false, `Public example manifest is missing ${filename}.`);
+  const svg = readFileSync(`docs/examples/${filename}`, "utf8");
+  assertGate(svg.includes("<svg") && svg.includes("node_public_001"), `Public SVG example is not normalized or renderable: ${filename}`);
 }
 
 for (const pack of [

@@ -14,6 +14,7 @@ This scorecard is the public, reviewer-facing snapshot for the repository. It sh
 | Style profiles | `6`: consulting, publication-line, minimal-flat, dark-talk, risk-warning, realism |
 | Export surfaces | SVG, PDF, PPTX, DOCX |
 | Agent surfaces | Local API, MCP resources, MCP tools, compact asset index |
+| Public visual examples | `3` generated SVG examples under `docs/examples/` |
 | Canonical artifact | Structured scene JSON |
 
 ## Portfolio Signals
@@ -23,6 +24,7 @@ This scorecard is the public, reviewer-facing snapshot for the repository. It sh
 - Agent-first interface for Codex, Claude, and other MCP clients to create editable scientific figures from asset IDs, templates, semantic slots, and style profiles.
 - Review and export QA that names exact fallback assets instead of hiding limitations behind screenshots.
 - Local-first architecture that keeps generated artifacts, private notes, and source documents out of git by default.
+- Public SVG examples are generated from structured scene nodes and checked for freshness in CI.
 
 ## Public Quality Gate
 
