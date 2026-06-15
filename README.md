@@ -13,7 +13,7 @@ The repo is intentionally usable with only Node 24 in this environment. The curr
 - Export-aware pipeline: SVG/PDF/PPTX/DOCX paths emit exact fallback and provenance warnings.
 - Verification target: `node --test tests/*.test.ts` and `node scripts/public-readiness-audit.ts`.
 
-For a reviewer-oriented Repository Index, see [docs/REPOSITORY_INDEX.md](docs/REPOSITORY_INDEX.md). For public release rules, see [docs/PUBLIC_RELEASE_CHECKLIST.md](docs/PUBLIC_RELEASE_CHECKLIST.md).
+For a reviewer-oriented Repository Index, see [docs/REPOSITORY_INDEX.md](docs/REPOSITORY_INDEX.md). For a metrics-based Portfolio Scorecard, see [docs/PORTFOLIO_SCORECARD.md](docs/PORTFOLIO_SCORECARD.md). For public release rules, see [docs/PUBLIC_RELEASE_CHECKLIST.md](docs/PUBLIC_RELEASE_CHECKLIST.md).
 
 ## What Is Included
 

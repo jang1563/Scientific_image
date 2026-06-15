@@ -32,6 +32,7 @@ function trackedFiles(): string[] {
 const requiredFiles = [
   "README.md",
   "docs/REPOSITORY_INDEX.md",
+  "docs/PORTFOLIO_SCORECARD.md",
   "docs/PUBLIC_RELEASE_CHECKLIST.md",
   "package.json",
   "apps/web/index.html",
@@ -53,23 +54,54 @@ const quality = getAssetQualityReport();
 const packs = listWorkflowPacks();
 const templates = listWorkflowTemplates();
 const audit = getCommercialVisualAudit({ limit: 20 });
+const signatureHeroAssets = quality.summary.signatureAssets + quality.summary.heroAssets;
+const styleProfileCount = quality.summary.styleProfiles.length;
 
 assertGate(quality.summary.totalAssets >= 450, `Expected at least 450 assets, found ${quality.summary.totalAssets}.`);
 assertGate(quality.summary.workflowPacks >= 18, `Expected at least 18 workflow packs, found ${quality.summary.workflowPacks}.`);
 assertGate(templates.length >= 70, `Expected at least 70 templates, found ${templates.length}.`);
-assertGate(quality.summary.signatureAssets + quality.summary.heroAssets >= 380, "Expected at least 380 signature/hero assets.");
+assertGate(signatureHeroAssets >= 380, "Expected at least 380 signature/hero assets.");
 assertGate(audit.summary.factoryTemplateRisks <= 7, `Factory template risk budget exceeded: ${audit.summary.factoryTemplateRisks}.`);
 warnGate(audit.summary.highRiskPremiumAssets <= 20, `High-risk premium asset count is above current budget: ${audit.summary.highRiskPremiumAssets}.`);
 
 const readme = readFileSync("README.md", "utf8");
+const scorecard = readFileSync("docs/PORTFOLIO_SCORECARD.md", "utf8");
+
+function assertTextIncludes(text: string, token: string, label: string): void {
+  assertGate(text.includes(token), `${label} is missing current computed signal: ${token}`);
+}
+
 for (const token of [
   "Portfolio Snapshot",
   "Repository Index",
+  "Portfolio Scorecard",
   "public-readiness-audit",
   "MCP",
   "Local-first"
 ]) {
   assertGate(readme.includes(token), `README is missing reviewer signal: ${token}`);
+}
+
+const currentMetricTokens = [
+  `\`${quality.summary.totalAssets}\` curated visual assets: \`${quality.summary.biologyAssets}\` biology and \`${quality.summary.aiAssets}\` AI assets.`,
+  `\`${signatureHeroAssets}\` signature/hero assets across \`${quality.summary.workflowPacks}\` workflow packs and \`${templates.length}\` templates.`,
+  `The curated registry contains \`${quality.summary.totalAssets}\` structured visual assets:`
+];
+
+for (const token of currentMetricTokens) {
+  assertTextIncludes(readme, token, "README");
+}
+
+for (const token of [
+  `\`${quality.summary.totalAssets}\` total: \`${quality.summary.biologyAssets}\` biology, \`${quality.summary.aiAssets}\` AI`,
+  `\`${signatureHeroAssets}\` signature/hero assets`,
+  `\`${quality.summary.workflowPacks}\` workflow packs`,
+  `\`${templates.length}\` workflow templates`,
+  `\`${styleProfileCount}\`: consulting, publication-line, minimal-flat, dark-talk, risk-warning, realism`,
+  "Generated local artifacts are not tracked.",
+  "obvious credentials, local paths, private notes, or planning transcripts"
+]) {
+  assertTextIncludes(scorecard, token, "Portfolio scorecard");
 }
 
 for (const pack of [
@@ -117,9 +149,10 @@ const cwd = process.cwd();
 const summary = {
   repo: relative(cwd, cwd) || ".",
   totalAssets: quality.summary.totalAssets,
-  signatureHeroAssets: quality.summary.signatureAssets + quality.summary.heroAssets,
+  signatureHeroAssets,
   workflowPacks: quality.summary.workflowPacks,
   templates: templates.length,
+  styleProfiles: styleProfileCount,
   factoryTemplateRisks: audit.summary.factoryTemplateRisks,
   highRiskPremiumAssets: audit.summary.highRiskPremiumAssets,
   findings
