@@ -20,6 +20,7 @@ No package install is required in the intended Node 24 environment. Run the veri
 
 ```bash
 node --test tests/*.test.ts
+node scripts/portfolio-metrics.ts
 node scripts/public-readiness-audit.ts
 node scripts/agent-acceptance-smoke.ts
 ```
@@ -47,6 +48,7 @@ Open one of the editable public demos:
 
 - `496` browseable assets in the local gallery: `466` curated structured assets plus `30` realistic fixtures.
 - `429` signature/hero assets across `18` workflow packs and `77` templates.
+- Metrics are recomputed from code with `node scripts/portfolio-metrics.ts`.
 - Local-first web workspace, API, and MCP server share the same scene graph.
 - Agent-ready contract: agents use `workflowPack`, `templateId`, `assetId`, `styleProfile`, semantic slots, and editable appearance overrides instead of raw screenshots.
 - Export-aware pipeline: SVG/PDF/PPTX/DOCX paths emit exact fallback and provenance warnings.

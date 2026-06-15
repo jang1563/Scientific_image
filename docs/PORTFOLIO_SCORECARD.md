@@ -17,6 +17,7 @@ This scorecard is the public, reviewer-facing snapshot for the repository. It sh
 | Agent quickstart | Copy-paste MCP/API path in `docs/AGENT_QUICKSTART.md` |
 | Public visual examples | `3` generated SVG examples under `docs/examples/` |
 | Canonical artifact | Structured scene JSON |
+| Metrics freshness | Recompute with `node scripts/portfolio-metrics.ts`; enforced by `node scripts/public-readiness-audit.ts` |
 
 ## Portfolio Signals
 
@@ -34,6 +35,7 @@ Run this before sharing the repository:
 
 ```bash
 node --test tests/*.test.ts
+node scripts/portfolio-metrics.ts
 node scripts/public-readiness-audit.ts
 ```
 
@@ -41,6 +43,7 @@ The public readiness audit currently enforces:
 
 - Required reviewer-facing files exist.
 - Asset, workflow-pack, template, and premium coverage stay above the portfolio baseline.
+- `scripts/portfolio-metrics.ts` returns the same computed metrics used in README and this scorecard.
 - README and this scorecard match computed registry metrics.
 - Generated local artifacts are not tracked.
 - Tracked files do not contain obvious credentials, local paths, private notes, or planning transcripts.

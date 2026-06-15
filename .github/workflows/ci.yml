@@ -25,7 +25,11 @@ jobs:
         run: |
           node --check apps/web/src/app.js
           node --check scripts/serve-static.ts
+          node --check scripts/portfolio-metrics.ts
           node --check scripts/public-readiness-audit.ts
+
+      - name: Portfolio metrics
+        run: node scripts/portfolio-metrics.ts
 
       - name: Public readiness audit
         run: node scripts/public-readiness-audit.ts

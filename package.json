@@ -6,6 +6,7 @@
   "description": "Local-first scientific visual communication editor with a structured scene graph, exports, API, and MCP surface.",
   "scripts": {
     "test": "node --test tests/*.test.ts",
+    "metrics": "node scripts/portfolio-metrics.ts",
     "agent:smoke": "node scripts/agent-acceptance-smoke.ts",
     "examples:public": "node scripts/generate-public-examples.ts",
     "public:audit": "node scripts/public-readiness-audit.ts",

@@ -50,6 +50,7 @@ const requiredFiles = [
   "packages/assets/src/index.ts",
   "packages/scene/src/index.ts",
   "packages/export/src/index.ts",
+  "scripts/portfolio-metrics.ts",
   "scripts/generate-public-examples.ts",
   "tests/assets.test.ts",
   "tests/api-mcp.test.ts",
@@ -80,6 +81,10 @@ warnGate(audit.summary.highRiskPremiumAssets <= 20, `High-risk premium asset cou
 
 const readme = readFileSync("README.md", "utf8");
 const scorecard = readFileSync("docs/PORTFOLIO_SCORECARD.md", "utf8");
+const exampleManifest = JSON.parse(readFileSync("docs/examples/manifest.json", "utf8")) as {
+  generatedBy?: string;
+  examples?: Array<{ filename?: string; templateId?: string; styleProfile?: string }>;
+};
 
 function assertTextIncludes(text: string, token: string, label: string): void {
   assertGate(text.includes(token), `${label} is missing current computed signal: ${token}`);
@@ -89,10 +94,12 @@ for (const token of [
   "30-Second Reviewer Path",
   "Copy-Paste Reviewer Commands",
   "No package install is required",
+  "node scripts/portfolio-metrics.ts",
   "Why This Is Technically Interesting",
   "One canonical scene graph drives the web workspace, API, MCP tools, visual examples, and SVG/PDF/PPTX/DOCX exports.",
   "docs/AGENT_QUICKSTART.md",
   "Portfolio Snapshot",
+  "Metrics are recomputed from code with `node scripts/portfolio-metrics.ts`.",
   "Repository Index",
   "Reviewer Evidence Map",
   "Portfolio Scorecard",
@@ -210,12 +217,51 @@ for (const token of [
   "Copy-paste MCP/API path in `docs/AGENT_QUICKSTART.md`",
   "Copy-pasteable agent quickstart that demonstrates compact indexing",
   "`3` generated SVG examples under `docs/examples/`",
+  "Metrics freshness",
+  "Recompute with `node scripts/portfolio-metrics.ts`; enforced by `node scripts/public-readiness-audit.ts`",
+  "`scripts/portfolio-metrics.ts` returns the same computed metrics used in README and this scorecard.",
   "Generated local artifacts are not tracked.",
   "Public SVG examples are generated from structured scene nodes",
   "obvious credentials, local paths, private notes, or planning transcripts"
 ]) {
   assertTextIncludes(scorecard, token, "Portfolio scorecard");
 }
+
+const portfolioMetrics = JSON.parse(execFileSync("node", ["scripts/portfolio-metrics.ts"], { encoding: "utf8" })) as {
+  generatedBy?: string;
+  browseableAssets?: number;
+  curatedStructuredAssets?: number;
+  realisticFixtures?: number;
+  biologyAssets?: number;
+  aiAssets?: number;
+  browseableSignatureHeroAssets?: number;
+  curatedSignatureHeroAssets?: number;
+  workflowPacks?: number;
+  listedWorkflowPacks?: number;
+  workflowTemplates?: number;
+  styleProfileCount?: number;
+  publicExamples?: number;
+  qualityBudgets?: {
+    factoryTemplateRisks?: number;
+    highRiskPremiumAssets?: number;
+  };
+};
+
+assertGate(portfolioMetrics.generatedBy === "scripts/portfolio-metrics.ts", "Portfolio metrics script has an unexpected generator marker.");
+assertGate(portfolioMetrics.browseableAssets === browseableAssets.length, "Portfolio metrics browseable asset count is stale.");
+assertGate(portfolioMetrics.curatedStructuredAssets === quality.summary.totalAssets, "Portfolio metrics curated asset count is stale.");
+assertGate(portfolioMetrics.realisticFixtures === realisticAssets.length, "Portfolio metrics realistic fixture count is stale.");
+assertGate(portfolioMetrics.biologyAssets === quality.summary.biologyAssets, "Portfolio metrics biology count is stale.");
+assertGate(portfolioMetrics.aiAssets === quality.summary.aiAssets, "Portfolio metrics AI count is stale.");
+assertGate(portfolioMetrics.browseableSignatureHeroAssets === browseableSignatureHeroAssets, "Portfolio metrics browseable signature/hero count is stale.");
+assertGate(portfolioMetrics.curatedSignatureHeroAssets === signatureHeroAssets, "Portfolio metrics curated signature/hero count is stale.");
+assertGate(portfolioMetrics.workflowPacks === quality.summary.workflowPacks, "Portfolio metrics workflow pack count is stale.");
+assertGate(portfolioMetrics.listedWorkflowPacks === packs.length, "Portfolio metrics listed workflow pack count is stale.");
+assertGate(portfolioMetrics.workflowTemplates === templates.length, "Portfolio metrics template count is stale.");
+assertGate(portfolioMetrics.styleProfileCount === styleProfileCount, "Portfolio metrics style profile count is stale.");
+assertGate(portfolioMetrics.publicExamples === exampleManifest.examples?.length, "Portfolio metrics public example count is stale.");
+assertGate(portfolioMetrics.qualityBudgets?.factoryTemplateRisks === audit.summary.factoryTemplateRisks, "Portfolio metrics factory template risk count is stale.");
+assertGate(portfolioMetrics.qualityBudgets?.highRiskPremiumAssets === audit.summary.highRiskPremiumAssets, "Portfolio metrics high-risk premium asset count is stale.");
 
 const license = readFileSync("LICENSE", "utf8");
 for (const token of [
@@ -230,6 +276,8 @@ const ciWorkflow = readFileSync(".github/workflows/ci.yml", "utf8");
 for (const token of [
   "node-version: \"24\"",
   "node --check apps/web/src/app.js",
+  "node --check scripts/portfolio-metrics.ts",
+  "node scripts/portfolio-metrics.ts",
   "node scripts/public-readiness-audit.ts",
   "node scripts/generate-public-examples.ts",
   "git diff --exit-code docs/examples",
@@ -238,10 +286,6 @@ for (const token of [
   assertTextIncludes(ciWorkflow, token, "GitHub Actions workflow");
 }
 
-const exampleManifest = JSON.parse(readFileSync("docs/examples/manifest.json", "utf8")) as {
-  generatedBy?: string;
-  examples?: Array<{ filename?: string; templateId?: string; styleProfile?: string }>;
-};
 assertGate(exampleManifest.generatedBy === "scripts/generate-public-examples.ts", "Public example manifest has an unexpected generator.");
 for (const filename of ["perturb-seq-workflow.svg", "spatial-results-panel.svg", "ai-biosecurity-pipeline.svg"]) {
   assertGate(exampleManifest.examples?.some((example) => example.filename === filename) ?? false, `Public example manifest is missing ${filename}.`);
