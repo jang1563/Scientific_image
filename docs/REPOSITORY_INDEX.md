@@ -4,13 +4,21 @@ This repository is a local-first scientific visual communication system. It is m
 
 ## Reviewer Fast Path
 
-1. Read the product summary in `README.md`.
-2. Run `node --test tests/*.test.ts`.
-3. Run `node scripts/public-readiness-audit.ts`.
-4. Inspect the core packages listed below.
+1. Inspect generated public examples in `docs/examples/`.
+2. Read the `30-Second Reviewer Path` and `Why This Is Technically Interesting` sections in `README.md`.
+3. Run `node --test tests/*.test.ts`.
+4. Run `node scripts/public-readiness-audit.ts`.
 5. Start the static web workspace with `node scripts/serve-static.ts apps/web 4173`.
 6. Run the agent smoke with `node scripts/agent-acceptance-smoke.ts`.
-7. Inspect generated public examples in `docs/examples/`.
+7. Inspect the core packages listed below.
+
+## What To Judge
+
+- Is the source of truth structured scene JSON rather than opaque screenshots?
+- Can a human edit the same objects that an agent creates through MCP/API tools?
+- Do assets have semantic metadata, provenance, style profiles, and editable part contracts?
+- Do exports report exact PPTX/DOCX fidelity fallbacks instead of pretending everything is natively editable?
+- Do tests and the public readiness audit keep the portfolio claims reproducible?
 
 ## Product Surface
 

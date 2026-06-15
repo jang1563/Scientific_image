@@ -83,6 +83,9 @@ function assertTextIncludes(text: string, token: string, label: string): void {
 }
 
 for (const token of [
+  "30-Second Reviewer Path",
+  "Why This Is Technically Interesting",
+  "One canonical scene graph drives the web workspace, API, MCP tools, visual examples, and SVG/PDF/PPTX/DOCX exports.",
   "Portfolio Snapshot",
   "Repository Index",
   "Portfolio Scorecard",
@@ -95,6 +98,16 @@ for (const token of [
   "Local-first"
 ]) {
   assertGate(readme.includes(token), `README is missing reviewer signal: ${token}`);
+}
+
+const repositoryIndex = readFileSync("docs/REPOSITORY_INDEX.md", "utf8");
+for (const token of [
+  "Reviewer Fast Path",
+  "What To Judge",
+  "Can a human edit the same objects that an agent creates through MCP/API tools?",
+  "Do exports report exact PPTX/DOCX fidelity fallbacks"
+]) {
+  assertTextIncludes(repositoryIndex, token, "Repository index");
 }
 
 const currentMetricTokens = [

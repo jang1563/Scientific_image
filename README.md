@@ -6,6 +6,21 @@ Local-first scientific visual communication MVP: a structured SVG-first editor f
 
 The repo is intentionally usable with only Node 24 in this environment. The current MVP core runs without installing packages and keeps structured scene JSON as the canonical artifact.
 
+## 30-Second Reviewer Path
+
+1. Look at the generated SVG examples below; they are produced from editable scene nodes, not screenshots.
+2. Skim the portfolio metrics and the [Repository Index](docs/REPOSITORY_INDEX.md).
+3. Run `node --test tests/*.test.ts` and `node scripts/public-readiness-audit.ts`.
+4. Start the local workspace with `node scripts/serve-static.ts apps/web 4173`.
+5. Inspect the agent path with `node scripts/agent-acceptance-smoke.ts`.
+
+## Why This Is Technically Interesting
+
+- One canonical scene graph drives the web workspace, API, MCP tools, visual examples, and SVG/PDF/PPTX/DOCX exports.
+- Assets are addressable by `assetId`, `workflowPack`, semantic slot, style profile, and editable part metadata, so agents can create diagrams without emitting raw SVG.
+- Export QA names exact fallback assets and unresolved review items instead of hiding fidelity loss behind screenshots.
+- The public examples are regenerated deterministically in CI, keeping README visuals tied to real code.
+
 ## Portfolio Snapshot
 
 - `496` browseable assets in the local gallery: `466` curated structured assets plus `30` realistic fixtures.
