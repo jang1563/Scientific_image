@@ -39,6 +39,7 @@ const requiredFiles = [
   "docs/examples/ai-biosecurity-pipeline.svg",
   "docs/AGENT_QUICKSTART.md",
   "docs/REPOSITORY_INDEX.md",
+  "docs/REVIEWER_EVIDENCE_MAP.md",
   "docs/PORTFOLIO_SCORECARD.md",
   "docs/PUBLIC_RELEASE_CHECKLIST.md",
   "package.json",
@@ -90,6 +91,7 @@ for (const token of [
   "docs/AGENT_QUICKSTART.md",
   "Portfolio Snapshot",
   "Repository Index",
+  "Reviewer Evidence Map",
   "Portfolio Scorecard",
   "Visual Examples",
   "Public demos",
@@ -109,11 +111,25 @@ const repositoryIndex = readFileSync("docs/REPOSITORY_INDEX.md", "utf8");
 for (const token of [
   "Reviewer Fast Path",
   "What To Judge",
+  "docs/REVIEWER_EVIDENCE_MAP.md",
   "public demo launching",
   "Can a human edit the same objects that an agent creates through MCP/API tools?",
   "Do exports report exact PPTX/DOCX fidelity fallbacks"
 ]) {
   assertTextIncludes(repositoryIndex, token, "Repository index");
+}
+
+const reviewerEvidenceMap = readFileSync("docs/REVIEWER_EVIDENCE_MAP.md", "utf8");
+for (const token of [
+  "Evidence To Inspect",
+  "Reviewer question",
+  "node scripts/serve-static.ts apps/web 4173",
+  "?demo=perturb-seq-workflow",
+  "node scripts/agent-acceptance-smoke.ts",
+  "node scripts/public-readiness-audit.ts",
+  "No private source material is required"
+]) {
+  assertTextIncludes(reviewerEvidenceMap, token, "Reviewer evidence map");
 }
 
 const webIndex = readFileSync("apps/web/index.html", "utf8");
