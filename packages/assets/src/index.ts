@@ -8155,9 +8155,9 @@ function createProteinEngineeringFlagshipTemplateNodes(template: WorkflowTemplat
       fontWeight: 900,
       color: theme.heading
     }),
-    figureText("Editable pack connects design model, variant library, assay evidence, purification, and readiness review.", createTransform(x + 650, y - 34, width - 650, 44), {
-      fontSize: 11.2,
-      fontWeight: 650,
+    figureText("Variant library design, structure rationale, assay evidence, purification, and developability review as editable evidence layers.", createTransform(x + 650, y - 34, width - 650, 44), {
+      fontSize: 11.1,
+      fontWeight: 700,
       color: theme.muted
     }),
     figureShape("round-rect", "", createTransform(x + 4, y + 12, 214, 28), {
@@ -8171,93 +8171,27 @@ function createProteinEngineeringFlagshipTemplateNodes(template: WorkflowTemplat
       fontWeight: 850,
       color: theme.accent
     }),
-    figureShape("round-rect", "", createTransform(x + 232, y + 12, 236, 28), {
+    figureShape("round-rect", "", createTransform(x + 232, y + 12, 344, 28), {
       fill: theme.chipAltFill,
       stroke: theme.isLine ? "#111827" : theme.isDark ? "#334155" : "#bbf7d0",
       strokeWidth: 1,
       depth: "surface"
     }),
-    figureText("agent-ready editable workflow", createTransform(x + 248, y + 17, 204, 18), {
+    figureText("editable brief: design / screen / developability", createTransform(x + 248, y + 17, 306, 18), {
       fontSize: 10.5,
       fontWeight: 850,
       color: theme.accent2
     })
   ];
 
-  const stageY = y + 64;
-  const stageH = 164;
-  const stageW = Math.round((width - 64) / 5);
-  const stages = [
-    { assetId: "protein-design-model", label: "Design", kind: "model", note: "structure prior", accent: theme.accent },
-    { assetId: "protein-variant-library", label: "Library", kind: "variants", note: "mutation space", accent: theme.accent },
-    { assetId: "binding-affinity-assay", label: "Screen", kind: "assay", note: "KD / kinetics", accent: theme.accent2 },
-    { assetId: "affinity-maturation", label: "Optimize", kind: "selection", note: "affinity gain", accent: theme.accent2 },
-    { assetId: "developability-profile", label: "Readiness", kind: "review", note: "risk profile", accent: theme.isLine ? "#111827" : theme.isDark ? "#fdba74" : "#d97706" }
-  ];
-  stages.forEach((stage, index) => {
-    const sx = x + index * (stageW + 16);
-    const warningStage = index === stages.length - 1;
-    nodes.push(figureShape("round-rect", "", createTransform(sx, stageY, stageW, stageH), {
-      fill: warningStage ? theme.warningFill : index % 2 ? theme.panelAltFill : theme.panelFill,
-      stroke: warningStage ? theme.warningStroke : theme.panelStroke,
-      strokeWidth: 1.25,
-      depth: warningStage ? theme.floatingDepth : theme.panelDepth
-    }));
-    nodes.push(figureShape("round-rect", "", createTransform(sx + 12, stageY + 12, 36, 20), {
-      fill: theme.isDark ? "#0f172a" : "#ffffff",
-      stroke: warningStage ? theme.warningStroke : theme.panelStroke,
-      strokeWidth: 1,
-      depth: "surface"
-    }));
-    nodes.push(figureText(`0${index + 1}`, createTransform(sx + 21, stageY + 16, 18, 12), {
-      fontSize: 8.8,
-      fontWeight: 950,
-      color: warningStage ? theme.warningText : stage.accent
-    }));
-    nodes.push(figureShape("round-rect", "", createTransform(sx + stageW - 80, stageY + 12, 66, 20), {
-      fill: warningStage ? theme.warningFill : theme.chipFill,
-      stroke: warningStage ? theme.warningStroke : theme.chipStroke,
-      strokeWidth: 1,
-      depth: "surface"
-    }));
-    nodes.push(figureText(stage.kind, createTransform(sx + stageW - 68, stageY + 16, 46, 12), {
-      fontSize: 8,
-      fontWeight: 850,
-      color: warningStage ? theme.warningText : stage.accent
-    }));
-    nodes.push(symbol(stage.assetId, stage.label, sx + Math.round((stageW - 112) / 2), stageY + 34, 112, 86, `${template.id}:stage-${index + 1}`, { accent: stage.accent, stroke: stage.accent, labelVisible: false }));
-    nodes.push(figureText(stage.label, createTransform(sx + 14, stageY + 122, stageW - 28, 18), {
-      fontSize: 12,
-      fontWeight: 900,
-      color: warningStage ? theme.warningText : theme.text
-    }));
-    nodes.push(figureText(stage.note, createTransform(sx + 14, stageY + 142, stageW - 28, 16), {
-      fontSize: 9.2,
-      fontWeight: 720,
-      color: theme.muted
-    }));
-    if (index > 0) {
-      nodes.push(createConnectorNode([
-        { x: sx - 16, y: stageY + 82 },
-        { x: sx - 2, y: stageY + 82 }
-      ], "", { stroke: theme.connector, strokeWidth: 2.3 }));
-    }
-  });
-  nodes.push(figureShape("round-rect", "", createTransform(x + 4, stageY + stageH + 14, width - 8, 28), {
-    fill: theme.isDark ? "#0f172a" : "#f8fafc",
-    stroke: theme.panelStroke,
-    strokeWidth: 1,
-    depth: "surface"
-  }));
-  nodes.push(figureText("Decision spine: design hypothesis -> library diversity -> assay evidence -> optimized binder/enzyme -> developability review", createTransform(x + 24, stageY + stageH + 20, width - 48, 16), {
-    fontSize: 9.5,
-    fontWeight: 820,
-    color: theme.muted
-  }));
-
-  const lowerY = y + 280;
-  const gap = 22;
-  const panelW = Math.round((width - gap * 2) / 3);
+  const panelTop = y + 58;
+  const panelGap = 18;
+  const leftW = 370;
+  const centerW = 336;
+  const rightW = width - leftW - centerW - panelGap * 2;
+  const panelH = 210;
+  const bottomY = y + 294;
+  const bottomH = 184;
   const affinityTable = {
     id: createId("table"),
     name: "Illustrative affinity maturation",
@@ -8283,8 +8217,8 @@ function createProteinEngineeringFlagshipTemplateNodes(template: WorkflowTemplat
     ],
     source
   };
-  const addPanel = (tag: string, title: string, status: string, px: number, py: number, pw: number, fill = theme.panelFill, tone = theme.text) => {
-    nodes.push(figureShape("round-rect", "", createTransform(px, py, pw, 196), {
+  const addPanel = (tag: string, title: string, status: string, px: number, py: number, pw: number, ph: number, fill = theme.panelFill, tone = theme.text) => {
+    nodes.push(figureShape("round-rect", "", createTransform(px, py, pw, ph), {
       fill,
       stroke: status === "review" ? theme.warningStroke : theme.panelStroke,
       strokeWidth: 1.25,
@@ -8318,16 +8252,17 @@ function createProteinEngineeringFlagshipTemplateNodes(template: WorkflowTemplat
       color: status === "review" ? theme.warningText : tone
     }));
   };
-  addPanel("A", "Structure and pocket", "design", x, lowerY, panelW, theme.panelFill, theme.accent);
-  addPanel("B", "Assay evidence", "source", x + panelW + gap, lowerY, panelW, theme.panelAltFill, theme.accent2);
-  addPanel("C", "Readiness review", "review", x + (panelW + gap) * 2, lowerY, width - (panelW + gap) * 2, theme.warningFill, theme.warningText);
+  addPanel("A", "Library design and selection logic", "design", x, panelTop, leftW, panelH, theme.panelFill, theme.accent);
+  addPanel("B", "Screening evidence", "source", x + leftW + panelGap, panelTop, centerW, panelH, theme.panelAltFill, theme.accent2);
+  addPanel("C", "Developability gate", "review", x + leftW + centerW + panelGap * 2, panelTop, rightW, panelH, theme.warningFill, theme.warningText);
+  addPanel("D", "Structure and sequence rationale", "rationale", x, bottomY, Math.round(width * 0.62), bottomH, theme.panelFill, theme.accent);
+  addPanel("E", "Lead selection handoff", "review", x + Math.round(width * 0.62) + panelGap, bottomY, width - Math.round(width * 0.62) - panelGap, bottomH, theme.warningFill, theme.warningText);
   nodes.push(
-    symbol("protein-domain", "Domain", x + 26, lowerY + 54, 104, 82, `${template.id}:protein-domain`, { accent: theme.accent, stroke: theme.accent, labelVisible: false }),
-    symbol("binding-pocket", "Pocket", x + 130, lowerY + 54, 104, 82, `${template.id}:binding-pocket`, { accent: theme.accent, stroke: theme.accent, labelVisible: false }),
-    symbol("structure-prediction", "Structure confidence", x + 232, lowerY + 54, 104, 82, `${template.id}:structure-prediction`, { accent: theme.accent, stroke: theme.accent, labelVisible: false }),
-    figureText("Domain", createTransform(x + 48, lowerY + 134, 62, 14), { fontSize: 9.2, fontWeight: 850, color: theme.text }),
-    figureText("Pocket", createTransform(x + 154, lowerY + 134, 62, 14), { fontSize: 9.2, fontWeight: 850, color: theme.text }),
-    figureText("Model confidence remains reviewable.", createTransform(x + 24, lowerY + 154, panelW - 48, 24), { fontSize: 10, fontWeight: 720, color: theme.muted }),
+    symbol("protein-design-model", "Design model", x + 24, panelTop + 56, 76, 82, `${template.id}:design-model`, { accent: theme.accent, stroke: theme.accent, labelVisible: false }),
+    symbol("protein-variant-library", "Variant library", x + 108, panelTop + 56, 76, 82, `${template.id}:variant-library`, { accent: "#7c3aed", stroke: "#7c3aed", labelVisible: false }),
+    symbol("sequence-logo", "Sequence logo", x + 192, panelTop + 56, 76, 82, `${template.id}:sequence-logo`, { accent: "#2563eb", stroke: "#2563eb", labelVisible: false }),
+    symbol("directed-evolution", "Evolution", x + 276, panelTop + 56, 72, 82, `${template.id}:directed-evolution`, { accent: theme.accent2, stroke: theme.accent2, labelVisible: false }),
+    figureText("Mutation space, sequence constraints, and selection pressure stay independently editable.", createTransform(x + 24, panelTop + 154, leftW - 48, 30), { fontSize: 9.7, fontWeight: 720, color: theme.muted }),
     createPlotNode({
       id: createId("plot"),
       plotType: "line",
@@ -8335,10 +8270,10 @@ function createProteinEngineeringFlagshipTemplateNodes(template: WorkflowTemplat
       table: affinityTable,
       encodings: { x: "round", y: "affinity", color: "series" },
       style: theme.plotStyle
-    }, createTransform(x + panelW + gap + 24, lowerY + 54, 128, 88)),
-    symbol("binding-affinity-assay", "Affinity assay", x + panelW + gap + 168, lowerY + 50, 90, 82, `${template.id}:affinity-assay`, { accent: theme.accent2, stroke: theme.accent2, labelVisible: false }),
-    symbol("enzyme-kinetics", "Kinetics", x + panelW + gap + 258, lowerY + 50, 78, 82, `${template.id}:enzyme-kinetics`, { accent: theme.accent2, stroke: theme.accent2, labelVisible: false }),
-    figureText("KD/kinetics claims stay tied to source table.", createTransform(x + panelW + gap + 24, lowerY + 154, panelW - 48, 24), { fontSize: 10, fontWeight: 720, color: theme.muted }),
+    }, createTransform(x + leftW + panelGap + 24, panelTop + 58, 118, 82)),
+    symbol("binding-affinity-assay", "Affinity assay", x + leftW + panelGap + 158, panelTop + 56, 78, 82, `${template.id}:affinity-assay`, { accent: theme.accent2, stroke: theme.accent2, labelVisible: false }),
+    symbol("enzyme-kinetics", "Kinetics", x + leftW + panelGap + 242, panelTop + 56, 72, 82, `${template.id}:enzyme-kinetics`, { accent: theme.accent2, stroke: theme.accent2, labelVisible: false }),
+    figureText("KD, kinetics, and enrichment evidence remain tied to source tables.", createTransform(x + leftW + panelGap + 24, panelTop + 154, centerW - 48, 30), { fontSize: 9.7, fontWeight: 720, color: theme.muted }),
     createPlotNode({
       id: createId("plot"),
       plotType: "bar",
@@ -8346,16 +8281,26 @@ function createProteinEngineeringFlagshipTemplateNodes(template: WorkflowTemplat
       table: developabilityTable,
       encodings: { x: "axis", y: "score", color: "risk" },
       style: theme.plotStyle
-    }, createTransform(x + (panelW + gap) * 2 + 20, lowerY + 54, 146, 92)),
-    symbol("purification-column", "Purification", x + (panelW + gap) * 2 + 180, lowerY + 50, 74, 80, `${template.id}:purification`, { accent: theme.warningText, stroke: theme.warningText, labelVisible: false }),
-    symbol("developability-profile", "Developability", x + (panelW + gap) * 2 + 260, lowerY + 50, 74, 80, `${template.id}:developability`, { accent: theme.warningText, stroke: theme.warningText, labelVisible: false }),
-    figureShape("round-rect", "", createTransform(x + (panelW + gap) * 2 + 170, lowerY + 140, 154, 24), {
+    }, createTransform(x + leftW + centerW + panelGap * 2 + 24, panelTop + 58, 130, 82)),
+    symbol("purification-column", "Purification", x + leftW + centerW + panelGap * 2 + 170, panelTop + 56, 72, 82, `${template.id}:purification`, { accent: theme.warningText, stroke: theme.warningText, labelVisible: false }),
+    symbol("developability-profile", "Developability", x + leftW + centerW + panelGap * 2 + 248, panelTop + 56, 72, 82, `${template.id}:developability`, { accent: theme.warningText, stroke: theme.warningText, labelVisible: false }),
+    figureText("Expression, aggregation, purification, and liability scores are flagged for review.", createTransform(x + leftW + centerW + panelGap * 2 + 24, panelTop + 154, rightW - 48, 30), { fontSize: 9.5, fontWeight: 720, color: theme.muted }),
+    symbol("protein-domain", "Domain", x + 28, bottomY + 54, 88, 82, `${template.id}:protein-domain`, { accent: theme.accent, stroke: theme.accent, labelVisible: false }),
+    symbol("binding-pocket", "Pocket", x + 124, bottomY + 54, 88, 82, `${template.id}:binding-pocket`, { accent: theme.accent, stroke: theme.accent, labelVisible: false }),
+    symbol("structure-prediction", "Structure", x + 220, bottomY + 54, 88, 82, `${template.id}:structure-prediction`, { accent: "#2563eb", stroke: "#2563eb", labelVisible: false }),
+    symbol("affinity-maturation", "Maturation", x + 316, bottomY + 54, 88, 82, `${template.id}:affinity-maturation`, { accent: theme.accent2, stroke: theme.accent2, labelVisible: false }),
+    symbol("antibody-fragment", "Fragment", x + 424, bottomY + 54, 88, 82, `${template.id}:antibody-fragment`, { accent: "#0891b2", stroke: "#0891b2", labelVisible: false }),
+    figureText("Structure pocket, domain architecture, and maturation rationale stay separate from measured assay claims.", createTransform(x + 28, bottomY + 142, Math.round(width * 0.62) - 56, 26), { fontSize: 9.7, fontWeight: 720, color: theme.muted }),
+    symbol("stability-assay", "Stability", x + Math.round(width * 0.62) + panelGap + 28, bottomY + 54, 82, 78, `${template.id}:stability`, { accent: theme.warningText, stroke: theme.warningText, labelVisible: false }, theme.riskSymbolProfile),
+    symbol("expression-host", "Yield", x + Math.round(width * 0.62) + panelGap + 118, bottomY + 54, 82, 78, `${template.id}:expression-yield`, { accent: theme.warningText, stroke: theme.warningText, labelVisible: false }, theme.riskSymbolProfile),
+    symbol("protein-complex", "Liability", x + Math.round(width * 0.62) + panelGap + 208, bottomY + 54, 82, 78, `${template.id}:liability-map`, { accent: theme.warningText, stroke: theme.warningText, labelVisible: false }, theme.riskSymbolProfile),
+    figureShape("round-rect", "", createTransform(x + Math.round(width * 0.62) + panelGap + 78, bottomY + 140, 208, 24), {
       fill: theme.isDark ? "#111827" : "#ffffff",
       stroke: theme.warningStroke,
       strokeWidth: 1,
       depth: "surface"
     }),
-    figureText("review-before-export", createTransform(x + (panelW + gap) * 2 + 180, lowerY + 146, 134, 13), {
+    figureText("review-before-export", createTransform(x + Math.round(width * 0.62) + panelGap + 112, bottomY + 146, 136, 13), {
       fontSize: 9.2,
       fontWeight: 850,
       color: theme.warningText

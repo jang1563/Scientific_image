@@ -1883,16 +1883,17 @@ test("priority flagship templates generate commercial editable figure structures
   assert.ok(drug.every((node) => node.payload.workflowPack === "drug-discovery" && node.payload.templateId === "drug-discovery-funnel"));
 
   const protein = createWorkflowFigureNodes({ templateId: "protein-engineering-platform", styleProfile: "consulting-2p5d" });
-  assert.ok(protein.length >= 58);
+  assert.ok(protein.length >= 60);
   assert.ok(protein.some((node) => node.kind === "text" && node.payload.text?.includes("Protein engineering design-to-developability platform")));
-  assert.ok(protein.some((node) => node.kind === "text" && node.payload.text?.includes("Decision spine: design hypothesis")));
+  assert.ok(protein.some((node) => node.kind === "text" && node.payload.text?.includes("Mutation space, sequence constraints")));
   assert.ok(protein.some((node) => node.kind === "text" && node.payload.text === "review-before-export"));
   assert.ok(protein.some((node) => node.kind === "plot" && node.payload.spec.plotType === "line" && node.payload.spec.title === "Affinity gain"));
   assert.ok(protein.some((node) => node.kind === "plot" && node.payload.spec.plotType === "bar" && node.payload.spec.title === "Developability"));
-  for (const assetId of ["protein-design-model", "protein-variant-library", "binding-affinity-assay", "affinity-maturation", "developability-profile", "protein-domain", "binding-pocket", "purification-column"]) {
+  for (const assetId of ["protein-design-model", "protein-variant-library", "sequence-logo", "directed-evolution", "binding-affinity-assay", "affinity-maturation", "developability-profile", "protein-domain", "binding-pocket", "structure-prediction", "enzyme-kinetics", "purification-column", "stability-assay", "expression-host", "protein-complex"]) {
     assert.ok(protein.some((node) => node.kind === "symbol" && node.payload.assetId === assetId), `${assetId} should appear in protein-engineering flagship`);
   }
-  assert.ok(protein.some((node) => node.kind === "symbol" && node.payload.layoutHint?.startsWith("protein-engineering-platform:stage-")));
+  assert.ok(protein.some((node) => node.kind === "symbol" && node.payload.layoutHint === "protein-engineering-platform:variant-library"));
+  assert.ok(protein.every((node) => !String(node.payload.text ?? "").includes("Decision spine: design hypothesis")));
   assert.ok(protein.every((node) => node.payload.workflowPack === "protein-engineering" && node.payload.templateId === "protein-engineering-platform"));
 
   const synthetic = createWorkflowFigureNodes({ templateId: "synthetic-biology-platform", styleProfile: "consulting-2p5d" });
