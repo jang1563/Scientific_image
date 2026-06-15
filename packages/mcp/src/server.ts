@@ -11,7 +11,7 @@ import {
   type SceneOperation,
   type SourceDocumentKind
 } from "../../scene/src/index.ts";
-import { compactAssetSearchResults, compactAssetSetRecommendation, createAssetBrief, createCuratedSymbolNode, createFlagshipWorkflowDemoNodes, createRealisticImageNode, createWorkflowFigureNodes, createWorkflowTemplateSpec, getAnyAsset, getAssetCoverageGapReport, getAssetIndex, getAssetOntology, getAssetQualityReport, getRealisticAssetGallery, getWorkflowPackExportSnapshot, getWorkflowPackGallery, getWorkflowPackQuality, getWorkflowPackVisualQaGallery, getWorkflowTemplate, getWorkflowTemplateQa, listWorkflowPacks, listWorkflowTemplates, recommendAssetSet, recommendAssetsForSlide, recommendWorkflowPack, renderPremiumAssetSvg, searchAssets } from "../../assets/src/index.ts";
+import { compactAssetSearchResults, compactAssetSetRecommendation, createAssetBrief, createCuratedSymbolNode, createFlagshipWorkflowDemoNodes, createRealisticImageNode, createWorkflowFigureNodes, createWorkflowTemplateSpec, getAnyAsset, getAssetCoverageGapReport, getAssetIndex, getAssetOntology, getAssetQualityReport, getCommercialVisualAudit, getRealisticAssetGallery, getWorkflowPackExportSnapshot, getWorkflowPackGallery, getWorkflowPackQuality, getWorkflowPackVisualQaGallery, getWorkflowTemplate, getWorkflowTemplateQa, listWorkflowPacks, listWorkflowTemplates, recommendAssetSet, recommendAssetsForSlide, recommendWorkflowPack, renderPremiumAssetSvg, searchAssets } from "../../assets/src/index.ts";
 import { createPlotNode, createPlotSpec, parseDelimited } from "../../plotting/src/index.ts";
 import { exportProject } from "../../export/src/index.ts";
 import { getAgentManifest, listAgentResources, readAgentResource } from "../../agent/src/index.ts";
@@ -436,6 +436,16 @@ const tools = [
     }
   },
   {
+    name: "get_commercial_visual_audit",
+    description: "Return the stricter commercial visual audit that flags premium-label inflation, panel-heavy assets, and factory-like flagship templates.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        limit: { type: "number" }
+      }
+    }
+  },
+  {
     name: "get_asset_ontology",
     description: "Return agent-facing asset ontology with style profiles, quality tiers, workflow packs, semantic slots, and compact asset contracts.",
     inputSchema: {
@@ -841,6 +851,13 @@ async function callTool(name: string, args: Record<string, unknown>): Promise<un
   }
   if (name === "get_asset_quality_report") {
     return { report: getAssetQualityReport() };
+  }
+  if (name === "get_commercial_visual_audit") {
+    return {
+      audit: getCommercialVisualAudit({
+        limit: args.limit === undefined ? undefined : Number(args.limit)
+      })
+    };
   }
   if (name === "get_asset_ontology") {
     return {

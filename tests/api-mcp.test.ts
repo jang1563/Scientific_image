@@ -160,10 +160,18 @@ test("local API exposes premium asset search, render, and recommendations", asyn
     assert.equal(report.report.summary.totalAssets, 466);
     assert.ok(report.report.benchmarks.some((benchmark: { id: string }) => benchmark.id === "biorender"));
     assert.ok(report.report.priorityGaps.some((gap: string) => gap.includes("Office editability")));
+    assert.equal(report.report.commercialVisualAudit.policy.premiumLabelFreeze, true);
+    assert.ok(report.report.commercialVisualAudit.summary.highRiskPremiumAssets > 0);
+
+    const commercialAudit = await fetch(`${base}/assets/commercial-visual-audit?limit=12`).then((response) => response.json());
+    assert.equal(commercialAudit.audit.policy.premiumLabelFreeze, true);
+    assert.ok(commercialAudit.audit.assetRisks.length <= 12);
+    assert.ok(commercialAudit.audit.templateRisks.some((risk: { skeletonSignature: string }) => risk.skeletonSignature === "five-stage-decision-spine"));
 
     const coverage = await fetch(`${base}/assets/coverage-gap-report`).then((response) => response.json());
     assert.equal(coverage.report.baseline.totalAssets, 466);
     assert.equal(coverage.report.productWedge, "asset-breadth-library");
+    assert.equal(coverage.report.commercialVisualAudit.premiumLabelFreeze, true);
     assert.deepEqual(coverage.report.broadMarketPackOrder.slice(0, 3), ["drug-discovery", "protein-engineering", "synthetic-biology"]);
     assert.ok(coverage.report.milestones.some((milestone: { targetAssets: number }) => milestone.targetAssets === 1200));
     assert.ok(coverage.report.plannedWorkflowPacks.some((pack: { id: string }) => pack.id === "bio-llm-benchmarks"));
@@ -462,6 +470,7 @@ test("local API exposes agent manifest and onboarding resources", async () => {
     const manifest = await fetch(`${base}/agent/manifest`).then((response) => response.json());
     assert.equal(manifest.manifest.server.mcpName, "scientific-image-mcp");
     assert.ok(manifest.manifest.recommendedFirstCalls.some((call: { tool?: string }) => call.tool === "get_asset_index"));
+    assert.ok(manifest.manifest.recommendedFirstCalls.some((call: { uri?: string }) => call.uri === "scientific-image://agent/commercial-visual-audit"));
     assert.ok(manifest.manifest.recommendedFirstCalls.some((call: { uri?: string }) => call.uri === "scientific-image://agent/agent-cookbook"));
     assert.ok(manifest.manifest.recommendedFirstCalls.some((call: { uri?: string }) => call.uri === "scientific-image://agent/demo-perturb-seq-crispr"));
     assert.ok(manifest.manifest.agentFacets.workflowPacks.includes("ai-biosecurity-eval"));
@@ -476,6 +485,7 @@ test("local API exposes agent manifest and onboarding resources", async () => {
     assert.ok(resources.resources.some((resource: { uri: string }) => resource.uri === "scientific-image://agent/asset-ontology"));
     assert.ok(resources.resources.some((resource: { uri: string }) => resource.uri === "scientific-image://agent/asset-index-compact"));
     assert.ok(resources.resources.some((resource: { uri: string }) => resource.uri === "scientific-image://agent/coverage-roadmap"));
+    assert.ok(resources.resources.some((resource: { uri: string }) => resource.uri === "scientific-image://agent/commercial-visual-audit"));
 
     const quickstart = await fetch(`${base}/agent/resources/quickstart`).then((response) => response.text());
     assert.match(quickstart, /Default agent loop/);
@@ -506,6 +516,11 @@ test("local API exposes agent manifest and onboarding resources", async () => {
 
     const roadmap = await fetch(`${base}/agent/resources/coverage-roadmap`).then((response) => response.json());
     assert.ok(roadmap.milestones.some((milestone: { targetAssets: number }) => milestone.targetAssets === 1200));
+    assert.equal(roadmap.commercialVisualAudit.premiumLabelFreeze, true);
+
+    const visualAudit = await fetch(`${base}/agent/resources/commercial-visual-audit`).then((response) => response.json());
+    assert.equal(visualAudit.policy.premiumLabelFreeze, true);
+    assert.ok(visualAudit.summary.highRiskPremiumAssets > 0);
 
     const configs = await fetch(`${base}/agent/resources/client-configs`).then((response) => response.text());
     assert.match(configs, /Claude Code project/);
@@ -561,6 +576,7 @@ test("MCP exposes agent resources and manifest fallback tool", async () => {
   assert.ok(resourcePayload.resources.some((resource) => resource.uri === "scientific-image://agent/asset-ontology" && resource.mimeType === "application/json"));
   assert.ok(resourcePayload.resources.some((resource) => resource.uri === "scientific-image://agent/asset-index-compact" && resource.mimeType === "application/json"));
   assert.ok(resourcePayload.resources.some((resource) => resource.uri === "scientific-image://agent/coverage-roadmap" && resource.mimeType === "application/json"));
+  assert.ok(resourcePayload.resources.some((resource) => resource.uri === "scientific-image://agent/commercial-visual-audit" && resource.mimeType === "application/json"));
 
   const quickstart = await handleJsonRpc({
     jsonrpc: "2.0",
@@ -773,6 +789,17 @@ test("MCP tools expose premium asset search, preview, recommendation, and insert
   assert.equal(qualityPayload.report.summary.totalAssets, 466);
   assert.ok(qualityPayload.report.benchmarks.some((benchmark: { id: string }) => benchmark.id === "figma-components"));
   assert.ok(qualityPayload.report.workflowCoverage.some((pack: { id: string }) => pack.id === "publication-results-panels"));
+  assert.equal(qualityPayload.report.commercialVisualAudit.policy.premiumLabelFreeze, true);
+
+  const visualAudit = await handleJsonRpc({
+    jsonrpc: "2.0",
+    id: 25001,
+    method: "tools/call",
+    params: { name: "get_commercial_visual_audit", arguments: { limit: 10 } }
+  });
+  const visualAuditPayload = JSON.parse((visualAudit.result as { content: { text: string }[] }).content[0].text);
+  assert.equal(visualAuditPayload.audit.policy.premiumLabelFreeze, true);
+  assert.ok(visualAuditPayload.audit.assetRisks.length <= 10);
 
   const coverage = await handleJsonRpc({
     jsonrpc: "2.0",

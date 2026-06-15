@@ -278,8 +278,79 @@ export interface AssetQualityReport {
   }[];
   benchmarks: VisualBenchmark[];
   qualityRubric: string[];
+  commercialVisualAudit: CommercialVisualQualityAudit;
   priorityGaps: string[];
   recommendedNextPacks: string[];
+}
+
+export interface CommercialVisualAuditAssetRisk {
+  assetId: string;
+  name: string;
+  qualityTier: AssetQualityTier;
+  workflowPacks: string[];
+  rendererFamily: AssetFamily;
+  renderRecipe: string;
+  riskLevel: "low" | "medium" | "high";
+  riskReasons: string[];
+  recommendedTier: AssetQualityTier;
+  visualMetrics: {
+    svgBytes: number;
+    domainClassCount: number;
+    panelTokenCount: number;
+    rectCount: number;
+    pathCount: number;
+    circleCount: number;
+  };
+  nextAction: string;
+}
+
+export interface CommercialVisualAuditPackRisk {
+  packId: string;
+  name: string;
+  claimedPremiumAssets: number;
+  highRiskPremiumAssets: number;
+  mediumRiskPremiumAssets: number;
+  flagshipTemplateId?: string;
+  templateSkeleton: string;
+  skeletonRisk: "low" | "medium" | "high";
+  riskReasons: string[];
+  nextAction: string;
+}
+
+export interface CommercialVisualAuditTemplateRisk {
+  templateId: string;
+  workflowPack: string;
+  skeletonSignature: string;
+  nodeCount: number;
+  symbolCount: number;
+  connectorCount: number;
+  textCount: number;
+  riskLevel: "low" | "medium" | "high";
+  riskReasons: string[];
+  nextAction: string;
+}
+
+export interface CommercialVisualQualityAudit {
+  reviewedAt: string;
+  status: "commercial-baseline" | "needs-polish" | "blocked";
+  policy: {
+    premiumLabelFreeze: boolean;
+    rule: string;
+    recommendedPromotionGate: string[];
+  };
+  summary: {
+    claimedPremiumAssets: number;
+    highRiskPremiumAssets: number;
+    mediumRiskPremiumAssets: number;
+    factoryTemplateRisks: number;
+    packRisks: number;
+    nextAnchor: string;
+  };
+  assetRisks: CommercialVisualAuditAssetRisk[];
+  packRisks: CommercialVisualAuditPackRisk[];
+  templateRisks: CommercialVisualAuditTemplateRisk[];
+  gates: string[];
+  nextActions: string[];
 }
 
 export interface AssetCoverageMilestone {
@@ -333,6 +404,14 @@ export interface AssetCoverageGapReport {
     remainingTemplates: number;
   })[];
   currentWorkflowReadiness: AssetQualityReport["workflowCoverage"];
+  commercialVisualAudit: {
+    status: CommercialVisualQualityAudit["status"];
+    premiumLabelFreeze: boolean;
+    highRiskPremiumAssets: number;
+    mediumRiskPremiumAssets: number;
+    factoryTemplateRisks: number;
+    nextAnchor: string;
+  };
   categoryGaps: {
     category: string;
     currentAssets: number;
@@ -3129,6 +3208,7 @@ export function getAssetQualityReport(): AssetQualityReport {
     styleCoverage,
     benchmarks: VISUAL_BENCHMARKS.map((benchmark) => ({ ...benchmark })),
     qualityRubric: [...ASSET_QUALITY_RUBRIC],
+    commercialVisualAudit: getCommercialVisualAudit(),
     priorityGaps: buildPriorityGaps(workflowCoverage, styleCoverage),
     recommendedNextPacks: [
       "immunology-oncology",
@@ -3140,8 +3220,70 @@ export function getAssetQualityReport(): AssetQualityReport {
   };
 }
 
+export function getCommercialVisualAudit(input: { limit?: number } = {}): CommercialVisualQualityAudit {
+  const limit = Math.max(1, Math.min(200, input.limit ?? 48));
+  const premiumAssets = CURATED_ASSETS.filter((asset) => asset.qualityTier === "signature" || asset.qualityTier === "hero");
+  const assetRisks = premiumAssets
+    .map(auditPremiumAssetVisualRisk)
+    .filter((risk) => risk.riskReasons.length)
+    .sort((a, b) => riskRank(b.riskLevel) - riskRank(a.riskLevel) || b.riskReasons.length - a.riskReasons.length || a.assetId.localeCompare(b.assetId));
+  const templateRisks = PREMIUM_WORKFLOW_PACKS
+    .map((pack) => auditFlagshipTemplateSkeleton(pack))
+    .filter((risk) => risk.riskReasons.length)
+    .sort((a, b) => riskRank(b.riskLevel) - riskRank(a.riskLevel) || a.workflowPack.localeCompare(b.workflowPack));
+  const riskByAssetId = new Map(assetRisks.map((risk) => [risk.assetId, risk]));
+  const packRisks = PREMIUM_WORKFLOW_PACKS
+    .map((pack) => auditWorkflowPackVisualRisk(pack, riskByAssetId, templateRisks))
+    .filter((risk) => risk.riskReasons.length)
+    .sort((a, b) => riskRank(b.skeletonRisk) - riskRank(a.skeletonRisk) || b.highRiskPremiumAssets - a.highRiskPremiumAssets || a.packId.localeCompare(b.packId));
+  const highRiskPremiumAssets = assetRisks.filter((risk) => risk.riskLevel === "high").length;
+  const mediumRiskPremiumAssets = assetRisks.filter((risk) => risk.riskLevel === "medium").length;
+  const factoryTemplateRisks = templateRisks.filter((risk) => risk.riskLevel !== "low").length;
+  const status: CommercialVisualQualityAudit["status"] = highRiskPremiumAssets || factoryTemplateRisks ? "needs-polish" : "commercial-baseline";
+  return {
+    reviewedAt: ASSET_ROADMAP_REVIEWED_AT,
+    status,
+    policy: {
+      premiumLabelFreeze: true,
+      rule: "Do not promote more signature/hero assets until the touched pack has a 48px, 120px, and slide-size visual QA artifact plus a non-factory flagship layout.",
+      recommendedPromotionGate: [
+        "Distinct silhouette at 48px, not the same rounded card with a motif swap.",
+        "120px preview has domain-specific detail, rim/highlight/depth, and readable visual hierarchy.",
+        "Slide-size rendering supports a real figure, not only an icon grid.",
+        "Publication-line and dark-talk styles preserve meaning without decorative clutter.",
+        "PPTX/DOCX fallback warnings name exact asset IDs and recipes."
+      ]
+    },
+    summary: {
+      claimedPremiumAssets: premiumAssets.length,
+      highRiskPremiumAssets,
+      mediumRiskPremiumAssets,
+      factoryTemplateRisks,
+      packRisks: packRisks.length,
+      nextAnchor: packRisks[0]?.nextAction ?? "Run a manual visual QA pass on the next flagship template before adding new coverage."
+    },
+    assetRisks: assetRisks.slice(0, limit),
+    packRisks: packRisks.slice(0, limit),
+    templateRisks: templateRisks.slice(0, limit),
+    gates: [
+      "Premium labels are frozen until visual QA evidence exists for the touched pack.",
+      "Signature assets with generic default cards, low domain markers, or panel-heavy render structure must be demoted or hand-redrawn.",
+      "Broad-pack flagship templates must not reuse the same five-stage decision-spine skeleton unless the workflow genuinely requires it.",
+      "Every premium pack needs at least one flagship demo that looks domain-native at slide size.",
+      "Agent recommendations should prefer visually verified assets over merely claimed signature assets."
+    ],
+    nextActions: [
+      "Start with the highest-risk active pack and redesign its flagship template layout before adding more packs.",
+      "For each high-risk signature asset, either hand-draw a distinct recipe or demote it to hero/standard.",
+      "Replace rounded-card motif renderers with domain-native silhouettes for synthetic biology, clinical/translational, and anatomy assets.",
+      "Add a visual QA snapshot after each asset upgrade and keep the audit risk list shrinking over time."
+    ]
+  };
+}
+
 export function getAssetCoverageGapReport(): AssetCoverageGapReport {
   const report = getAssetQualityReport();
+  const commercialVisualAudit = report.commercialVisualAudit;
   const templateCount = PREMIUM_WORKFLOW_TEMPLATES.length;
   const signatureHeroAssets = report.summary.signatureAssets + report.summary.heroAssets;
   const baseline = {
@@ -3187,6 +3329,14 @@ export function getAssetCoverageGapReport(): AssetCoverageGapReport {
     packMinimumContract: { ...COMMERCIAL_PACK_MINIMUM_CONTRACT },
     milestones,
     currentWorkflowReadiness: report.workflowCoverage,
+    commercialVisualAudit: {
+      status: commercialVisualAudit.status,
+      premiumLabelFreeze: commercialVisualAudit.policy.premiumLabelFreeze,
+      highRiskPremiumAssets: commercialVisualAudit.summary.highRiskPremiumAssets,
+      mediumRiskPremiumAssets: commercialVisualAudit.summary.mediumRiskPremiumAssets,
+      factoryTemplateRisks: commercialVisualAudit.summary.factoryTemplateRisks,
+      nextAnchor: commercialVisualAudit.summary.nextAnchor
+    },
     categoryGaps,
     plannedWorkflowPacks: [...PLANNED_WORKFLOW_PACKS]
       .sort((a, b) => plannedPackRank(a) - plannedPackRank(b) || a.priority - b.priority || a.name.localeCompare(b.name))
@@ -3295,6 +3445,172 @@ function countByTier(assets: PremiumAsset[]): Record<AssetQualityTier, number> {
     counts[asset.qualityTier] += 1;
     return counts;
   }, { signature: 0, hero: 0, standard: 0, utility: 0 });
+}
+
+function auditPremiumAssetVisualRisk(asset: PremiumAsset): CommercialVisualAuditAssetRisk {
+  const svg = renderPremiumAssetSvg(asset.id, {
+    styleProfile: "consulting-2p5d",
+    width: 160,
+    height: 120,
+    showLabel: false
+  });
+  const classNames = extractSvgClassNames(svg);
+  const domainClasses = classNames.filter((className) => !COMMON_RENDER_CLASS_RE.test(className));
+  const domainClassCount = new Set(domainClasses).size;
+  const panelTokenCount = countMatches(svg, /\b(?:asset-[\w-]*(?:panel|card|default|dashboard|table|form|board)[\w-]*)\b/g);
+  const rectCount = countMatches(svg, /<rect\b/g);
+  const pathCount = countMatches(svg, /<path\b/g);
+  const circleCount = countMatches(svg, /<circle\b/g);
+  const riskReasons: string[] = [];
+
+  if (asset.qaStatus === "premium" && asset.fidelityScore >= 0.9) {
+    riskReasons.push("premium-status-is-derived-from-tier; needs explicit visual QA evidence before treating as commercial-ready");
+  }
+  if (domainClassCount < 5) {
+    riskReasons.push("low-domain-marker-count; renderer may be visually under-specified or hard to distinguish at 48px");
+  }
+  if (panelTokenCount >= 3 || (panelTokenCount >= 1 && rectCount > pathCount + circleCount)) {
+    riskReasons.push("panel-heavy-render; likely reads as UI card/icon rather than scientific illustration");
+  }
+  if (/asset-[\w-]*default(?:-|_)?(?:card|chart|panel)/.test(svg)) {
+    riskReasons.push("generic-default-renderer-path; should not be signature without a hand-tuned recipe");
+  }
+  if (asset.qualityTier === "signature" && !asset.workflowPacks.length) {
+    riskReasons.push("signature-asset-is-not-attached-to-a workflow pack; premium status lacks product context");
+  }
+
+  const riskLevel = riskReasons.some((reason) => reason.includes("generic-default") || reason.includes("panel-heavy"))
+    ? "high"
+    : riskReasons.length >= 2
+      ? "medium"
+      : riskReasons.length
+        ? "low"
+        : "low";
+  const recommendedTier: AssetQualityTier = riskLevel === "high"
+    ? asset.qualityTier === "signature" ? "hero" : "standard"
+    : riskLevel === "medium" && asset.qualityTier === "signature"
+      ? "hero"
+      : asset.qualityTier;
+
+  return {
+    assetId: asset.id,
+    name: asset.name,
+    qualityTier: asset.qualityTier,
+    workflowPacks: [...asset.workflowPacks],
+    rendererFamily: asset.family,
+    renderRecipe: asset.renderSpec.assetRecipe,
+    riskLevel,
+    riskReasons,
+    recommendedTier,
+    visualMetrics: {
+      svgBytes: svg.length,
+      domainClassCount,
+      panelTokenCount,
+      rectCount,
+      pathCount,
+      circleCount
+    },
+    nextAction: riskLevel === "high"
+      ? `Hand-redraw ${asset.id} with a distinct silhouette or demote it to ${recommendedTier}.`
+      : riskLevel === "medium"
+        ? `Add visual QA evidence and more domain-specific micro-detail before keeping ${asset.id} as ${asset.qualityTier}.`
+        : `Keep ${asset.id} on the watch list until pack-level visual QA is complete.`
+  };
+}
+
+const COMMON_RENDER_CLASS_RE = /^(premium-asset|commercial-premium-asset|style-|asset-(anchors|contact-shadow|soft-shadow|body-depth|body-depth-overlay|soft-body-gradient|glass-highlight|inner-highlight|rim-highlight|label|selected|warning-glow))/;
+
+function auditWorkflowPackVisualRisk(
+  pack: WorkflowPack,
+  riskByAssetId: Map<string, CommercialVisualAuditAssetRisk>,
+  templateRisks: CommercialVisualAuditTemplateRisk[]
+): CommercialVisualAuditPackRisk {
+  const packAssets = pack.assetIds
+    .map((assetId) => CURATED_ASSETS.find((asset) => asset.id === assetId))
+    .filter((asset): asset is PremiumAsset => Boolean(asset));
+  const claimedPremiumAssets = packAssets.filter((asset) => asset.qualityTier === "signature" || asset.qualityTier === "hero").length;
+  const highRiskPremiumAssets = pack.assetIds.filter((assetId) => riskByAssetId.get(assetId)?.riskLevel === "high").length;
+  const mediumRiskPremiumAssets = pack.assetIds.filter((assetId) => riskByAssetId.get(assetId)?.riskLevel === "medium").length;
+  const templateRisk = templateRisks.find((risk) => risk.templateId === pack.flagshipTemplateId);
+  const riskReasons: string[] = [];
+  if (claimedPremiumAssets / Math.max(1, packAssets.length) > 0.82 && highRiskPremiumAssets + mediumRiskPremiumAssets > 6) {
+    riskReasons.push("premium-ratio-is-too-high-for-an-unaudited-pack; likely label inflation");
+  }
+  if (highRiskPremiumAssets > 4) {
+    riskReasons.push("multiple high-risk signature/hero assets need hand redraw or demotion");
+  }
+  if (templateRisk && templateRisk.riskLevel !== "low") {
+    riskReasons.push(`flagship-template-uses-${templateRisk.skeletonSignature}; layout may feel factory-made`);
+  }
+  const skeletonRisk = templateRisk?.riskLevel ?? (highRiskPremiumAssets > 4 ? "medium" : "low");
+  return {
+    packId: pack.id,
+    name: pack.name,
+    claimedPremiumAssets,
+    highRiskPremiumAssets,
+    mediumRiskPremiumAssets,
+    flagshipTemplateId: pack.flagshipTemplateId,
+    templateSkeleton: templateRisk?.skeletonSignature ?? "not-audited",
+    skeletonRisk,
+    riskReasons,
+    nextAction: templateRisk && templateRisk.riskLevel !== "low"
+      ? `Redesign ${pack.flagshipTemplateId} so ${pack.id} has a domain-native flagship layout, then redraw the highest-risk core assets.`
+      : `Audit ${pack.id} signature assets at 48px/120px/slide-size before adding more coverage.`
+  };
+}
+
+function auditFlagshipTemplateSkeleton(pack: WorkflowPack): CommercialVisualAuditTemplateRisk {
+  const nodes = createFlagshipWorkflowDemoNodes({ workflowPack: pack.id, styleProfile: "consulting-2p5d" });
+  const symbolCount = nodes.filter((node) => node.kind === "symbol").length;
+  const connectorCount = nodes.filter((node) => node.kind === "connector").length;
+  const textNodes = nodes.filter((node) => node.kind === "text");
+  const text = textNodes.map((node) => String((node.payload as { text?: unknown }).text ?? "")).join(" | ");
+  const hasDecisionSpine = /Decision spine:/i.test(text);
+  const hasAgentReadyChip = /agent-ready/i.test(text);
+  const hasReviewChip = /review/i.test(text);
+  const skeletonSignature = hasDecisionSpine && connectorCount >= 4 && symbolCount >= 9
+    ? "five-stage-decision-spine"
+    : hasAgentReadyChip && symbolCount >= 8
+      ? "agent-ready-card-grid"
+      : "custom-or-lightweight";
+  const riskReasons: string[] = [];
+  if (skeletonSignature === "five-stage-decision-spine") {
+    riskReasons.push("flagship uses the repeated five-stage decision-spine skeleton; broad packs may look interchangeable");
+  }
+  if (hasAgentReadyChip && hasReviewChip && symbolCount >= 10) {
+    riskReasons.push("template emphasizes system status chips more than domain-native figure structure");
+  }
+  const riskLevel = riskReasons.length >= 2 ? "high" : riskReasons.length ? "medium" : "low";
+  return {
+    templateId: pack.flagshipTemplateId ?? pack.templates[0],
+    workflowPack: pack.id,
+    skeletonSignature,
+    nodeCount: nodes.length,
+    symbolCount,
+    connectorCount,
+    textCount: textNodes.length,
+    riskLevel,
+    riskReasons,
+    nextAction: riskLevel === "low"
+      ? `Keep ${pack.flagshipTemplateId ?? pack.templates[0]} but still inspect it visually before delivery.`
+      : `Redesign ${pack.flagshipTemplateId ?? pack.templates[0]} around the real scientific object or evidence panel, not a generic workflow skeleton.`
+  };
+}
+
+function extractSvgClassNames(svg: string): string[] {
+  return [...svg.matchAll(/class="([^"]+)"/g)]
+    .flatMap((match) => match[1].split(/\s+/))
+    .filter(Boolean);
+}
+
+function countMatches(value: string, pattern: RegExp): number {
+  return value.match(pattern)?.length ?? 0;
+}
+
+function riskRank(risk: "low" | "medium" | "high"): number {
+  if (risk === "high") return 3;
+  if (risk === "medium") return 2;
+  return 1;
 }
 
 function countByQaStatus(assets: PremiumAsset[]): Record<AssetQaStatus, number> {

@@ -13,6 +13,7 @@ import {
   getAssetCoverageGapReport,
   getAssetOntology,
   getAssetQualityReport,
+  getCommercialVisualAudit,
   getWorkflowPackExportSnapshot,
   getWorkflowPackGallery,
   getWorkflowPackVisualQaGallery,
@@ -360,6 +361,20 @@ test("commercial signature and hero assets have v2 recipes and quality metadata"
     assert.match(renderPremiumAssetSvg(assetId, { styleProfile: "consulting-2p5d" }), new RegExp(`data-recipe="hero-${assetId}"`));
     assert.doesNotMatch(renderPremiumAssetSvg(assetId, { styleProfile: "consulting-2p5d" }), /data-recipe="standard-/);
   }
+});
+
+test("commercial visual audit flags premium-label inflation and factory template risks", () => {
+  const audit = getCommercialVisualAudit({ limit: 80 });
+
+  assert.equal(audit.policy.premiumLabelFreeze, true);
+  assert.equal(audit.status, "needs-polish");
+  assert.equal(audit.summary.claimedPremiumAssets, 401);
+  assert.ok(audit.summary.highRiskPremiumAssets > 0);
+  assert.ok(audit.summary.factoryTemplateRisks > 0);
+  assert.ok(audit.assetRisks.some((risk) => risk.riskReasons.some((reason) => reason.includes("premium-status-is-derived-from-tier"))));
+  assert.ok(audit.templateRisks.some((risk) => risk.skeletonSignature === "five-stage-decision-spine"));
+  assert.ok(audit.packRisks.some((risk) => risk.riskReasons.some((reason) => reason.includes("flagship-template-uses"))));
+  assert.ok(audit.nextActions.some((action) => action.includes("hand-draw")));
 });
 
 test("premium assets render non-empty SVG variants", () => {
@@ -1179,6 +1194,8 @@ test("premium coverage roadmap exposes 12 month targets and ontology contracts",
   assert.equal(coverage.productWedge, "asset-breadth-library");
   assert.equal(coverage.firstWave, "broad-biology-market");
   assert.equal(coverage.qualityGate, "pack-complete-premium");
+  assert.equal(coverage.commercialVisualAudit.premiumLabelFreeze, true);
+  assert.ok(coverage.commercialVisualAudit.highRiskPremiumAssets > 0);
   assert.deepEqual(coverage.broadMarketPackOrder.slice(0, 5), ["drug-discovery", "protein-engineering", "synthetic-biology", "microbiome-infectious-disease", "cell-therapy"]);
   assert.equal(coverage.packMinimumContract.minSignatureHeroAssets, 12);
   assert.equal(coverage.packMinimumContract.requiresAgentPath, true);

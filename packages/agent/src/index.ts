@@ -1,4 +1,4 @@
-import { getAssetCoverageGapReport, getAssetIndex, getAssetQualityReport, getAssetOntology, listWorkflowPacks, listWorkflowTemplates } from "../../assets/src/index.ts";
+import { getAssetCoverageGapReport, getAssetIndex, getAssetQualityReport, getAssetOntology, getCommercialVisualAudit, listWorkflowPacks, listWorkflowTemplates } from "../../assets/src/index.ts";
 
 export interface AgentResourceDescriptor {
   uri: string;
@@ -79,6 +79,12 @@ export const AGENT_RESOURCE_DESCRIPTORS: AgentResourceDescriptor[] = [
     uri: "scientific-image://agent/coverage-roadmap",
     name: "Premium Coverage Roadmap",
     description: "12-month premium asset coverage targets, workflow-pack expansion plan, acceptance gates, and gap report.",
+    mimeType: "application/json"
+  },
+  {
+    uri: "scientific-image://agent/commercial-visual-audit",
+    name: "Commercial Visual Audit",
+    description: "Stricter visual polish audit for premium-label inflation, panel-heavy assets, and factory-like flagship templates.",
     mimeType: "application/json"
   }
 ];
@@ -226,6 +232,7 @@ export function getAgentManifest() {
     agentFacets: getAssetIndex({ limit: 0 }).facets,
     recommendedFirstCalls: [
       { method: "resources/read", uri: "scientific-image://agent/manifest" },
+      { method: "resources/read", uri: "scientific-image://agent/commercial-visual-audit" },
       { method: "resources/read", uri: "scientific-image://agent/agent-cookbook" },
       { method: "resources/read", uri: "scientific-image://agent/demo-perturb-seq-crispr" },
       { tool: "get_asset_index", arguments: { responseShape: "compact", limit: 20 } },
@@ -236,6 +243,7 @@ export function getAgentManifest() {
     ],
     guardrails: [
       "Use workflow pack templates before hand-placing many generic assets.",
+      "Before adding new premium coverage, read commercial-visual-audit and reduce the highest-risk pack or asset first.",
       "Use asset IDs and scene operations rather than emitting opaque screenshots.",
       "Keep unsupported scientific claims in the review queue until cited, user-confirmed, or accepted-risk.",
       "Before Office export, call template or pack export QA and surface exact fallback assets.",
@@ -246,7 +254,7 @@ export function getAgentManifest() {
       sourcesAndDecks: ["import_source", "create_deck_outline", "revise_deck_outline", "generate_slide_from_brief", "generate_deck_from_outline"],
       premiumAssets: ["get_asset_index", "get_asset_ontology", "search_assets", "get_asset", "create_asset_brief", "render_asset_preview", "recommend_assets_for_slide", "recommend_asset_set", "insert_premium_asset"],
       workflowPacks: ["recommend_workflow_pack", "list_workflow_packs", "list_workflow_templates", "get_workflow_pack_gallery", "validate_asset_pack", "get_workflow_template_qa", "create_workflow_template", "create_workflow_figure", "create_flagship_workflow_demo"],
-      reviewAndExport: ["validate_deck", "list_review_items", "summarize_review_queue", "resolve_review_item", "resolve_review_items", "get_coverage_gap_report", "get_workflow_pack_export_snapshot", "export_pack_qa_report", "export_deck"]
+      reviewAndExport: ["validate_deck", "list_review_items", "summarize_review_queue", "resolve_review_item", "resolve_review_items", "get_commercial_visual_audit", "get_coverage_gap_report", "get_workflow_pack_export_snapshot", "export_pack_qa_report", "export_deck"]
     },
     workflowRecipes: WORKFLOW_RECIPES,
     workflowPacks,
@@ -260,6 +268,7 @@ export function getAgentManifest() {
       targetWorkflowPacks12Months: coverage.milestones.at(-1)?.targetWorkflowPacks,
       targetTemplates12Months: coverage.milestones.at(-1)?.targetTemplates,
       priorityGaps: report.priorityGaps,
+      commercialVisualAudit: report.commercialVisualAudit.summary,
       recommendedNextPacks: report.recommendedNextPacks,
       plannedNextPacks: coverage.plannedWorkflowPacks.slice(0, 8).map((pack) => pack.id)
     },
@@ -283,6 +292,7 @@ function resourceText(uri: string): string {
   if (uri === "scientific-image://agent/asset-ontology") return JSON.stringify(getAssetOntology({ limit: 240 }), null, 2);
   if (uri === "scientific-image://agent/asset-index-compact") return JSON.stringify(getAssetIndex());
   if (uri === "scientific-image://agent/coverage-roadmap") return JSON.stringify(getAssetCoverageGapReport(), null, 2);
+  if (uri === "scientific-image://agent/commercial-visual-audit") return JSON.stringify(getCommercialVisualAudit({ limit: 80 }), null, 2);
   throw new Error(`Unknown agent resource: ${uri}`);
 }
 
@@ -296,12 +306,13 @@ Use this project as a local-first visual workspace. The canonical source is stru
 1. Read \`scientific-image://agent/manifest\`.
 2. Read \`scientific-image://agent/agent-cookbook\` for copy-paste JSON-RPC examples.
 3. For the canonical biology demo, read \`scientific-image://agent/demo-perturb-seq-crispr\`.
-4. Read \`scientific-image://agent/asset-index-compact\` or call \`get_asset_index\` with a workflow pack filter.
-5. Choose a workflow recipe: outline-first deck, workflow-pack figure, semantic asset insertion, or review/export QA.
-6. Prefer workflow pack templates and signature/hero assets before low-level node construction.
-7. Apply deterministic tools and scene operations only.
-8. Run validation, list review items, and surface unresolved scientific claims or export fallbacks.
-9. Export PPTX/PDF/SVG only after the human has approved or accepted remaining review items.
+4. Read \`scientific-image://agent/commercial-visual-audit\` before adding new premium coverage.
+5. Read \`scientific-image://agent/asset-index-compact\` or call \`get_asset_index\` with a workflow pack filter.
+6. Choose a workflow recipe: outline-first deck, workflow-pack figure, semantic asset insertion, or review/export QA.
+7. Prefer workflow pack templates and signature/hero assets before low-level node construction.
+8. Apply deterministic tools and scene operations only.
+9. Run validation, list review items, and surface unresolved scientific claims or export fallbacks.
+10. Export PPTX/PDF/SVG only after the human has approved or accepted remaining review items.
 
 ## Fast path for a premium figure
 

@@ -17,7 +17,7 @@ import {
   type SceneOperation,
   type SourceDocumentKind
 } from "../../../packages/scene/src/index.ts";
-import { compactAssetSetRecommendation, createAssetBrief, createFlagshipWorkflowDemoNodes, createRealisticImageNode, createUploadAsset, createWorkflowFigureNodes, createWorkflowTemplateSpec, getAnyAsset, getAssetCoverageGapReport, getAssetOntology, getAssetQualityReport, getRealisticAssetGallery, getWorkflowPackExportSnapshot, getWorkflowPackGallery, getWorkflowPackQuality, getWorkflowPackVisualQaGallery, getWorkflowTemplate, getWorkflowTemplateQa, listAssets, listRealisticAssets, listWorkflowPacks, listWorkflowTemplates, recommendAssetSet, recommendAssetsForSlide, recommendWorkflowPack, renderPremiumAssetSvg, searchAssets } from "../../../packages/assets/src/index.ts";
+import { compactAssetSetRecommendation, createAssetBrief, createFlagshipWorkflowDemoNodes, createRealisticImageNode, createUploadAsset, createWorkflowFigureNodes, createWorkflowTemplateSpec, getAnyAsset, getAssetCoverageGapReport, getAssetOntology, getAssetQualityReport, getCommercialVisualAudit, getRealisticAssetGallery, getWorkflowPackExportSnapshot, getWorkflowPackGallery, getWorkflowPackQuality, getWorkflowPackVisualQaGallery, getWorkflowTemplate, getWorkflowTemplateQa, listAssets, listRealisticAssets, listWorkflowPacks, listWorkflowTemplates, recommendAssetSet, recommendAssetsForSlide, recommendWorkflowPack, renderPremiumAssetSvg, searchAssets } from "../../../packages/assets/src/index.ts";
 import { createPlotNode, createPlotSpec, parseDelimited } from "../../../packages/plotting/src/index.ts";
 import { exportProject } from "../../../packages/export/src/index.ts";
 import { getAgentManifest, listAgentResources, readAgentResource } from "../../../packages/agent/src/index.ts";
@@ -131,6 +131,15 @@ export async function handleRequest(request: IncomingMessage, response: ServerRe
 
   if (parts[0] === "assets" && request.method === "GET" && parts[1] === "coverage-gap-report") {
     sendJson(response, 200, { report: getAssetCoverageGapReport() });
+    return;
+  }
+
+  if (parts[0] === "assets" && request.method === "GET" && parts[1] === "commercial-visual-audit") {
+    sendJson(response, 200, {
+      audit: getCommercialVisualAudit({
+        limit: url.searchParams.has("limit") ? Number(url.searchParams.get("limit")) : undefined
+      })
+    });
     return;
   }
 
