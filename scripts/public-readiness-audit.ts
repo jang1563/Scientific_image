@@ -59,7 +59,9 @@ const requiredFiles = [
   "packages/export/src/index.ts",
   "scripts/portfolio-metrics.ts",
   "scripts/generate-public-examples.ts",
+  "scripts/build-npm-package.ts",
   "scripts/npm-package-readiness.ts",
+  "tsconfig.npm.json",
   "tests/assets.test.ts",
   "tests/api-mcp.test.ts",
   "tests/export.test.ts"
@@ -330,6 +332,8 @@ for (const token of [
   "Package name: `@jang1563/scientific-image`",
   "CLI bin: `scientific-image-mcp`",
   "node scripts/npm-package-readiness.ts",
+  "node scripts/build-npm-package.ts",
+  "dist/packages/mcp/src/server.js",
   "npm pack --dry-run",
   "npm publish --dry-run --access public",
   "npm publish --access public",

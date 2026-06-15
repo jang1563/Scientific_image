@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "rootDir": ".",
+    "outDir": "dist",
+    "allowImportingTsExtensions": true,
+    "rewriteRelativeImportExtensions": true,
+    "allowJs": true,
+    "checkJs": false,
+    "noCheck": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "files": [
+    "packages/mcp/src/server.ts",
+    "packages/agent/src/index.ts",
+    "packages/assets/src/index.ts",
+    "packages/assets/src/renderer.js",
+    "packages/scene/src/index.ts",
+    "packages/scene/src/types.ts",
+    "packages/export/src/index.ts",
+    "packages/deck/src/index.ts",
+    "packages/plotting/src/index.ts"
+  ]
+}

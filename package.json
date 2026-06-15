@@ -27,19 +27,21 @@
     "scientific-image-mcp": "bin/scientific-image-mcp.js"
   },
   "exports": {
-    ".": "./packages/agent/src/index.ts",
-    "./assets": "./packages/assets/src/index.ts",
-    "./scene": "./packages/scene/src/index.ts",
-    "./export": "./packages/export/src/index.ts",
-    "./mcp/server": "./packages/mcp/src/server.ts",
+    ".": "./dist/packages/agent/src/index.js",
+    "./assets": "./dist/packages/assets/src/index.js",
+    "./scene": "./dist/packages/scene/src/index.js",
+    "./export": "./dist/packages/export/src/index.js",
+    "./mcp/server": "./dist/packages/mcp/src/server.js",
     "./package.json": "./package.json"
   },
   "files": [
     "bin/",
+    "dist/",
     "apps/api/src/",
     "apps/web/",
     "packages/",
     "scripts/agent-acceptance-smoke.ts",
+    "scripts/build-npm-package.ts",
     "scripts/generate-public-examples.ts",
     "scripts/npm-package-readiness.ts",
     "scripts/portfolio-metrics.ts",
@@ -50,7 +52,8 @@
     ".mcp.npm.example.json",
     "codex.mcp.example.toml",
     "codex.npm.example.toml",
-    "tsconfig.json"
+    "tsconfig.json",
+    "tsconfig.npm.json"
   ],
   "publishConfig": {
     "access": "public",
@@ -62,9 +65,11 @@
     "agent:smoke": "node scripts/agent-acceptance-smoke.ts",
     "examples:public": "node scripts/generate-public-examples.ts",
     "public:audit": "node scripts/public-readiness-audit.ts",
+    "build:npm": "node scripts/build-npm-package.ts",
     "package:check": "node scripts/npm-package-readiness.ts",
     "pack:dry-run": "npm pack --dry-run",
     "publish:dry-run": "npm publish --dry-run --access public",
+    "prepack": "node scripts/build-npm-package.ts",
     "prepublishOnly": "node scripts/npm-package-readiness.ts && node scripts/public-readiness-audit.ts",
     "dev:web": "node scripts/serve-static.ts apps/web 4173",
     "dev:api": "node apps/api/src/server.ts",

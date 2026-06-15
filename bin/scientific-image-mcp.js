@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 const packageRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const packageJson = JSON.parse(readFileSync(resolve(packageRoot, "package.json"), "utf8"));
@@ -29,5 +29,8 @@ if (args.has("--version") || args.has("-v")) {
   process.exit(0);
 }
 
-const { startStdioServer } = await import("../packages/mcp/src/server.ts");
+const distServer = resolve(packageRoot, "dist/packages/mcp/src/server.js");
+const sourceServer = resolve(packageRoot, "packages/mcp/src/server.ts");
+const serverModuleUrl = pathToFileURL(existsSync(distServer) ? distServer : sourceServer).href;
+const { startStdioServer } = await import(serverModuleUrl);
 startStdioServer();
