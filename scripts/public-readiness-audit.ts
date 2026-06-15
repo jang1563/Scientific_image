@@ -31,6 +31,8 @@ function trackedFiles(): string[] {
 
 const requiredFiles = [
   "README.md",
+  "LICENSE",
+  ".github/workflows/ci.yml",
   "docs/REPOSITORY_INDEX.md",
   "docs/PORTFOLIO_SCORECARD.md",
   "docs/PUBLIC_RELEASE_CHECKLIST.md",
@@ -80,6 +82,8 @@ for (const token of [
   "Repository Index",
   "Portfolio Scorecard",
   "public-readiness-audit",
+  "actions/workflows/ci.yml",
+  "License And Reuse",
   "MCP",
   "Local-first"
 ]) {
@@ -107,6 +111,25 @@ for (const token of [
   "obvious credentials, local paths, private notes, or planning transcripts"
 ]) {
   assertTextIncludes(scorecard, token, "Portfolio scorecard");
+}
+
+const license = readFileSync("LICENSE", "utf8");
+for (const token of [
+  "Source-available portfolio license",
+  "No permission is granted",
+  "written permission"
+]) {
+  assertTextIncludes(license, token, "LICENSE");
+}
+
+const ciWorkflow = readFileSync(".github/workflows/ci.yml", "utf8");
+for (const token of [
+  "node-version: \"24\"",
+  "node --check apps/web/src/app.js",
+  "node scripts/public-readiness-audit.ts",
+  "node --test tests/*.test.ts"
+]) {
+  assertTextIncludes(ciWorkflow, token, "GitHub Actions workflow");
 }
 
 for (const pack of [

@@ -1,0 +1,17 @@
+Source-available portfolio license
+
+Copyright (c) 2026 Scientific Image contributors.
+
+This repository is published publicly as a portfolio and technical review artifact.
+The source code, visual assets, templates, documentation, and generated examples are
+provided for evaluation and reference only.
+
+No permission is granted to copy, redistribute, sublicense, sell, host, train on, or
+incorporate substantial portions of this work into another product without prior
+written permission from the copyright holder.
+
+Small excerpts may be referenced for hiring, code review, academic discussion, or
+technical evaluation with attribution to this repository.
+
+Third-party dependencies, if installed separately, remain governed by their own
+licenses.

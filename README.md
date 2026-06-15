@@ -1,5 +1,7 @@
 # Scientific Image
 
+[![CI](https://github.com/jang1563/Scientific_image/actions/workflows/ci.yml/badge.svg)](https://github.com/jang1563/Scientific_image/actions/workflows/ci.yml)
+
 Local-first scientific visual communication MVP: a structured SVG-first editor for biology and AI diagrams, figures, plots, posters, and premium slide decks.
 
 The repo is intentionally usable with only Node 24 in this environment. The current MVP core runs without installing packages and keeps structured scene JSON as the canonical artifact.
@@ -149,6 +151,10 @@ node scripts/public-readiness-audit.ts
 ```
 
 before sharing the repository or changing GitHub visibility.
+
+## License And Reuse
+
+This repository is source-available for portfolio review. It is not currently released under an open-source license. See [LICENSE](LICENSE) before copying, redistributing, hosting, or incorporating the code, assets, templates, or generated examples elsewhere.
 
 ## V1 Boundaries
 

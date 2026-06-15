@@ -7,6 +7,8 @@ Use this checklist before changing repository visibility, sharing a link with re
 - `node --test tests/*.test.ts` passes.
 - `node scripts/public-readiness-audit.ts` passes.
 - README and `docs/PORTFOLIO_SCORECARD.md` reflect current asset, workflow-pack, template, and test posture.
+- GitHub Actions CI is present and linked from the README.
+- License/reuse posture is explicit.
 - Repository index is understandable without private chat context.
 - No private source documents, unpublished manuscript notes, local paths, API keys, personal application material, or internal conversation history are committed.
 - Generated QA artifacts remain ignored unless deliberately selected as small examples.
@@ -18,6 +20,7 @@ Use this checklist before changing repository visibility, sharing a link with re
 - The project demonstrates real engineering depth: schema design, deterministic operations, visual rendering, export handling, agent contracts, and test coverage.
 - Claims are specific and verifiable from the repository. Avoid inflated marketing language that the code cannot support.
 - Known limitations are named without exposing private plans or internal decision history.
+- Reuse rights are explicit; avoid implying an open-source license unless one has actually been selected.
 
 ## Privacy And Safety Standard
 
