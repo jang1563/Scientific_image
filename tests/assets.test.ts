@@ -1860,6 +1860,23 @@ test("priority flagship templates generate commercial editable figure structures
   assert.ok(perturb.some((node) => node.kind === "plot" && node.payload.spec.plotType === "volcano"));
   assert.ok(perturb.some((node) => node.kind === "symbol" && node.payload.assetId === "guide-rna"));
   assert.ok(perturb.some((node) => node.kind === "symbol" && node.payload.layoutHint?.startsWith("perturb-seq-workflow:step-")));
+  const perturbReviewTitle = perturb.find((node) => node.kind === "text" && node.payload.text === "Review before export");
+  const perturbReviewCard = perturb.find((node) =>
+    node.kind === "shape" &&
+    perturbReviewTitle &&
+    node.transform.x === perturbReviewTitle.transform.x - 16 &&
+    node.transform.y <= perturbReviewTitle.transform.y &&
+    node.transform.width === 190
+  );
+  assert.ok(perturbReviewTitle);
+  assert.ok(perturbReviewCard);
+  for (const label of ["SVG exact", "PPTX fallback"]) {
+    const badge = perturb.find((node) => node.kind === "text" && node.payload.text === label);
+    assert.ok(badge, `${label} badge should be present`);
+    assert.ok(badge.transform.x >= perturbReviewCard.transform.x, `${label} badge should stay inside review card`);
+    assert.ok(badge.transform.x + badge.transform.width <= perturbReviewCard.transform.x + perturbReviewCard.transform.width, `${label} badge should stay inside review card`);
+    assert.ok(badge.transform.y + badge.transform.height <= perturbReviewCard.transform.y + perturbReviewCard.transform.height, `${label} badge should not hang below review card`);
+  }
 
   const spatial = createWorkflowFigureNodes({ templateId: "spatial-results-panel", styleProfile: "consulting-2p5d" });
   assert.ok(spatial.length >= 24);

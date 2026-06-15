@@ -7752,41 +7752,41 @@ function createPerturbSeqFlagshipTemplateNodes(template: WorkflowTemplate, input
       encodings: { x: "log2FC", y: "pValue", color: "program", label: "gene" },
       style: theme.plotStyle
     }, createTransform(x + 414, y + 320, 430, 128)),
-    createShapeNode("round-rect", "", createTransform(x + 856, y + 322, 190, 112), {
+    createShapeNode("round-rect", "", createTransform(x + 856, y + 318, 190, 136), {
       fill: theme.warningFill,
       stroke: theme.warningStroke,
       strokeWidth: 1.2,
       depth: "surface"
     }),
-    figureText("Review before export", createTransform(x + 872, y + 338, 156, 20), {
+    figureText("Review before export", createTransform(x + 872, y + 334, 156, 20), {
       fontSize: 12,
       fontWeight: 900,
       color: theme.warningText
     }),
-    createTextNode("Confirm library source, guide mapping, hit threshold, and plot provenance before export.", createTransform(x + 872, y + 362, 156, 54), {
-      fontSize: 10.5,
+    createTextNode("Confirm source, guide mapping, hit threshold, and plot provenance.", createTransform(x + 872, y + 358, 156, 42), {
+      fontSize: 9.8,
       fontWeight: 720,
       color: theme.reviewText
     }),
-    createShapeNode("round-rect", "", createTransform(x + 856, y + 440, 82, 20), {
+    createShapeNode("round-rect", "", createTransform(x + 868, y + 414, 74, 20), {
       fill: theme.chipFill,
       stroke: theme.chipStroke,
       strokeWidth: 1,
       depth: "surface"
     }),
-    figureText("SVG exact", createTransform(x + 870, y + 444, 54, 14), {
-      fontSize: 8.8,
+    figureText("SVG exact", createTransform(x + 878, y + 418, 54, 14), {
+      fontSize: 8.4,
       fontWeight: 850,
       color: theme.accent
     }),
-    createShapeNode("round-rect", "", createTransform(x + 946, y + 440, 100, 20), {
+    createShapeNode("round-rect", "", createTransform(x + 950, y + 414, 84, 20), {
       fill: theme.warningFill,
       stroke: theme.warningStroke,
       strokeWidth: 1,
       depth: "surface"
     }),
-    figureText("PPTX fallback", createTransform(x + 958, y + 444, 76, 14), {
-      fontSize: 8.8,
+    figureText("PPTX fallback", createTransform(x + 954, y + 418, 76, 14), {
+      fontSize: 8.2,
       fontWeight: 850,
       color: theme.warningText
     })
