@@ -26,16 +26,24 @@ For a reviewer-facing map of what this smoke proves, see `docs/AGENT_DEMO_EVIDEN
 
 ## MCP Server
 
-Start the stdio MCP server:
+After npm publication, start the stdio MCP server with:
 
 ```bash
-node packages/mcp/src/server.ts
+npx -y -p @jang1563/scientific-image scientific-image-mcp
+```
+
+For source checkout development, start the same server with:
+
+```bash
+node bin/scientific-image-mcp.js
 ```
 
 For client setup, see [MCP_CLIENT_SETUP.md](MCP_CLIENT_SETUP.md). Root examples are provided for common clients:
 
 - `.mcp.json.example` for Claude Code.
 - `codex.mcp.example.toml` for Codex.
+- `.mcp.npm.example.json` for Claude Code with npm.
+- `codex.npm.example.toml` for Codex with npm.
 
 Copy the relevant file into your client config, replace `cwd` with the absolute path to this repository, then restart the client.
 

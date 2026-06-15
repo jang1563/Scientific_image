@@ -74,7 +74,7 @@ Open one of the editable public demos:
 - Export-aware pipeline: SVG/PDF/PPTX/DOCX paths emit exact fallback and provenance warnings.
 - Verification target: `node --test tests/*.test.ts` and `node scripts/public-readiness-audit.ts`.
 
-For a reviewer-oriented Repository Index, see [docs/REPOSITORY_INDEX.md](docs/REPOSITORY_INDEX.md). For MCP/Codex/Claude setup, see [docs/MCP_CLIENT_SETUP.md](docs/MCP_CLIENT_SETUP.md) and [docs/AGENT_QUICKSTART.md](docs/AGENT_QUICKSTART.md). For a metrics-based Portfolio Scorecard, see [docs/PORTFOLIO_SCORECARD.md](docs/PORTFOLIO_SCORECARD.md). For public release rules, see [docs/PUBLIC_RELEASE_CHECKLIST.md](docs/PUBLIC_RELEASE_CHECKLIST.md).
+For a reviewer-oriented Repository Index, see [docs/REPOSITORY_INDEX.md](docs/REPOSITORY_INDEX.md). For MCP/Codex/Claude setup, see [docs/MCP_CLIENT_SETUP.md](docs/MCP_CLIENT_SETUP.md) and [docs/AGENT_QUICKSTART.md](docs/AGENT_QUICKSTART.md). For npm package readiness, see [docs/NPM_PACKAGE_RELEASE.md](docs/NPM_PACKAGE_RELEASE.md). For a metrics-based Portfolio Scorecard, see [docs/PORTFOLIO_SCORECARD.md](docs/PORTFOLIO_SCORECARD.md). For public release rules, see [docs/PUBLIC_RELEASE_CHECKLIST.md](docs/PUBLIC_RELEASE_CHECKLIST.md).
 
 For a claim-by-claim Reviewer Evidence Map, see [docs/REVIEWER_EVIDENCE_MAP.md](docs/REVIEWER_EVIDENCE_MAP.md). It links each portfolio claim to the exact files, tests, commands, and public demos a reviewer can inspect.
 
@@ -130,17 +130,30 @@ node apps/api/src/server.ts
 Optional MCP server:
 
 ```bash
-node packages/mcp/src/server.ts
+node bin/scientific-image-mcp.js
 ```
 
 ## Use As An MCP Server
 
-Scientific Image can be connected to Claude Code, Codex, or another MCP client as a local stdio server. It is public and usable from a cloned repo, but it is not packaged as an npm-distributed MCP server yet.
+Scientific Image can be connected to Claude Code, Codex, or another MCP client as a local stdio server. The npm package target is `@jang1563/scientific-image` with the `scientific-image-mcp` bin.
+
+After npm publication, clients can launch it with:
+
+```bash
+npx -y -p @jang1563/scientific-image scientific-image-mcp
+```
+
+For source checkout usage, run:
+
+```bash
+node bin/scientific-image-mcp.js
+```
 
 Copy one of the root example configs and replace `cwd` with your local repo path:
 
 - `.mcp.json.example` for Claude Code projects.
 - `codex.mcp.example.toml` for Codex config.
+- `.mcp.npm.example.json` and `codex.npm.example.toml` for npm-backed client configs.
 
 Then restart the client and start with these MCP resources:
 
@@ -149,7 +162,7 @@ Then restart the client and start with these MCP resources:
 - `scientific-image://agent/demo-perturb-seq-crispr`
 - `scientific-image://agent/asset-index-compact`
 
-Full setup instructions are in [docs/MCP_CLIENT_SETUP.md](docs/MCP_CLIENT_SETUP.md). The copy-paste agent workflow is in [docs/AGENT_QUICKSTART.md](docs/AGENT_QUICKSTART.md).
+Full setup instructions are in [docs/MCP_CLIENT_SETUP.md](docs/MCP_CLIENT_SETUP.md). Package release checks are in [docs/NPM_PACKAGE_RELEASE.md](docs/NPM_PACKAGE_RELEASE.md). The copy-paste agent workflow is in [docs/AGENT_QUICKSTART.md](docs/AGENT_QUICKSTART.md).
 
 The right-side Insert panel includes a `Public demos` launcher for the same Perturb-seq, spatial transcriptomics, and AI biosecurity examples shown above.
 Direct local demo links also work after the static server is running:
@@ -238,7 +251,7 @@ The smoke follows the same loop an agent should use: read MCP resources, inspect
 Claude Code, Codex, and other MCP clients should connect to the local stdio server:
 
 ```bash
-node packages/mcp/src/server.ts
+node bin/scientific-image-mcp.js
 ```
 
 Recommended first calls are:

@@ -206,7 +206,7 @@ export function getAgentManifest() {
     server: {
       mcpName: "scientific-image-mcp",
       protocolVersion: "2024-11-05",
-      command: "node packages/mcp/src/server.ts",
+      command: "scientific-image-mcp",
       apiBaseUrl: "http://127.0.0.1:8787",
       webWorkspaceUrl: "http://127.0.0.1:4173"
     },
@@ -510,6 +510,33 @@ function clientConfigsMarkdown(): string {
   const cwd = process.cwd();
   return `# Claude and Codex MCP Client Configs
 
+## npm package config after publish
+
+Claude Code:
+
+\`\`\`json
+{
+  "mcpServers": {
+    "scientific-image": {
+      "command": "npx",
+      "args": ["-y", "-p", "@jang1563/scientific-image", "scientific-image-mcp"]
+    }
+  }
+}
+\`\`\`
+
+Codex \`config.toml\`:
+
+\`\`\`toml
+[mcp_servers.scientific-image]
+command = "npx"
+args = ["-y", "-p", "@jang1563/scientific-image", "scientific-image-mcp"]
+startup_timeout_sec = 30
+tool_timeout_sec = 120
+\`\`\`
+
+## Source checkout config
+
 Run from the repository root or set \`cwd\` to this workspace:
 
 \`\`\`text
@@ -523,7 +550,7 @@ ${cwd}
   "mcpServers": {
     "scientific-image": {
       "command": "node",
-      "args": ["packages/mcp/src/server.ts"],
+      "args": ["bin/scientific-image-mcp.js"],
       "cwd": "${cwd}"
     }
   }
@@ -535,7 +562,7 @@ ${cwd}
 \`\`\`toml
 [mcp_servers.scientific-image]
 command = "node"
-args = ["packages/mcp/src/server.ts"]
+args = ["bin/scientific-image-mcp.js"]
 cwd = "${cwd}"
 startup_timeout_sec = 20
 tool_timeout_sec = 120

@@ -1493,7 +1493,7 @@ function responseShapeArg(args: Record<string, unknown>): "compact" | "full" {
   return args.responseShape === "compact" ? "compact" : "full";
 }
 
-function startStdioServer(): void {
+export function startStdioServer(): void {
   let buffer = Buffer.alloc(0);
   stdin.on("data", async (chunk) => {
     buffer = Buffer.concat([buffer, chunk]);

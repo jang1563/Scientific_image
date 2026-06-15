@@ -2,7 +2,7 @@
   "mcpServers": {
     "scientific-image": {
       "command": "node",
-      "args": ["packages/mcp/src/server.ts"],
+      "args": ["bin/scientific-image-mcp.js"],
       "cwd": "/absolute/path/to/Scientific_image"
     }
   }

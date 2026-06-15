@@ -34,12 +34,15 @@ const requiredFiles = [
   "LICENSE",
   ".github/workflows/ci.yml",
   ".mcp.json.example",
+  ".mcp.npm.example.json",
   "codex.mcp.example.toml",
+  "codex.npm.example.toml",
   "docs/examples/manifest.json",
   "docs/examples/perturb-seq-workflow.svg",
   "docs/examples/spatial-results-panel.svg",
   "docs/examples/ai-biosecurity-pipeline.svg",
   "docs/MCP_CLIENT_SETUP.md",
+  "docs/NPM_PACKAGE_RELEASE.md",
   "docs/PUBLIC_EXAMPLE_GALLERY.md",
   "docs/AGENT_QUICKSTART.md",
   "docs/AGENT_DEMO_EVIDENCE.md",
@@ -56,6 +59,7 @@ const requiredFiles = [
   "packages/export/src/index.ts",
   "scripts/portfolio-metrics.ts",
   "scripts/generate-public-examples.ts",
+  "scripts/npm-package-readiness.ts",
   "tests/assets.test.ts",
   "tests/api-mcp.test.ts",
   "tests/export.test.ts"
@@ -115,9 +119,14 @@ for (const token of [
   "One canonical scene graph drives the web workspace, API, MCP tools, visual examples, and SVG/PDF/PPTX/DOCX exports.",
   "docs/AGENT_QUICKSTART.md",
   "docs/MCP_CLIENT_SETUP.md",
+  "docs/NPM_PACKAGE_RELEASE.md",
   "Use As An MCP Server",
+  "@jang1563/scientific-image",
+  "scientific-image-mcp",
   ".mcp.json.example",
+  ".mcp.npm.example.json",
   "codex.mcp.example.toml",
+  "codex.npm.example.toml",
   "docs/AGENT_DEMO_EVIDENCE.md",
   "Portfolio Snapshot",
   "Metrics are recomputed from code with `node scripts/portfolio-metrics.ts`.",
@@ -154,6 +163,7 @@ for (const token of [
   "docs/PUBLIC_EXAMPLE_GALLERY.md",
   "docs/AGENT_DEMO_EVIDENCE.md",
   "docs/MCP_CLIENT_SETUP.md",
+  "docs/NPM_PACKAGE_RELEASE.md",
   "docs/REVIEWER_EVIDENCE_MAP.md",
   "public demo launching",
   "Can a human edit the same objects that an agent creates through MCP/API tools?",
@@ -244,8 +254,11 @@ for (const token of [
   "MCP_CLIENT_SETUP.md",
   ".mcp.json.example",
   "codex.mcp.example.toml",
+  ".mcp.npm.example.json",
+  "codex.npm.example.toml",
   "docs/AGENT_DEMO_EVIDENCE.md",
-  "node packages/mcp/src/server.ts",
+  "npx -y -p @jang1563/scientific-image scientific-image-mcp",
+  "node bin/scientific-image-mcp.js",
   "get_asset_index",
   "recommend_asset_set",
   "create_workflow_figure",
@@ -262,9 +275,12 @@ const mcpClientSetup = readFileSync("docs/MCP_CLIENT_SETUP.md", "utf8");
 for (const token of [
   "MCP Client Setup",
   "Scientific Image is exposed as a local stdio MCP server",
+  "@jang1563/scientific-image",
   ".mcp.json.example",
+  ".mcp.npm.example.json",
   "Claude Code",
   "codex.mcp.example.toml",
+  "codex.npm.example.toml",
   "Codex",
   "scientific-image://agent/manifest",
   "scientific-image://agent/demo-perturb-seq-crispr",
@@ -279,7 +295,7 @@ const codexMcpExample = readFileSync("codex.mcp.example.toml", "utf8");
 for (const token of [
   "\"scientific-image\"",
   "\"command\": \"node\"",
-  "\"args\": [\"packages/mcp/src/server.ts\"]",
+  "\"args\": [\"bin/scientific-image-mcp.js\"]",
   "\"cwd\": \"/absolute/path/to/Scientific_image\""
 ]) {
   assertTextIncludes(claudeMcpExample, token, "Claude MCP example");
@@ -287,10 +303,40 @@ for (const token of [
 for (const token of [
   "[mcp_servers.scientific-image]",
   "command = \"node\"",
-  "args = [\"packages/mcp/src/server.ts\"]",
+  "args = [\"bin/scientific-image-mcp.js\"]",
   "cwd = \"/absolute/path/to/Scientific_image\""
 ]) {
   assertTextIncludes(codexMcpExample, token, "Codex MCP example");
+}
+
+const claudeNpmMcpExample = readFileSync(".mcp.npm.example.json", "utf8");
+const codexNpmMcpExample = readFileSync("codex.npm.example.toml", "utf8");
+for (const token of [
+  "\"command\": \"npx\"",
+  "\"args\": [\"-y\", \"-p\", \"@jang1563/scientific-image\", \"scientific-image-mcp\"]"
+]) {
+  assertTextIncludes(claudeNpmMcpExample, token, "Claude npm MCP example");
+}
+for (const token of [
+  "command = \"npx\"",
+  "args = [\"-y\", \"-p\", \"@jang1563/scientific-image\", \"scientific-image-mcp\"]"
+]) {
+  assertTextIncludes(codexNpmMcpExample, token, "Codex npm MCP example");
+}
+
+const npmPackageRelease = readFileSync("docs/NPM_PACKAGE_RELEASE.md", "utf8");
+for (const token of [
+  "npm Package Release",
+  "Package name: `@jang1563/scientific-image`",
+  "CLI bin: `scientific-image-mcp`",
+  "node scripts/npm-package-readiness.ts",
+  "npm pack --dry-run",
+  "npm publish --dry-run --access public",
+  "npm publish --access public",
+  "bin/scientific-image-mcp.js",
+  "Ignored local artifacts"
+]) {
+  assertTextIncludes(npmPackageRelease, token, "npm package release");
 }
 
 const currentMetricTokens = [
@@ -374,7 +420,9 @@ for (const token of [
   "node-version: \"24\"",
   "node --check apps/web/src/app.js",
   "node --check scripts/portfolio-metrics.ts",
+  "node --check scripts/npm-package-readiness.ts",
   "node scripts/portfolio-metrics.ts",
+  "node scripts/npm-package-readiness.ts",
   "node scripts/public-readiness-audit.ts",
   "node scripts/generate-public-examples.ts",
   "git diff --exit-code docs/examples",

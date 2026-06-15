@@ -4,19 +4,50 @@ This page is for users who want Claude Code, Codex, or another MCP client to cal
 
 ## Current Distribution Model
 
-Scientific Image is exposed as a local stdio MCP server from this public repository. It is not published as an npm package or hosted MCP service yet.
+Scientific Image is exposed as a local stdio MCP server from this public repository. It is prepared for npm registry publication as `@jang1563/scientific-image`, but it is not a hosted MCP service.
 
 Use the server after cloning the repo:
 
 ```bash
 git clone https://github.com/jang1563/Scientific_image.git
 cd Scientific_image
-node packages/mcp/src/server.ts
+node bin/scientific-image-mcp.js
 ```
 
 The server is intentionally local-first. Agents create editable scene JSON by calling tools that reference workflow packs, template IDs, asset IDs, style profiles, semantic slots, and appearance overrides.
 
-## Claude Code
+## From npm After Publish
+
+After the package is published, users can connect without cloning the repository:
+
+```json
+{
+  "mcpServers": {
+    "scientific-image": {
+      "command": "npx",
+      "args": ["-y", "-p", "@jang1563/scientific-image", "scientific-image-mcp"]
+    }
+  }
+}
+```
+
+For Codex:
+
+```toml
+[mcp_servers.scientific-image]
+command = "npx"
+args = ["-y", "-p", "@jang1563/scientific-image", "scientific-image-mcp"]
+startup_timeout_sec = 30
+tool_timeout_sec = 120
+```
+
+The same examples are available in `.mcp.npm.example.json` and `codex.npm.example.toml`.
+
+## From Source Checkout
+
+Use this path when developing the repository locally.
+
+### Claude Code
 
 Copy `.mcp.json.example` to your Claude Code project as `.mcp.json`, then replace `cwd` with the absolute path to this repository:
 
@@ -25,7 +56,7 @@ Copy `.mcp.json.example` to your Claude Code project as `.mcp.json`, then replac
   "mcpServers": {
     "scientific-image": {
       "command": "node",
-      "args": ["packages/mcp/src/server.ts"],
+      "args": ["bin/scientific-image-mcp.js"],
       "cwd": "/absolute/path/to/Scientific_image"
     }
   }
@@ -34,14 +65,14 @@ Copy `.mcp.json.example` to your Claude Code project as `.mcp.json`, then replac
 
 Restart Claude Code after adding the server.
 
-## Codex
+### Codex
 
 Copy `codex.mcp.example.toml` into your Codex config, then replace `cwd` with the absolute path to this repository:
 
 ```toml
 [mcp_servers.scientific-image]
 command = "node"
-args = ["packages/mcp/src/server.ts"]
+args = ["bin/scientific-image-mcp.js"]
 cwd = "/absolute/path/to/Scientific_image"
 startup_timeout_sec = 20
 tool_timeout_sec = 120

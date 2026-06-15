@@ -49,6 +49,8 @@ This repository is a local-first scientific visual communication system. It is m
 
 - `docs/MCP_CLIENT_SETUP.md`: Claude Code and Codex setup guide for connecting this repository as a local stdio MCP server.
 
+- `docs/NPM_PACKAGE_RELEASE.md`: npm package readiness and release checklist for publishing the `scientific-image-mcp` CLI bin.
+
 - `docs/AGENT_DEMO_EVIDENCE.md`: Reviewer-facing map of the agent smoke path, expected JSON handoff fields, MCP resources, and export/review QA contract.
 
 - `docs/REVIEWER_EVIDENCE_MAP.md`: Claim-by-claim evidence map for public portfolio review, linking product claims to source files, tests, local demos, and audit commands.

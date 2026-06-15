@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "scientific-image": {
+      "command": "npx",
+      "args": ["-y", "-p", "@jang1563/scientific-image", "scientific-image-mcp"]
+    }
+  }
+}
