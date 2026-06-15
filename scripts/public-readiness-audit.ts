@@ -92,6 +92,13 @@ function assertTextIncludes(text: string, token: string, label: string): void {
 }
 
 for (const token of [
+  "At A Glance",
+  "Product wedge",
+  "Local-first, agent-addressable scientific figure/deck workspace",
+  "Differentiator",
+  "Structured SVG workflow packs combine premium assets, templates, provenance, review/export QA, and MCP/API operations",
+  "Proof path",
+  "the examples are generated from code and checked in CI",
   "Project Brief",
   "portfolio-grade local product prototype",
   "static web workspace, structured SVG scientific asset library, export-aware scene graph, local API, and MCP server",
