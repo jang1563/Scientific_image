@@ -87,18 +87,18 @@ What to look for:
 - The same scene nodes can be opened in the web workspace through the public demo URLs above.
 - Review/export warnings remain part of the delivery path, so PPTX/DOCX limitations are visible instead of hidden.
 
-## What Is Included
+## Architecture Map
 
-- Strict scene graph package with validation, provenance, claim status, and deterministic editing helpers.
-- Premium deck layer with source documents, deck outlines, slide metadata, review queues, and agent run history.
-- Outline-first agent workflow for source import, deck outline drafting, approved slide generation, deterministic operations, and deck validation.
-- Premium structured SVG asset system with curated biology and AI assets, semantic search, variants, provenance, and reusable renderer families.
-- CSV/TSV parser and editable `PlotSpec` generation for common bio plots.
-- Multi-slide SVG, PDF, PNG-helper, and minimal editable PPTX export primitives.
-- Local HTTP API covering project, source, outline, deck generation, review, node, plot, validation, and export operations.
-- MCP stdio server exposing deterministic project and premium deck tools.
-- Static local premium deck workspace using the same project schema.
-- Node tests for schema, deck workflow, plotting, export, and API/MCP-facing operations.
+| Layer | Responsibility | Where to inspect |
+| --- | --- | --- |
+| Scene graph | Canonical project/page/node schema, validation, provenance, claim status, transforms, and deterministic edits | `packages/scene/`, `tests/scene.test.ts` |
+| Asset system | Structured SVG biology/AI assets, workflow packs, semantic search, style profiles, realistic fixtures, and visual QA | `packages/assets/`, `tests/assets.test.ts` |
+| Web workspace | Static local editor for browsing assets, launching public demos, editing scenes, reviewing delivery state, and exporting local artifacts | `apps/web/`, `tests/web-ui.test.ts` |
+| Agent/API layer | Local HTTP and MCP surfaces for source import, asset recommendation, workflow figure creation, review validation, and export QA | `apps/api/`, `packages/mcp/`, `packages/agent/`, `tests/api-mcp.test.ts` |
+| Export layer | SVG/PDF/PPTX/DOCX exports with named fidelity fallbacks and review-aware warnings | `packages/export/`, `tests/export.test.ts` |
+| Deck/plot layer | Deck outline metadata, source documents, review queue, agent trace, CSV/TSV parsing, and editable plot specs | `packages/deck/`, `packages/plotting/`, `tests/deck.test.ts`, `tests/plotting.test.ts` |
+
+The same structured scene JSON moves through all layers. For a fuller file-by-file map, see [docs/REPOSITORY_INDEX.md](docs/REPOSITORY_INDEX.md).
 
 ## Local Workspace And Servers
 

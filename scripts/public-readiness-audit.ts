@@ -111,6 +111,8 @@ for (const token of [
   "Reviewer Evidence Map",
   "Portfolio Scorecard",
   "Visual Examples",
+  "Architecture Map",
+  "The same structured scene JSON moves through all layers.",
   "Local Workspace And Servers",
   "Agent Proof Path",
   "docs/PUBLIC_EXAMPLE_GALLERY.md",
@@ -132,6 +134,8 @@ const repositoryIndex = readFileSync("docs/REPOSITORY_INDEX.md", "utf8");
 for (const token of [
   "Reviewer Fast Path",
   "What To Judge",
+  "Product Surface",
+  "Core Packages",
   "Copy-Paste Reviewer Commands",
   "docs/PUBLIC_EXAMPLE_GALLERY.md",
   "docs/AGENT_DEMO_EVIDENCE.md",
