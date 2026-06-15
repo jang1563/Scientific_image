@@ -24,6 +24,7 @@ jobs:
       - name: Static checks
         run: |
           node --check bin/scientific-image-mcp.js
+          node --check bin/scientific-image-mcp-doctor.js
           node --check apps/web/src/app.js
           node --check scripts/serve-static.ts
           node --check scripts/build-npm-package.ts

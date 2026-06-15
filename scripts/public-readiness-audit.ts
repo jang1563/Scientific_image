@@ -51,6 +51,7 @@ const requiredFiles = [
   "docs/PORTFOLIO_SCORECARD.md",
   "docs/PUBLIC_RELEASE_CHECKLIST.md",
   "package.json",
+  "bin/scientific-image-mcp-doctor.js",
   "apps/web/index.html",
   "apps/api/src/server.ts",
   "packages/mcp/src/server.ts",
@@ -125,6 +126,7 @@ for (const token of [
   "Use As An MCP Server",
   "@jang1563/scientific-image",
   "scientific-image-mcp",
+  "scientific-image-mcp-doctor",
   ".mcp.json.example",
   ".mcp.npm.example.json",
   "codex.mcp.example.toml",
@@ -245,6 +247,7 @@ for (const token of [
   "scientific-image://agent/demo-perturb-seq-crispr",
   "scientific-image://agent/asset-index-compact",
   "node scripts/agent-acceptance-smoke.ts --workflow-pack perturb-seq-crispr",
+  "npm run mcp:doctor",
   "resources/read` for `scientific-image://agent/agent-cookbook"
 ]) {
   assertTextIncludes(readme, token, "README agent proof path");
@@ -260,6 +263,8 @@ for (const token of [
   "codex.npm.example.toml",
   "docs/AGENT_DEMO_EVIDENCE.md",
   "npx -y -p @jang1563/scientific-image scientific-image-mcp",
+  "npx -y -p @jang1563/scientific-image scientific-image-mcp-doctor",
+  "npm run mcp:doctor",
   "node bin/scientific-image-mcp.js",
   "get_asset_index",
   "recommend_asset_set",
@@ -286,6 +291,8 @@ for (const token of [
   "Codex",
   "scientific-image://agent/manifest",
   "scientific-image://agent/demo-perturb-seq-crispr",
+  "scientific-image-mcp-doctor",
+  "npm run mcp:doctor",
   "node scripts/agent-acceptance-smoke.ts --workflow-pack perturb-seq-crispr",
   "Do not use raw SVG"
 ]) {
@@ -331,13 +338,16 @@ for (const token of [
   "npm Package Release",
   "Package name: `@jang1563/scientific-image`",
   "CLI bin: `scientific-image-mcp`",
+  "Diagnostic bin: `scientific-image-mcp-doctor`",
   "node scripts/npm-package-readiness.ts",
   "node scripts/build-npm-package.ts",
+  "npm run mcp:doctor",
   "dist/packages/mcp/src/server.js",
   "npm pack --dry-run",
   "npm publish --dry-run --access public",
   "npm publish --access public",
   "bin/scientific-image-mcp.js",
+  "bin/scientific-image-mcp-doctor.js",
   "Ignored local artifacts"
 ]) {
   assertTextIncludes(npmPackageRelease, token, "npm package release");
@@ -422,6 +432,7 @@ for (const token of [
 const ciWorkflow = readFileSync(".github/workflows/ci.yml", "utf8");
 for (const token of [
   "node-version: \"24\"",
+  "node --check bin/scientific-image-mcp-doctor.js",
   "node --check apps/web/src/app.js",
   "node --check scripts/portfolio-metrics.ts",
   "node --check scripts/npm-package-readiness.ts",

@@ -14,6 +14,12 @@ cd Scientific_image
 node bin/scientific-image-mcp.js
 ```
 
+Before connecting a client, run the MCP doctor from the repository root:
+
+```bash
+npm run mcp:doctor
+```
+
 The server is intentionally local-first. Agents create editable scene JSON by calling tools that reference workflow packs, template IDs, asset IDs, style profiles, semantic slots, and appearance overrides.
 
 ## From npm After Publish
@@ -42,6 +48,14 @@ tool_timeout_sec = 120
 ```
 
 The same examples are available in `.mcp.npm.example.json` and `codex.npm.example.toml`.
+
+Before editing a Claude/Codex config after publication, verify the package install path:
+
+```bash
+npx -y -p @jang1563/scientific-image scientific-image-mcp-doctor
+```
+
+The doctor checks `--version`, `--help`, MCP `initialize`, `resources/list`, `tools/list`, and `resources/read` for `scientific-image://agent/manifest`.
 
 ## From Source Checkout
 
@@ -99,6 +113,12 @@ Once connected, the easiest path is:
 For copy-paste JSON-RPC examples, use [AGENT_QUICKSTART.md](AGENT_QUICKSTART.md).
 
 ## Smoke Test
+
+Run this first to verify MCP server startup and client-facing resources:
+
+```bash
+npm run mcp:doctor
+```
 
 Run this from the repository root before connecting a client:
 

@@ -135,7 +135,7 @@ node bin/scientific-image-mcp.js
 
 ## Use As An MCP Server
 
-Scientific Image can be connected to Claude Code, Codex, or another MCP client as a local stdio server. The npm package target is `@jang1563/scientific-image` with the `scientific-image-mcp` bin.
+Scientific Image can be connected to Claude Code, Codex, or another MCP client as a local stdio server. The npm package target is `@jang1563/scientific-image` with the `scientific-image-mcp` bin and a companion `scientific-image-mcp-doctor` diagnostic bin.
 
 After npm publication, clients can launch it with:
 
@@ -143,10 +143,22 @@ After npm publication, clients can launch it with:
 npx -y -p @jang1563/scientific-image scientific-image-mcp
 ```
 
+Before editing a Claude/Codex config, verify the installed server with:
+
+```bash
+npx -y -p @jang1563/scientific-image scientific-image-mcp-doctor
+```
+
 For source checkout usage, run:
 
 ```bash
 node bin/scientific-image-mcp.js
+```
+
+Source checkout diagnostics:
+
+```bash
+npm run mcp:doctor
 ```
 
 Copy one of the root example configs and replace `cwd` with your local repo path:

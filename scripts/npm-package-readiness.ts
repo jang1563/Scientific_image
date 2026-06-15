@@ -38,6 +38,7 @@ assertGate(Boolean(pkg.version), "package version is required.");
 assertGate(pkg.private === false, "package must set private:false before npm publish.");
 assertGate(pkg.license === "SEE LICENSE IN LICENSE", "package must declare the source-available LICENSE file.");
 assertGate(pkg.bin?.["scientific-image-mcp"] === "bin/scientific-image-mcp.js", "scientific-image-mcp bin is missing.");
+assertGate(pkg.bin?.["scientific-image-mcp-doctor"] === "bin/scientific-image-mcp-doctor.js", "scientific-image-mcp-doctor bin is missing.");
 assertGate(pkg.publishConfig?.access === "public", "publishConfig.access must be public.");
 assertGate(pkg.publishConfig?.registry === "https://registry.npmjs.org/", "publishConfig.registry must target the public npm registry.");
 
@@ -45,6 +46,7 @@ for (const file of [
   "README.md",
   "LICENSE",
   "bin/scientific-image-mcp.js",
+  "bin/scientific-image-mcp-doctor.js",
   "scripts/build-npm-package.ts",
   "tsconfig.npm.json",
   "packages/mcp/src/server.ts",
@@ -61,6 +63,8 @@ for (const file of [
 
 const binMode = existsSync("bin/scientific-image-mcp.js") ? statSync("bin/scientific-image-mcp.js").mode : 0;
 assertGate((binMode & 0o111) !== 0, "bin/scientific-image-mcp.js should be executable.");
+const doctorBinMode = existsSync("bin/scientific-image-mcp-doctor.js") ? statSync("bin/scientific-image-mcp-doctor.js").mode : 0;
+assertGate((doctorBinMode & 0o111) !== 0, "bin/scientific-image-mcp-doctor.js should be executable.");
 
 const versionOutput = execFileSync("node", ["bin/scientific-image-mcp.js", "--version"], { encoding: "utf8" }).trim();
 assertGate(versionOutput === pkg.version, "scientific-image-mcp --version should match package.json version.");
@@ -68,6 +72,10 @@ assertGate(versionOutput === pkg.version, "scientific-image-mcp --version should
 const helpOutput = execFileSync("node", ["bin/scientific-image-mcp.js", "--help"], { encoding: "utf8" });
 for (const token of ["scientific-image-mcp", "Run the Scientific Image local stdio MCP server", "scientific-image://agent/manifest"]) {
   assertGate(helpOutput.includes(token), `MCP bin help is missing: ${token}`);
+}
+const doctorHelpOutput = execFileSync("node", ["bin/scientific-image-mcp-doctor.js", "--help"], { encoding: "utf8" });
+for (const token of ["scientific-image-mcp-doctor", "Verify that the Scientific Image MCP stdio server", "--timeout-ms"]) {
+  assertGate(doctorHelpOutput.includes(token), `MCP doctor help is missing: ${token}`);
 }
 
 execFileSync("node", ["scripts/build-npm-package.ts"], { stdio: "pipe", env: npmEnv });
@@ -93,6 +101,7 @@ for (const file of [
   "README.md",
   "LICENSE",
   "bin/scientific-image-mcp.js",
+  "bin/scientific-image-mcp-doctor.js",
   "dist/packages/mcp/src/server.js",
   "dist/packages/agent/src/index.js",
   "dist/packages/assets/src/index.js",
@@ -128,8 +137,12 @@ if (tarballPath && existsSync(tarballPath)) {
   mkdirSync(installDir, { recursive: true });
   execFileSync("npm", ["install", "--no-audit", "--no-fund", tarballPath], { cwd: installDir, stdio: "pipe", env: npmEnv });
   const installedBin = join(installDir, "node_modules/.bin/scientific-image-mcp");
+  const installedDoctorBin = join(installDir, "node_modules/.bin/scientific-image-mcp-doctor");
   const installedVersion = execFileSync(installedBin, ["--version"], { encoding: "utf8", env: npmEnv }).trim();
   assertGate(installedVersion === pkg.version, "installed scientific-image-mcp --version should match package.json version.");
+  const doctorReport = JSON.parse(execFileSync(installedDoctorBin, ["--timeout-ms", "5000"], { encoding: "utf8", env: npmEnv }));
+  assertGate(doctorReport.ok === true, "installed scientific-image-mcp-doctor should pass local MCP diagnostics.");
+  assertGate(doctorReport.checks?.tools?.ok === true, "installed MCP doctor should verify required tool list.");
   const importSmoke = execFileSync("node", ["--input-type=module", "-e", "const mod = await import('@jang1563/scientific-image'); console.log(Boolean(mod.getAgentManifest));"], { cwd: installDir, encoding: "utf8", env: npmEnv }).trim();
   assertGate(importSmoke === "true", "installed package export should import from dist JS.");
   const initialize = JSON.stringify({ jsonrpc: "2.0", id: 1, method: "initialize", params: {} });

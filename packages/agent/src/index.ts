@@ -207,6 +207,7 @@ export function getAgentManifest() {
       mcpName: "scientific-image-mcp",
       protocolVersion: "2024-11-05",
       command: "scientific-image-mcp",
+      doctorCommand: "scientific-image-mcp-doctor",
       apiBaseUrl: "http://127.0.0.1:8787",
       webWorkspaceUrl: "http://127.0.0.1:4173"
     },
@@ -512,6 +513,12 @@ function clientConfigsMarkdown(): string {
 
 ## npm package config after publish
 
+Verify the package before editing Claude/Codex config:
+
+\`\`\`bash
+npx -y -p @jang1563/scientific-image scientific-image-mcp-doctor
+\`\`\`
+
 Claude Code:
 
 \`\`\`json
@@ -536,6 +543,12 @@ tool_timeout_sec = 120
 \`\`\`
 
 ## Source checkout config
+
+Verify the source checkout before editing Claude/Codex config:
+
+\`\`\`bash
+npm run mcp:doctor
+\`\`\`
 
 Run from the repository root or set \`cwd\` to this workspace:
 

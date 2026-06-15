@@ -469,6 +469,7 @@ test("local API exposes agent manifest and onboarding resources", async () => {
   try {
     const manifest = await fetch(`${base}/agent/manifest`).then((response) => response.json());
     assert.equal(manifest.manifest.server.mcpName, "scientific-image-mcp");
+    assert.equal(manifest.manifest.server.doctorCommand, "scientific-image-mcp-doctor");
     assert.ok(manifest.manifest.recommendedFirstCalls.some((call: { tool?: string }) => call.tool === "get_asset_index"));
     assert.ok(manifest.manifest.recommendedFirstCalls.some((call: { uri?: string }) => call.uri === "scientific-image://agent/commercial-visual-audit"));
     assert.ok(manifest.manifest.recommendedFirstCalls.some((call: { uri?: string }) => call.uri === "scientific-image://agent/agent-cookbook"));
@@ -526,6 +527,7 @@ test("local API exposes agent manifest and onboarding resources", async () => {
     assert.match(configs, /Claude Code project/);
     assert.match(configs, /mcp_servers\.scientific-image/);
     assert.match(configs, /agent-cookbook/);
+    assert.match(configs, /scientific-image-mcp-doctor/);
   } finally {
     await new Promise<void>((resolve) => server.close(() => resolve()));
   }
@@ -635,6 +637,7 @@ test("MCP exposes agent resources and manifest fallback tool", async () => {
   });
   const manifestPayload = JSON.parse((manifest.result as { content: { text: string }[] }).content[0].text);
   assert.equal(manifestPayload.manifest.defaultVisualContract.styleProfile, "consulting-2p5d");
+  assert.equal(manifestPayload.manifest.server.doctorCommand, "scientific-image-mcp-doctor");
   assert.ok(manifestPayload.manifest.toolGroups.workflowPacks.includes("create_flagship_workflow_demo"));
   assert.ok(manifestPayload.manifest.toolGroups.premiumAssets.includes("get_asset_index"));
   assert.ok(manifestPayload.manifest.toolGroups.premiumAssets.includes("get_asset_ontology"));
@@ -652,6 +655,7 @@ test("MCP exposes agent resources and manifest fallback tool", async () => {
   const configsPayload = JSON.parse((configs.result as { content: { text: string }[] }).content[0].text);
   assert.match(configsPayload.resource.text, /Codex `config.toml`/);
   assert.match(configsPayload.resource.text, /agent-cookbook/);
+  assert.match(configsPayload.resource.text, /npm run mcp:doctor/);
 });
 
 test("MCP tools run premium deck workflow", async () => {

@@ -6,6 +6,12 @@ The rule of thumb is simple: agents should create scene JSON by referencing work
 
 ## Fast Smoke Test
 
+Run this first to verify that the MCP stdio server can answer the same startup calls a Claude/Codex client needs:
+
+```bash
+npm run mcp:doctor
+```
+
 Run this from the repository root:
 
 ```bash
@@ -30,6 +36,12 @@ After npm publication, start the stdio MCP server with:
 
 ```bash
 npx -y -p @jang1563/scientific-image scientific-image-mcp
+```
+
+To verify the npm package before adding it to a client config:
+
+```bash
+npx -y -p @jang1563/scientific-image scientific-image-mcp-doctor
 ```
 
 For source checkout development, start the same server with:

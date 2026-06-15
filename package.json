@@ -24,7 +24,8 @@
     "local-first"
   ],
   "bin": {
-    "scientific-image-mcp": "bin/scientific-image-mcp.js"
+    "scientific-image-mcp": "bin/scientific-image-mcp.js",
+    "scientific-image-mcp-doctor": "bin/scientific-image-mcp-doctor.js"
   },
   "exports": {
     ".": "./dist/packages/agent/src/index.js",
@@ -74,6 +75,7 @@
     "dev:web": "node scripts/serve-static.ts apps/web 4173",
     "dev:api": "node apps/api/src/server.ts",
     "mcp": "node bin/scientific-image-mcp.js",
+    "mcp:doctor": "node bin/scientific-image-mcp-doctor.js",
     "mcp:help": "node bin/scientific-image-mcp.js --help"
   },
   "dependencies": {},
