@@ -21,6 +21,9 @@ test("web inspector exposes premium asset contract and part-level controls", asy
   assert.match(app, /publicDemos/);
   assert.match(app, /renderPublicDemoLauncher/);
   assert.match(app, /launchPublicDemo/);
+  assert.match(app, /initialPublicDemoId/);
+  assert.match(app, /resolvePublicDemoId/);
+  assert.match(app, /searchParams\.set\("demo"/);
   assert.match(app, /ai-biosecurity-pipeline/);
   assert.match(app, /48/);
   assert.match(app, /120/);

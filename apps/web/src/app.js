@@ -149,6 +149,7 @@ const publicDemos = [
     styleProfile: "risk-warning"
   }
 ];
+let pendingPublicDemoId = initialPublicDemoId();
 
 let project = createProject("Premium scientific deck");
 let activePageId = project.pages[0].id;
@@ -387,6 +388,7 @@ loadAssetCoverageReport();
 loadPremiumAssets();
 loadWorkflowTemplates();
 loadWorkflowPacks();
+launchInitialPublicDemoFromUrl();
 
 document.querySelector("#newProject").addEventListener("click", () => {
   checkpoint();
@@ -1599,13 +1601,44 @@ function renderPublicDemoLauncher() {
   });
 }
 
-function launchPublicDemo(demoId) {
+function initialPublicDemoId() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const hash = window.location.hash.startsWith("#demo=") ? window.location.hash.slice(6) : window.location.hash.replace(/^#/, "");
+    return resolvePublicDemoId(params.get("demo") ?? params.get("template") ?? params.get("workflowPack") ?? hash);
+  } catch {
+    return null;
+  }
+}
+
+function resolvePublicDemoId(value) {
+  const raw = String(value ?? "").trim().toLowerCase();
+  if (!raw) return null;
+  const normalized = raw.replace(/_/g, "-");
+  return publicDemos.find((demo) =>
+    [demo.id, demo.templateId, demo.workflowPack, slug(demo.title)].map((item) => String(item).toLowerCase()).includes(normalized)
+  )?.id ?? null;
+}
+
+function launchInitialPublicDemoFromUrl() {
+  if (!pendingPublicDemoId) return;
+  const demoId = pendingPublicDemoId;
+  pendingPublicDemoId = null;
+  launchPublicDemo(demoId, { updateUrl: false });
+}
+
+function launchPublicDemo(demoId, options = {}) {
   const demo = publicDemos.find((candidate) => candidate.id === demoId);
   if (!demo) return;
   selectedWorkflowTemplateId = demo.templateId;
   if (assetWorkflowPack) assetWorkflowPack.value = demo.workflowPack;
   if (workflowTemplate) workflowTemplate.value = demo.workflowPack;
   if (assetStyleProfile) assetStyleProfile.value = demo.styleProfile;
+  if (options.updateUrl !== false) {
+    const url = new URL(window.location.href);
+    url.searchParams.set("demo", demo.id);
+    window.history.replaceState(null, "", url);
+  }
   workflowPackGalleries.clear();
   workflowPackVisualQaGalleries.clear();
   loadWorkflowPackGallery(demo.workflowPack);

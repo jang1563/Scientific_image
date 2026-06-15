@@ -93,6 +93,8 @@ for (const token of [
   "Portfolio Scorecard",
   "Visual Examples",
   "Public demos",
+  "?demo=perturb-seq-workflow",
+  "?demo=ai-biosecurity-pipeline",
   "scripts/generate-public-examples.ts",
   "public-readiness-audit",
   "actions/workflows/ci.yml",
@@ -119,6 +121,9 @@ const webApp = readFileSync("apps/web/src/app.js", "utf8");
 for (const token of [
   "publicDemoLauncher",
   "Public demos",
+  "initialPublicDemoId",
+  "resolvePublicDemoId",
+  "searchParams.set(\"demo\"",
   "launchPublicDemo",
   "perturb-seq-workflow",
   "spatial-results-panel",
