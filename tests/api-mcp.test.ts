@@ -161,12 +161,13 @@ test("local API exposes premium asset search, render, and recommendations", asyn
     assert.ok(report.report.benchmarks.some((benchmark: { id: string }) => benchmark.id === "biorender"));
     assert.ok(report.report.priorityGaps.some((gap: string) => gap.includes("Office editability")));
     assert.equal(report.report.commercialVisualAudit.policy.premiumLabelFreeze, true);
-    assert.ok(report.report.commercialVisualAudit.summary.highRiskPremiumAssets > 0);
+    assert.equal(report.report.commercialVisualAudit.summary.highRiskPremiumAssets, 0);
 
     const commercialAudit = await fetch(`${base}/assets/commercial-visual-audit?limit=12`).then((response) => response.json());
     assert.equal(commercialAudit.audit.policy.premiumLabelFreeze, true);
     assert.ok(commercialAudit.audit.assetRisks.length <= 12);
-    assert.ok(commercialAudit.audit.templateRisks.some((risk: { skeletonSignature: string }) => risk.skeletonSignature === "five-stage-decision-spine"));
+    assert.equal(commercialAudit.audit.summary.factoryTemplateRisks, 0);
+    assert.ok(!commercialAudit.audit.templateRisks.some((risk: { skeletonSignature: string }) => risk.skeletonSignature === "five-stage-decision-spine"));
 
     const coverage = await fetch(`${base}/assets/coverage-gap-report`).then((response) => response.json());
     assert.equal(coverage.report.baseline.totalAssets, 466);
@@ -521,7 +522,7 @@ test("local API exposes agent manifest and onboarding resources", async () => {
 
     const visualAudit = await fetch(`${base}/agent/resources/commercial-visual-audit`).then((response) => response.json());
     assert.equal(visualAudit.policy.premiumLabelFreeze, true);
-    assert.ok(visualAudit.summary.highRiskPremiumAssets > 0);
+    assert.equal(visualAudit.summary.highRiskPremiumAssets, 0);
 
     const configs = await fetch(`${base}/agent/resources/client-configs`).then((response) => response.text());
     assert.match(configs, /Claude Code project/);

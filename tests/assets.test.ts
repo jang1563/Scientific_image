@@ -234,13 +234,35 @@ test("commercial signature and hero assets have v2 recipes and quality metadata"
     assert.ok(asset.semanticSlots.length);
     assert.ok(asset.editablePartDefinitions.length);
   }
-  for (const assetId of ["dual-use-triage", "gene-synthesis-screen", "escalation-path", "bio-protocol-benchmark", "safety-classifier", "policy-stack", "review-queue", "approval-stamp", "blocked-output"]) {
+  const aiBiosecurityMarkers: Record<string, RegExp[]> = {
+    benchmark: [/asset-benchmark-suite/, /asset-benchmark-matrix-cell/, /asset-benchmark-pass-badge/],
+    "bio-classifier": [/asset-bio-classifier-dna-query/, /asset-bio-classifier-chip-body/, /asset-bio-classifier-safety-shield/],
+    "pathogen-intent-classifier": [/asset-bio-classifier-dna-query/, /asset-bio-classifier-model-core/, /asset-bio-classifier-approval-check/],
+    "protocol-risk-screen": [/asset-protocol-risk-document/, /asset-protocol-risk-shield/, /asset-protocol-risk-decision-check/],
+    "dual-use-triage": [/asset-dual-use-source-document/, /asset-dual-use-triage-wedge/, /asset-dual-use-escalation-arrow/],
+    "gene-synthesis-screen": [/asset-gene-synthesis-screen-frame/, /asset-gene-synthesis-dna-query/, /asset-gene-synthesis-clearance-check/],
+    "escalation-path": [/asset-escalation-path-curve/, /asset-escalation-step-node/, /asset-escalation-review-box/],
+    "durc-flag": [/asset-durc-flag-pole/, /asset-durc-flag-banner/, /asset-durc-warning-triangle/],
+    "bio-protocol-benchmark": [/asset-bio-protocol-benchmark-sheet/, /asset-bio-protocol-task-row/, /asset-bio-protocol-score-bar/],
+    "safety-classifier": [/asset-safety-classifier-system/, /asset-safety-classifier-model-layer/, /asset-safety-classifier-shield/],
+    "permission-tier": [/asset-permission-tier-frame/, /asset-permission-tier-rung/, /asset-permission-tier-handle/],
+    "biosafety-tier": [/asset-permission-tier-frame/, /asset-permission-tier-ladder/, /asset-permission-tier-review/],
+    "red-team": [/asset-red-team-target-ring/, /asset-red-team-crosshair/, /asset-red-team-attack-vector/],
+    "policy-stack": [/asset-policy-stack/, /asset-policy-stack-layer/, /asset-policy-stack-approval-check/],
+    "review-queue": [/asset-review-triage-funnel/, /asset-reviewer-checkpoint/, /asset-review-audit-trail/, /asset-review-decision-check/],
+    "approval-stamp": [/asset-approval-stamp-seal/, /asset-approval-stamp-handle/, /asset-approval-check-mark/],
+    "blocked-output": [/asset-blocked-output-sheet/, /asset-blocked-output-stop-badge/, /asset-blocked-output-gate-bar/]
+  };
+  for (const [assetId, markers] of Object.entries(aiBiosecurityMarkers)) {
     const asset = getAsset(assetId);
+    const svg = renderPremiumAssetSvg(assetId, { styleProfile: "risk-warning" });
     assert.equal(asset.qualityTier, "signature");
     assert.equal(asset.renderSpec.assetRecipe, `hero-${assetId}`);
     assert.ok(asset.workflowPacks.includes("ai-biosecurity-eval"));
-    assert.match(renderPremiumAssetSvg(assetId, { styleProfile: "risk-warning" }), new RegExp(`data-recipe="hero-${assetId}"`));
-    assert.doesNotMatch(renderPremiumAssetSvg(assetId, { styleProfile: "risk-warning" }), /data-recipe="standard-/);
+    assert.match(svg, new RegExp(`data-recipe="hero-${assetId}"`));
+    assert.doesNotMatch(svg, /data-recipe="standard-/);
+    for (const marker of markers) assert.match(svg, marker);
+    assert.doesNotMatch(svg, /asset-review-card|asset-blocked-output-card/);
   }
   for (const assetId of ["prime-editor", "plate-384"]) {
     const asset = getAsset(assetId);
@@ -265,13 +287,38 @@ test("commercial signature and hero assets have v2 recipes and quality metadata"
     assert.ok(asset.workflowPacks.includes("drug-discovery"));
     assert.match(renderPremiumAssetSvg(assetId, { styleProfile: "consulting-2p5d" }), new RegExp(`data-recipe="hero-${assetId}"`));
   }
-  for (const assetId of ["context-window", "vector-store", "memory", "planner", "executor", "router", "multi-agent", "scratchpad", "function-schema"]) {
+  const agenticAssetMarkers = {
+    "audit-log": ["asset-audit-log-ledger", "asset-audit-log-event-line", "asset-audit-log-trace-line", "asset-audit-log-event-dot", "asset-audit-log-event-3"],
+    classifier: ["asset-classifier-decision-lane", "asset-classifier-output-score", "asset-classifier-threshold-node", "asset-classifier-positive-call", "asset-classifier-check-mark"],
+    dataset: ["asset-dataset-stack", "asset-dataset-layer", "asset-dataset-record-line", "asset-dataset-ingest-arc", "asset-dataset-chip"],
+    "foundation-model": ["asset-foundation-model-frame", "asset-foundation-model-layer", "asset-foundation-model-scale-band", "asset-model-block-input-port", "asset-model-block-output-port"],
+    "human-review": ["asset-human-review-workspace", "asset-human-review-head", "asset-human-review-queue-row", "asset-human-review-approval-badge", "asset-human-review-approval-check"],
+    "model-block": ["asset-model-block-frame", "asset-model-block-layer", "asset-model-block-layer-1", "asset-model-block-input-port", "asset-model-block-output-port"],
+    "context-window": ["asset-context-window-shell", "asset-context-token", "asset-context-window-bracket", "asset-context-window-budget", "asset-context-window-utilization"],
+    prompt: ["asset-prompt-bubble", "asset-prompt-tail", "asset-prompt-instruction-line", "asset-prompt-context-line", "asset-prompt-system-line"],
+    retrieval: ["asset-retrieval-document-stack", "asset-retrieval-match-line", "asset-retrieval-query-lens", "asset-retrieval-result-beam", "asset-retrieval-search-handle"],
+    "vector-store": ["asset-vector-store-cylinder-top", "asset-vector-store-cylinder-wall", "asset-vector-store-embedding-space", "asset-vector-store-neighbor-edge", "asset-vector-store-point"],
+    memory: ["asset-memory-stack", "asset-memory-layer", "asset-memory-recall-line", "asset-memory-recall-arrow", "asset-memory-persist-node"],
+    planner: ["asset-planner-canvas", "asset-planner-route", "asset-planner-milestone", "asset-planner-goal-node", "asset-planner-checkmark"],
+    executor: ["asset-executor-console", "asset-executor-run-slot", "asset-executor-run-button", "asset-executor-task-slot", "asset-executor-complete-check"],
+    router: ["asset-router-hub-shell", "asset-router-decision-core", "asset-router-input-node", "asset-router-route-line", "asset-router-arrow-head"],
+    "multi-agent": ["asset-multi-agent-node", "asset-multi-agent-coordinator", "asset-multi-agent-message-link", "asset-multi-agent-orchestration-ring", "asset-multi-agent-coordinator-plus"],
+    scratchpad: ["asset-scratchpad-sheet", "asset-scratchpad-folded-corner", "asset-scratchpad-thought-line", "asset-scratchpad-ink-stroke", "asset-scratchpad-token-strip"],
+    "function-schema": ["asset-function-schema-root", "asset-function-schema-field", "asset-function-schema-link", "asset-function-schema-io-port", "asset-function-schema-validation-dot"],
+    "tool-call": ["asset-tool-call-envelope", "asset-tool-call-code-bracket", "asset-tool-call-execution-dot", "asset-tool-call-return-port", "asset-tool-call-status-light"],
+    "mcp-server": ["asset-mcp-server-rack", "asset-mcp-server-endpoint", "asset-mcp-server-tool-port", "asset-mcp-server-status-led", "asset-mcp-server-export-port"],
+    "agent-loop": ["asset-agent-loop-planner-node", "asset-agent-loop-executor-node", "asset-agent-loop-memory-node", "asset-agent-loop-cycle-arrow", "asset-agent-loop-handoff"],
+    "risk-gate": ["asset-risk-gate-shield", "asset-risk-gate-boundary", "asset-risk-gate-decision-check", "asset-risk-gate-clearance-bar", "asset-risk-gate-status-node"]
+  };
+  for (const [assetId, markers] of Object.entries(agenticAssetMarkers)) {
     const asset = getAsset(assetId);
     assert.equal(asset.qualityTier, "signature");
     assert.equal(asset.renderSpec.assetRecipe, `hero-${assetId}`);
     assert.ok(asset.workflowPacks.includes("agentic-ai-mcp-rag"));
-    assert.match(renderPremiumAssetSvg(assetId, { styleProfile: "consulting-2p5d" }), new RegExp(`data-recipe="hero-${assetId}"`));
-    assert.doesNotMatch(renderPremiumAssetSvg(assetId, { styleProfile: "consulting-2p5d" }), /data-recipe="standard-/);
+    const svg = renderPremiumAssetSvg(assetId, { styleProfile: "consulting-2p5d" });
+    assert.match(svg, new RegExp(`data-recipe="hero-${assetId}"`));
+    assert.doesNotMatch(svg, /data-recipe="standard-/);
+    for (const marker of markers) assert.match(svg, new RegExp(`\\b${marker}\\b`), `${assetId} should expose ${marker}`);
   }
   for (const assetId of ["microbiome-community", "gut-microbiome", "pathogen-host-interaction", "mucosal-barrier", "microbiome-profile", "metagenomic-read", "taxonomic-abundance", "antimicrobial-resistance", "microbiome-dysbiosis", "outbreak-cluster", "infection-model", "amr-gene"]) {
     const asset = getAsset(assetId);
@@ -363,17 +410,53 @@ test("commercial signature and hero assets have v2 recipes and quality metadata"
   }
 });
 
-test("commercial visual audit flags premium-label inflation and factory template risks", () => {
+test("single-cell multiomics assets expose editable biological and omics markers", () => {
+  const expectedMarkers: Record<string, RegExp[]> = {
+    "cell-b": [/asset-cell-b/, /asset-bcell-bcr-receptor/, /asset-bcell-nucleus/, /asset-bcell-lineage-badge/],
+    "cell-dividing": [/asset-cell-dividing/, /asset-dividing-cell-chromosome/, /asset-dividing-cell-spindle/, /asset-dividing-cell-cleavage-furrow/],
+    "cell-neighborhood": [/asset-cell-neighborhood/, /asset-neighborhood-adjacency-edge/, /asset-neighborhood-cell-nucleus/, /asset-neighborhood-boundary-ring/],
+    "cell-stem": [/asset-cell-stem/, /asset-stem-cell-potency-crown/, /asset-stem-cell-fate-arrow/, /asset-stem-cell-fate-branches/],
+    "chromatin": [/asset-chromatin/, /asset-chromatin-nucleosome/, /asset-chromatin-accessibility-track/, /asset-chromatin-epigenetic-mark/],
+    "nucleosome": [/asset-nucleosome/, /asset-nucleosome-histone-octamer/, /asset-nucleosome-dna-rung/, /asset-nucleosome-histone-tail/],
+    "embedding-space": [/asset-embedding-space/, /asset-single-cell-embedding/, /asset-embedding-point/, /asset-embedding-cluster-hull/],
+    "read-pair": [/asset-read-pair/, /asset-read-pair-forward-read/, /asset-read-pair-reverse-read/, /asset-read-pair-insert-arc/],
+    "peak-call": [/asset-peak-call/, /asset-peak-call-signal-track/, /asset-peak-call-axis/, /asset-peak-call-boundary/],
+    "genome-browser-track": [/asset-genome-browser-track/, /asset-genome-browser-track-lane/, /asset-genome-browser-coordinate-ticks/, /asset-genome-browser-locus-bracket/],
+    "variant-snp": [/asset-variant-snp/, /asset-snp-variant-base/, /asset-snp-dna-backbone/, /asset-snp-callout-bubble/],
+    "copy-number": [/asset-copy-number/, /asset-copy-number-segment/, /asset-copy-number-gain-segment/, /asset-copy-number-breakpoint-marker/]
+  };
+
+  for (const [assetId, markers] of Object.entries(expectedMarkers)) {
+    const asset = getAsset(assetId);
+    const svg = renderPremiumAssetSvg(assetId, { styleProfile: "consulting-2p5d", width: 180, height: 140 });
+    assert.ok(asset.workflowPacks.includes("single-cell-multiomics"));
+    assert.ok(asset.qualityTier === "signature" || asset.qualityTier === "hero");
+    assert.match(svg, /commercial-premium-asset/);
+    assert.match(svg, /filter="url\(#asset-soft-shadow\)"/);
+    assert.ok(svg.length > 1800, `${assetId} render is too small to be a premium single-cell asset`);
+    for (const marker of markers) assert.match(svg, marker);
+  }
+});
+
+test("commercial visual audit tracks premium-label inflation after high-risk cleanup", () => {
   const audit = getCommercialVisualAudit({ limit: 80 });
 
   assert.equal(audit.policy.premiumLabelFreeze, true);
-  assert.equal(audit.status, "needs-polish");
+  assert.equal(audit.status, "commercial-baseline");
   assert.equal(audit.summary.claimedPremiumAssets, 401);
-  assert.ok(audit.summary.highRiskPremiumAssets > 0);
-  assert.ok(audit.summary.factoryTemplateRisks > 0);
+  assert.equal(audit.summary.highRiskPremiumAssets, 0);
+  assert.ok(audit.summary.mediumRiskPremiumAssets > 0);
+  assert.equal(audit.summary.factoryTemplateRisks, 0);
   assert.ok(audit.assetRisks.some((risk) => risk.riskReasons.some((reason) => reason.includes("premium-status-is-derived-from-tier"))));
-  assert.ok(audit.templateRisks.some((risk) => risk.skeletonSignature === "five-stage-decision-spine"));
-  assert.ok(audit.packRisks.some((risk) => risk.riskReasons.some((reason) => reason.includes("flagship-template-uses"))));
+  assert.ok(!audit.templateRisks.some((risk) => risk.skeletonSignature === "five-stage-decision-spine"));
+  assert.ok(!audit.templateRisks.some((risk) => risk.templateId === "drug-discovery-funnel"));
+  assert.ok(!audit.templateRisks.some((risk) => risk.templateId === "lab-automation-platform"));
+  assert.ok(!audit.templateRisks.some((risk) => risk.templateId === "synthetic-biology-platform"));
+  assert.ok(!audit.templateRisks.some((risk) => risk.templateId === "anatomy-organ-system-overview"));
+  assert.ok(!audit.templateRisks.some((risk) => risk.templateId === "cell-therapy-manufacturing-platform"));
+  assert.ok(!audit.templateRisks.some((risk) => risk.templateId === "methods-protocol-overview"));
+  assert.ok(!audit.templateRisks.some((risk) => risk.templateId === "microbiome-infectious-disease-platform"));
+  assert.ok(!audit.packRisks.some((risk) => risk.riskReasons.some((reason) => reason.includes("flagship-template-uses"))));
   assert.ok(audit.nextActions.some((action) => action.includes("hand-draw")));
 });
 
@@ -423,16 +506,26 @@ test("cell and tissue hero assets expose morphology-specific premium markers", (
       /asset-tcell-body/,
       /asset-tcell-nucleus/,
       /asset-tcell-uropod/,
-      /asset-tcell-synapse/,
+      /asset-tcell-immunological-synapse/,
+      /asset-tcell-polarization-axis/,
       /asset-tcell-tcr-cluster/,
       /asset-tcell-cytotoxic-granule/
     ],
+    "cell-b": [
+      /asset-bcell-body/,
+      /asset-bcell-nucleus/,
+      /asset-bcell-bcr-receptor/,
+      /asset-bcell-secreted-antibody/,
+      /asset-bcell-bcr-crown/,
+      /asset-bcell-lineage-badge/
+    ],
     "cell-immune": [
+      /asset-cell-immune/,
       /asset-immune-cell-body/,
-      /asset-immune-segmented-nucleus/,
+      /asset-immune-lobed-nucleus/,
       /asset-immune-membrane-ruffle/,
       /asset-immune-membrane-receptor/,
-      /asset-immune-granule/,
+      /asset-immune-granule-field/,
       /asset-immune-cd-badge/
     ],
     "tissue-section": [
@@ -472,7 +565,7 @@ test("pathogen and biosafety assets have distinct premium vector markers", () =>
     plasmid: [/asset-plasmid-ring/, /asset-plasmid-origin/, /asset-plasmid-cargo/, /asset-plasmid-cut-site/],
     "pathogen-sample": [/asset-pathogen-sample-tube/, /asset-pathogen-sample-particles/, /asset-pathogen-sample-warning/],
     "biohazard-label": [/asset-biohazard-label/, /asset-biohazard-mark/, /asset-biohazard-ring/],
-    "biosafety-cabinet": [/asset-bsc-shell/, /asset-bsc-sash/, /asset-bsc-airflow/, /asset-bsc-warning-badge/]
+    "biosafety-cabinet": [/asset-bsc-shell/, /asset-bsc-sash/, /asset-bsc-glass-sash/, /asset-bsc-airflow/, /asset-bsc-work-zone/, /asset-bsc-hepa-filter-grille/, /asset-bsc-sample-tray/, /asset-bsc-warning-badge/]
   };
 
   for (const [assetId, markers] of Object.entries(expectedMarkers)) {
@@ -584,6 +677,32 @@ test("perturb-seq core assets expose distinct premium editable part markers", ()
   }
 });
 
+test("perturb-seq editing and readout assets expose agent-addressable part markers", () => {
+  const expectedMarkers: Record<string, RegExp[]> = {
+    "crispr-cas9": [/asset-crispr-cas9/, /asset-crispr-target-dna/, /asset-crispr-cas9-body/, /asset-crispr-guide-rna/, /asset-crispr-cut-site/],
+    "cell-barcode": [/asset-cell-barcode/, /asset-cell-barcode-frame/, /asset-cell-barcode-bar/, /asset-cell-barcode-read-window/, /asset-cell-barcode-anchor-dot/],
+    "sequencing-read": [/asset-sequencing-read/, /asset-sequencing-read-frame/, /asset-sequencing-read-base/, /asset-sequencing-quality-track/, /asset-sequencing-quality-sparkline/],
+    "umi-tag": [/asset-umi-tag/, /asset-umi-barcode-bead/, /asset-umi-capture-window/, /asset-umi-capture-hairpin/, /asset-umi-status-dot/],
+    "knockdown": [/asset-gene-edit-state/, /asset-gene-edit-knockdown-arrow/, /asset-gene-edit-target-exon/, /asset-gene-edit-editor-block/],
+    "activation": [/asset-gene-edit-state/, /asset-gene-edit-activation-arrow/, /asset-gene-edit-target-exon/, /asset-gene-edit-editor-block/],
+    "inhibition": [/asset-gene-edit-state/, /asset-gene-edit-inhibition-block/, /asset-gene-edit-target-exon/, /asset-gene-edit-editor-block/],
+    "base-editor": [/asset-gene-edit-base-editor/, /asset-base-editor-edit-mark/, /asset-gene-edit-target-exon/, /asset-gene-edit-editor-block/],
+    "prime-editor": [/asset-prime-editor/, /asset-prime-editor-body/, /asset-prime-editor-peg-rna/, /asset-prime-editor-rt-badge/, /asset-prime-editor-nick-site/],
+    "cell-macrophage": [/asset-cell-macrophage/, /asset-macrophage-pseudopod/, /asset-macrophage-bean-nucleus/, /asset-macrophage-phagosome/, /asset-macrophage-vacuole/]
+  };
+
+  for (const [assetId, markers] of Object.entries(expectedMarkers)) {
+    const asset = getAsset(assetId);
+    const svg = renderPremiumAssetSvg(assetId, { styleProfile: "consulting-2p5d", width: 180, height: 140 });
+    assert.ok(asset.workflowPacks.includes("perturb-seq-crispr"), `${assetId} should belong to perturb-seq-crispr`);
+    assert.ok(asset.qualityTier === "signature" || asset.qualityTier === "hero");
+    assert.match(svg, /commercial-premium-asset/);
+    assert.match(svg, /filter="url\(#asset-soft-shadow\)"/);
+    assert.ok(svg.length > 1800, `${assetId} render is too small to be a premium Perturb-seq editing/readout asset`);
+    for (const marker of markers) assert.match(svg, marker);
+  }
+});
+
 test("perturb-seq core publication-line assets remain export-clean line art", () => {
   for (const assetId of ["scrna-droplet", "guide-rna", "lentiviral-library", "expression-matrix"]) {
     const lineSvg = renderPremiumAssetSvg(assetId, { styleProfile: "publication-line", width: 180, height: 140 });
@@ -606,9 +725,9 @@ test("drug discovery broad pack assets expose dedicated premium recipe markers",
     "lead-series": [/asset-lead-series-molecule/, /asset-lead-series-rank/, /asset-lead-series-scaffold-link/, /asset-lead-series-optimization-arrow/, /asset-lead-series-anchor-scaffold/],
     "candidate-nomination": [/asset-candidate-nomination-card/, /asset-candidate-nomination-molecule/, /asset-candidate-nomination-stamp/, /asset-candidate-nomination-flag/, /asset-candidate-nomination-package-tab/, /asset-candidate-nomination-readiness-gate/],
     "target-engagement": [/asset-target-engagement-membrane/, /asset-target-engagement-membrane-lipid/, /asset-target-engagement-receptor/, /asset-target-engagement-ligand/, /asset-target-engagement-bound-complex/, /asset-target-engagement-occupancy/, /asset-target-engagement-phospho-signal/, /asset-target-engagement-assay-arc/],
-    "selectivity-panel": [/asset-selectivity-panel-frame/, /asset-selectivity-matrix-cell/, /asset-selectivity-target-cell/, /asset-selectivity-ratio/, /asset-selectivity-target-beam/, /asset-selectivity-offtarget-warning/],
+    "selectivity-panel": [/asset-selectivity-landscape/, /asset-selectivity-landscape-cell/, /asset-selectivity-target-cell/, /asset-selectivity-ratio/, /asset-selectivity-target-beam/, /asset-selectivity-offtarget-warning/],
     "pk-profile": [/asset-pk-profile-panel/, /asset-pk-profile-axis/, /asset-pk-profile-curve/, /asset-pk-profile-timepoint/, /asset-pk-profile-plasma-tube/, /asset-pk-profile-half-life-band/, /asset-pk-profile-clearance-arrow/],
-    "sar-table": [/asset-sar-table-card/, /asset-sar-table-row/, /asset-sar-table-molecule/, /asset-sar-table-potency-bar/, /asset-sar-table-delta/, /asset-sar-table-rgroup-header/, /asset-sar-table-best-row/],
+    "sar-table": [/asset-sar-optimization-map/, /asset-sar-optimization-scaffold/, /asset-sar-optimization-sidechain/, /asset-sar-optimization-series/, /asset-sar-optimization-molecule/, /asset-sar-optimization-potency-path/, /asset-sar-optimization-delta/, /asset-sar-optimization-rgroup-track/, /asset-sar-optimization-best-series/],
     "medicinal-chemistry-cycle": [/asset-medchem-cycle-orbit/, /asset-medchem-cycle-arrow/, /asset-medchem-cycle-molecule/, /asset-medchem-cycle-step/, /asset-medchem-cycle-central-card/, /asset-medchem-cycle-decision-gate/],
     "drug-perturbation": [/asset-drug-perturbation-pill/, /asset-drug-perturbation-pill-band/, /asset-drug-perturbation-cell/, /asset-drug-perturbation-exposure-path/, /asset-drug-perturbation-response/, /asset-drug-perturbation-response-arrow/],
     "efficacy-model": [/asset-efficacy-model-subject/, /asset-efficacy-model-tumor/, /asset-efficacy-model-response/, /asset-efficacy-model-dose/, /asset-efficacy-model-tumor-volume-axis/, /asset-efficacy-model-treatment-arm/, /asset-efficacy-model-response-badge/],
@@ -630,14 +749,22 @@ test("drug discovery broad pack assets expose dedicated premium recipe markers",
 
 test("drug discovery supporting anchors keep distinct visual silhouettes", () => {
   const markerGroups: Record<string, RegExp[]> = {
-    "metric-card": [/asset-metric-card-frame/, /asset-metric-card-score-dial/, /asset-metric-card-ranked-rows/, /asset-metric-card-decision-badge/, /asset-metric-card-summary-trend/],
+    "metric-card": [/asset-metric-evidence-slate/, /asset-metric-evidence-score-dial/, /asset-metric-evidence-ranked-rows/, /asset-metric-evidence-decision-mark/, /asset-metric-evidence-trend/],
     "calibration": [/asset-calibration-curve-frame/, /asset-calibration-curve-axes/, /asset-calibration-curve-ideal-line/, /asset-calibration-curve-observed-line/, /asset-calibration-curve-bin/, /asset-calibration-curve-ruler/],
-    "protein": [/asset-protein-helix/, /asset-protein-beta/, /asset-binding-pocket/],
-    "receptor": [/asset-receptor-membrane/, /asset-receptor-body/, /asset-receptor-bound-ligand/],
+    "protein": [/asset-protein-surface/, /asset-protein-domain-patch/, /asset-protein-helix/, /asset-protein-beta/, /asset-binding-pocket/, /asset-protein-pocket-ligand/],
+    "receptor": [/asset-receptor-membrane/, /asset-receptor-lipid-core/, /asset-receptor-body/, /asset-receptor-transmembrane-domain/, /asset-receptor-bound-ligand/],
     "ligand": [/asset-ligand-ring/, /asset-ligand-second-ring/, /asset-ligand-atom/],
-    "pathway-node": [/asset-pathway-node/, /asset-pathway-core-node/, /asset-pathway-edge/, /asset-phospho-badge/],
-    "signaling-cascade": [/asset-signaling-cascade/, /asset-cascade-node/, /asset-cascade-edge/, /asset-cascade-label/],
-    "protein-complex": [/asset-protein-complex/, /asset-complex-subunit/, /asset-complex-interface/]
+    "pathway-node": [/asset-pathway-node/, /asset-pathway-core-node/, /asset-pathway-node-inner-ring/, /asset-pathway-edge/, /asset-phospho-badge/, /asset-pathway-node-label-p/],
+    "signaling-cascade": [/asset-signaling-cascade/, /asset-cascade-node/, /asset-cascade-node-body/, /asset-cascade-phospho-dot/, /asset-cascade-edge/, /asset-cascade-output-label/],
+    "protein-complex": [/asset-protein-complex/, /asset-complex-subunit/, /asset-complex-subunit-highlight/, /asset-complex-active-site/, /asset-complex-interface/, /asset-complex-assembly-arc/],
+    "metabolite": [/asset-metabolite/, /asset-metabolite-backbone/, /asset-metabolite-accent-bond/, /asset-metabolite-atom/, /asset-metabolite-spectrum-label/],
+    "error-analysis": [/asset-error-analysis/, /asset-error-analysis-frame/, /asset-error-analysis-grid-cell/, /asset-error-analysis-lens/, /asset-error-analysis-check/],
+    "arrayed-screen": [/asset-arrayed-screen/, /asset-arrayed-screen-well/, /asset-arrayed-screen-hit-well/, /asset-arrayed-screen-check/, /asset-screening-hit-call/],
+    "pooled-screen": [/asset-pooled-screen/, /asset-pooled-screen-well/, /asset-pooled-screen-hit-well/, /asset-pooled-screen-pool-lens/, /asset-screening-readout/],
+    "plate-96": [/asset-plate96/, /asset-plate-frame/, /asset-plate96-well-map/, /asset-plate-hit-well/, /asset-plate96-hit-check/],
+    "plate-384": [/asset-plate384/, /asset-plate384-density-grid/, /asset-plate384-well/, /asset-plate384-format-badge/, /asset-plate384-rim-highlight/],
+    "cell-tumor": [/asset-cell-tumor/, /asset-tumor-cell-body/, /asset-tumor-cell-membrane/, /asset-tumor-cell-nucleus/, /asset-tumor-cell-stress-fiber/],
+    "gene-locus": [/asset-gene-locus/, /asset-gene-track-ruler/, /asset-gene-exon/, /asset-gene-direction-arrow/, /asset-gene-locus-signal/]
   };
 
   for (const [assetId, markers] of Object.entries(markerGroups)) {
@@ -647,7 +774,7 @@ test("drug discovery supporting anchors keep distinct visual silhouettes", () =>
     assert.match(svg, /commercial-premium-asset/);
     for (const marker of markers) assert.match(svg, marker);
   }
-  assert.doesNotMatch(renderPremiumAssetSvg("calibration", { styleProfile: "consulting-2p5d" }), /asset-metric-card-score-dial/);
+  assert.doesNotMatch(renderPremiumAssetSvg("calibration", { styleProfile: "consulting-2p5d" }), /asset-metric-evidence-score-dial/);
 });
 
 test("protein engineering broad pack assets expose dedicated premium recipe markers", () => {
@@ -656,10 +783,10 @@ test("protein engineering broad pack assets expose dedicated premium recipe mark
     "binding-pocket": [/asset-protein-engineering-pocket/, /asset-binding-pocket-cavity/, /asset-binding-pocket-ligand/],
     "directed-evolution": [/asset-protein-engineering-evolution/, /asset-directed-evolution-cycle/, /asset-directed-evolution-selection-gate/],
     "affinity-maturation": [/asset-protein-engineering-affinity/, /asset-affinity-maturation-antibody/, /asset-affinity-maturation-gauge/],
-    "protein-design-model": [/asset-protein-engineering-design-model/, /asset-protein-design-model-ribbon/, /asset-protein-design-model-card/],
+    "protein-design-model": [/asset-protein-engineering-design-model/, /asset-protein-design-model-ribbon/, /asset-protein-design-model-graph/, /asset-protein-design-model-latent-field/],
     "purification-column": [/asset-protein-engineering-purification/, /asset-purification-column/, /asset-purification-fractions/],
     "developability-profile": [/asset-protein-engineering-developability/, /asset-developability-profile-radar/, /asset-developability-risk-chip/],
-    "sequence-logo": [/asset-protein-engineering-sequence-logo/, /asset-sequence-logo-frame/, /asset-sequence-logo-column/]
+    "sequence-logo": [/asset-protein-engineering-sequence-logo/, /asset-sequence-logo-lattice/, /asset-sequence-logo-column/, /asset-sequence-logo-conservation-arc/]
   };
 
   for (const [assetId, markers] of Object.entries(expectedMarkers)) {
@@ -677,14 +804,14 @@ test("protein engineering broad pack assets expose dedicated premium recipe mark
 test("synthetic biology broad pack assets expose dedicated premium recipe markers", () => {
   const expectedMarkers: Record<string, RegExp[]> = {
     "genetic-circuit": [/asset-synbio-genetic-circuit/, /asset-genetic-circuit-feedback/, /asset-genetic-circuit-node/],
-    "promoter-library": [/asset-synbio-promoter-library/, /asset-promoter-library-card/, /asset-promoter-library-strength-scale/],
+    "promoter-library": [/asset-synbio-promoter-library/, /asset-promoter-library-variant/, /asset-promoter-library-dna-track/, /asset-promoter-library-strength-bead/],
     "plasmid-vector": [/asset-synbio-plasmid-vector/, /asset-plasmid-vector-ring/, /asset-plasmid-vector-cargo/],
     "dna-assembly": [/asset-synbio-dna-assembly/, /asset-dna-assembly-fragment/, /asset-dna-assembly-assembly-arrow/],
     "design-build-test-learn-cycle": [/asset-synbio-dbtl/, /asset-dbtl-cycle-arrow/, /asset-dbtl-stage/],
     "chassis-cell": [/asset-synbio-chassis/, /asset-synbio-chassis-cell/, /asset-chassis-expression-output/],
     "biosensor-circuit": [/asset-synbio-biosensor/, /asset-biosensor-signal/, /asset-biosensor-readout-card/],
     "metabolic-pathway-engineering": [/asset-synbio-metabolic-pathway/, /asset-metabolic-pathway-node/, /asset-metabolic-pathway-flux-edge/],
-    "pathway-flux-map": [/asset-synbio-flux-map/, /asset-flux-map-cell/, /asset-flux-map-trajectory/],
+    "pathway-flux-map": [/asset-synbio-flux-map/, /asset-flux-map-node/, /asset-flux-map-flux-edge/, /asset-flux-map-trajectory/],
     "kill-switch": [/asset-synbio-kill-switch/, /asset-kill-switch-shield/, /asset-kill-switch-toggle/]
   };
 
@@ -698,6 +825,12 @@ test("synthetic biology broad pack assets expose dedicated premium recipe marker
     assert.ok(svg.length > 2500, `${assetId} render is too small to be a premium synthetic-biology asset`);
     for (const marker of markers) assert.match(svg, marker);
   }
+  const promoterLibrarySvg = renderPremiumAssetSvg("promoter-library", { styleProfile: "consulting-2p5d", width: 180, height: 140 });
+  assert.doesNotMatch(promoterLibrarySvg, /asset-promoter-library-card|asset-synbio-panel/);
+  const dbtlSvg = renderPremiumAssetSvg("design-build-test-learn-cycle", { styleProfile: "consulting-2p5d", width: 180, height: 140 });
+  assert.doesNotMatch(dbtlSvg, /asset-synbio-panel/);
+  const fluxMapSvg = renderPremiumAssetSvg("pathway-flux-map", { styleProfile: "consulting-2p5d", width: 180, height: 140 });
+  assert.doesNotMatch(fluxMapSvg, /asset-synbio-panel|asset-flux-map-cell/);
 });
 
 test("microbiome infectious disease broad pack assets expose dedicated premium recipe markers", () => {
@@ -753,8 +886,8 @@ test("microscopy image analysis broad pack assets expose dedicated premium recip
     "image-analysis-pipeline": [/asset-microscopy-analysis-pipeline/, /asset-image-analysis-raw-tile/, /asset-image-analysis-pipeline-arrow/],
     "microscope-field": [/asset-microscopy-analysis-field/, /asset-microscope-field-fov/, /asset-microscope-field-scale-bar/],
     "fluorescence-channel": [/asset-microscopy-analysis-channel/, /asset-fluorescence-channel-stack/, /asset-fluorescence-channel-merge/],
-    "z-stack": [/asset-microscopy-analysis-z-stack/, /asset-z-stack-volume/, /asset-z-stack-depth-arrow/],
-    "tile-stitching": [/asset-microscopy-analysis-tile-stitching/, /asset-microscopy-tile/, /asset-tile-stitching-seam/],
+    "z-stack": [/asset-microscopy-analysis-z-stack/, /asset-z-stack-slice-volume/, /asset-z-stack-optical-slice/, /asset-z-stack-depth-arrow/],
+    "tile-stitching": [/asset-microscopy-analysis-tile-stitching/, /asset-tile-stitching-mosaic/, /asset-microscopy-mosaic-tile/, /asset-tile-stitching-registration-seam/],
     "nuclei-segmentation": [/asset-microscopy-analysis-nuclei-segmentation/, /asset-nuclei-segmentation-mask/, /asset-nuclei-segmentation-contour/],
     "membrane-segmentation": [/asset-microscopy-analysis-membrane-segmentation/, /asset-membrane-segmentation-tile/, /asset-membrane-segmentation-contour/],
     "instance-mask": [/asset-microscopy-analysis-instance-mask/, /asset-instance-mask-region/, /asset-instance-mask-id-badges/],
@@ -776,14 +909,14 @@ test("microscopy image analysis broad pack assets expose dedicated premium recip
 
 test("lab automation broad pack assets expose dedicated premium recipe markers", () => {
   const expectedMarkers: Record<string, RegExp[]> = {
-    "lab-automation-platform": [/asset-lab-automation-platform/, /asset-lab-automation-scheduler-card/, /asset-lab-automation-deck-map/],
+    "lab-automation-platform": [/asset-lab-automation-workcell/, /asset-lab-automation-run-trace/, /asset-lab-automation-run-route/, /asset-lab-automation-deck-map/],
     "robotic-arm": [/asset-lab-automation-robotic-arm/, /asset-robotic-arm-joint/, /asset-robotic-arm-gripper/],
     "automated-liquid-handler": [/asset-lab-automation-automated-liquid-handler/, /asset-liquid-handler-head/, /asset-liquid-handler-deck/],
     "plate-handler": [/asset-lab-automation-plate-handler/, /asset-plate-handler-shuttle/, /asset-plate-handler-plate/],
     "plate-stack": [/asset-lab-automation-plate-stack/, /asset-plate-stack-layer/, /asset-plate-stack-loader/],
     "barcode-scanner": [/asset-lab-automation-barcode-scanner/, /asset-barcode-scanner-beam/, /asset-barcode-label/],
     "plate-reader": [/asset-lab-automation-plate-reader/, /asset-plate-reader-optics/, /asset-plate-reader-signal/],
-    "lims-dashboard": [/asset-lab-automation-lims-dashboard/, /asset-lims-dashboard-table/, /asset-lims-dashboard-status/],
+    "lims-dashboard": [/asset-lab-automation-lims-run-monitor/, /asset-lims-sample-ledger/, /asset-lims-sample-ledger-route/, /asset-lims-run-state/],
     "assay-scheduler": [/asset-lab-automation-assay-scheduler/, /asset-assay-scheduler-timeline/, /asset-assay-scheduler-lane/],
     "qc-gate-automation": [/asset-lab-automation-qc-gate/, /asset-automation-qc-gate/, /asset-automation-qc-threshold/]
   };
@@ -804,6 +937,13 @@ test("anatomy organ systems broad pack assets expose dedicated premium recipe ma
   const expectedMarkers: Record<string, RegExp[]> = {
     "anatomy-overview": [/asset-anatomy-overview/, /asset-anatomy-organ-card/, /asset-anatomy-axis-link/],
     "organ-axis-brain-lung-gut": [/asset-organ-axis-brain-lung-gut/, /asset-organ-axis-node/, /asset-organ-axis-connector/],
+    brain: [/asset-anatomy-brain/, /asset-brain-cortical-folds/, /asset-brain-stem/],
+    lung: [/asset-anatomy-lung/, /asset-lung-bronchial-tree/, /asset-lung-alveoli-cluster/],
+    gut: [/asset-anatomy-gut/, /asset-gut-colon/, /asset-gut-microbiome/],
+    liver: [/asset-anatomy-liver/, /asset-liver-portal/, /asset-liver-gallbladder/],
+    heart: [/asset-anatomy-heart/, /asset-heart-aorta/, /asset-heart-chamber-septa/],
+    "immune-system": [/asset-anatomy-immune-system/, /asset-immune-system-node/, /asset-immune-lineage-map/],
+    "blood-brain-barrier": [/asset-blood-brain-barrier/, /asset-bbb-junction/, /asset-bbb-astrocyte-foot/],
     kidney: [/asset-anatomy-kidney/, /asset-kidney-cortex/, /asset-kidney-vessel/],
     spleen: [/asset-anatomy-spleen/, /asset-spleen-white-pulp/],
     pancreas: [/asset-anatomy-pancreas/, /asset-pancreas-duct/],
@@ -813,7 +953,18 @@ test("anatomy organ systems broad pack assets expose dedicated premium recipe ma
     vasculature: [/asset-anatomy-vasculature/, /asset-vasculature-branch/],
     "renal-nephron": [/asset-anatomy-renal-nephron/, /asset-nephron-loop/],
     "hepatic-lobule": [/asset-anatomy-hepatic-lobule/, /asset-hepatic-lobule-sinusoid/],
-    "tissue-biomarker-panel": [/asset-anatomy-biomarker-panel/, /asset-biomarker-row/],
+    "cardiac-muscle": [/asset-anatomy-heart-muscle/, /asset-heart-muscle-fiber/, /asset-heart-intercalated-disc/],
+    "human-cohort": [/asset-human-cohort/, /asset-human-cohort-people/, /asset-human-cohort-consent-card/],
+    "organoid-model": [/asset-organoid-model/, /asset-organoid-lobular-body/, /asset-organoid-lobe/],
+    "mouse-model": [/asset-mouse-model/, /asset-mouse-body/, /asset-mouse-tail/],
+    "cell-epithelial": [/asset-cell-epithelial/, /asset-epithelial-cell-column/, /asset-epithelial-basement-membrane/],
+    "cell-neuron": [/asset-cell-neuron/, /asset-neuron-soma/, /asset-neuron-axon-dendrite-tree/],
+    "cell-hepatocyte": [/asset-cell-hepatocyte/, /asset-hepatocyte-cell-plate/, /asset-hepatocyte-sinusoid/],
+    "cell-muscle": [/asset-cell-muscle/, /asset-muscle-fiber/, /asset-muscle-striation/],
+    "blood-sample": [/asset-blood-sample/, /asset-blood-sample-tube/, /asset-red-blood-cell/],
+    "histology-section": [/asset-histology-section/, /asset-histology-gland/, /asset-histology-nucleus-speckle/],
+    "spatial-grid": [/asset-spatial-grid/, /asset-spatial-grid-spot/, /asset-spatial-grid-axis/],
+    "tissue-biomarker-panel": [/asset-anatomy-biomarker-matrix/, /asset-biomarker-row/],
     "clinical-endpoint-card": [/asset-anatomy-clinical-endpoint-card/, /asset-clinical-endpoint-row/],
     "organ-system-network": [/asset-anatomy-organ-system-network/, /asset-organ-system-network-node/]
   };
@@ -833,14 +984,28 @@ test("anatomy organ systems broad pack assets expose dedicated premium recipe ma
 test("methods and protocols broad pack assets expose dedicated premium recipe markers", () => {
   const expectedMarkers: Record<string, RegExp[]> = {
     "protocol-overview": [/asset-methods-protocol-overview/, /asset-methods-step-node/, /asset-methods-review-gate/],
-    "sample-prep-workflow": [/asset-methods-sample-prep-workflow/, /asset-sample-prep-input-tube/, /asset-sample-prep-cleanup/],
+    "sample-prep-workflow": [/asset-methods-sample-prep-workflow/, /asset-sample-prep-input-tube/, /asset-methods-tube-liquid/, /asset-sample-prep-cleanup/],
     "reagent-mastermix": [/asset-methods-reagent-mastermix/, /asset-reagent-mastermix-bottle/, /asset-reagent-mastermix-droplet/],
     "serial-dilution": [/asset-methods-serial-dilution/, /asset-serial-dilution-tube-row/, /asset-serial-dilution-gradient/],
-    "qpcr-assay": [/asset-methods-qpcr-assay/, /asset-qpcr-instrument/, /asset-qpcr-amplification-curve/],
-    "elisa-assay": [/asset-methods-elisa-assay/, /asset-elisa-plate/, /asset-elisa-antibody-bridge/],
+    "wash-step": [/asset-methods-wash-step/, /asset-wash-buffer-stream/, /asset-wash-step-plate/, /asset-methods-plate-well-map/],
+    "pcr-amplification": [/asset-methods-pcr-amplification/, /asset-pcr-thermocycler/, /asset-pcr-helix/],
+    "qpcr-assay": [/asset-methods-qpcr-assay/, /asset-qpcr-instrument/, /asset-qpcr-amplification-curve/, /asset-methods-curve-axis/, /asset-methods-curve-endpoint/],
+    "elisa-assay": [/asset-methods-elisa-assay/, /asset-elisa-plate/, /asset-methods-plate-hit-well/, /asset-elisa-antibody-bridge/],
     "western-blot-workflow": [/asset-methods-western-blot-workflow/, /asset-western-blot-gel/, /asset-western-blot-bands/],
+    "gel-imaging": [/asset-methods-gel-imaging/, /asset-gel-imaging-box/, /asset-gel-imaging-bands/],
+    "immunostaining": [/asset-methods-immunostaining/, /asset-immunostaining-cells/, /asset-immunostaining-antibody/],
+    "fixation-permeabilization": [/asset-methods-fixation-permeabilization/, /asset-fixperm-cell/, /asset-fixperm-permeabilization-drops/],
+    "cell-culture-passaging": [/asset-methods-cell-culture-passaging/, /asset-cell-culture-flask/, /asset-cell-culture-cells/],
+    "transfection-step": [/asset-methods-transfection-step/, /asset-transfection-cell/, /asset-transfection-vector/],
+    "assay-timeline": [/asset-methods-assay-timeline/, /asset-assay-timeline-lanes/, /asset-assay-timeline-step/],
+    "protocol-checklist": [/asset-methods-protocol-checklist/, /asset-protocol-checklist-rows/, /asset-methods-checkmark/],
     "protocol-qc-gate": [/asset-methods-protocol-qc-gate/, /asset-protocol-qc-gate-shield/, /asset-protocol-qc-check/],
+    "replicate-layout": [/asset-methods-replicate-layout/, /asset-replicate-layout-plate/, /asset-replicate-layout-grouping/],
     "standard-curve": [/asset-methods-standard-curve/, /asset-standard-curve-fit/, /asset-standard-curve-points/],
+    "reagent-compatibility": [/asset-methods-reagent-compatibility/, /asset-reagent-compatibility-matrix/],
+    "temperature-profile": [/asset-methods-temperature-profile/, /asset-temperature-profile-curve/, /asset-temperature-profile-hold/],
+    "sample-normalization": [/asset-methods-sample-normalization/, /asset-sample-normalization-bars/, /asset-sample-normalization-target/],
+    "protocol-deviation": [/asset-methods-protocol-deviation/, /asset-protocol-deviation-warning/, /asset-protocol-deviation-log-line/],
     "method-safety-note": [/asset-methods-method-safety-note/, /asset-method-safety-note-card/, /asset-method-safety-note-badge/]
   };
 
@@ -852,6 +1017,8 @@ test("methods and protocols broad pack assets expose dedicated premium recipe ma
     assert.ok(asset.workflowPacks.includes("methods-and-protocols"));
     assert.ok(asset.qualityTier === "signature" || asset.qualityTier === "hero");
     assert.ok(svg.length > 1800, `${assetId} render is too small to be a premium methods/protocols asset`);
+    assert.match(svg, /asset-methods-frame/);
+    assert.match(svg, /asset-methods-rim-highlight/);
     for (const marker of markers) assert.match(svg, marker);
   }
 });
@@ -900,8 +1067,8 @@ test("clinical translational broad pack assets expose dedicated premium recipe m
     "biomarker-validation": [/asset-clinical-biomarker-validation/, /asset-biomarker-panel-card/, /asset-biomarker-marker/, /asset-assay-validation-check/],
     "endpoint-hierarchy": [/asset-clinical-endpoint-hierarchy/, /asset-endpoint-card/, /asset-primary-endpoint/, /asset-secondary-endpoint/],
     "survival-curve": [/asset-clinical-survival-curve/, /asset-survival-curve-axes/, /asset-survival-step-curve/],
-    "adverse-event-panel": [/asset-clinical-adverse-event-panel/, /asset-adverse-event-panel/, /asset-clinical-safety-shield/, /asset-safety-monitoring-pulse/],
-    "regulatory-evidence-brief": [/asset-clinical-regulatory-evidence-brief/, /asset-clinical-evidence-grade/, /asset-regulatory-evidence-card/],
+    "adverse-event-panel": [/asset-clinical-adverse-event-signal/, /asset-adverse-event-signal-field/, /asset-adverse-event-severity-dot/, /asset-clinical-safety-shield/, /asset-safety-monitoring-pulse/],
+    "regulatory-evidence-brief": [/asset-clinical-regulatory-evidence-brief/, /asset-regulatory-evidence-dossier/, /asset-regulatory-evidence-seal/, /asset-regulatory-evidence-ribbon/],
     "ecrf-data-capture": [/asset-clinical-ecrf-data-capture/, /asset-ecrf-data-capture-card/, /asset-clinical-data-lock/],
     "site-activation": [/asset-clinical-site-activation/, /asset-site-activation-map/, /asset-site-pin/],
     "clinical-decision-support": [/asset-clinical-clinical-decision-support/, /asset-pro-speech-bubble/, /asset-clinical-decision-support-arrow/]
@@ -1195,7 +1362,7 @@ test("premium coverage roadmap exposes 12 month targets and ontology contracts",
   assert.equal(coverage.firstWave, "broad-biology-market");
   assert.equal(coverage.qualityGate, "pack-complete-premium");
   assert.equal(coverage.commercialVisualAudit.premiumLabelFreeze, true);
-  assert.ok(coverage.commercialVisualAudit.highRiskPremiumAssets > 0);
+  assert.equal(coverage.commercialVisualAudit.highRiskPremiumAssets, 0);
   assert.deepEqual(coverage.broadMarketPackOrder.slice(0, 5), ["drug-discovery", "protein-engineering", "synthetic-biology", "microbiome-infectious-disease", "cell-therapy"]);
   assert.equal(coverage.packMinimumContract.minSignatureHeroAssets, 12);
   assert.equal(coverage.packMinimumContract.requiresAgentPath, true);
@@ -1884,10 +2051,78 @@ test("priority flagship templates generate commercial editable figure structures
   assert.ok(spatial.some((node) => node.kind === "symbol" && node.payload.assetId === "cell-boundary"));
   assert.ok(spatial.some((node) => node.kind === "symbol" && node.payload.assetId === "neighborhood-graph"));
 
+  const singleCell = createWorkflowFigureNodes({ templateId: "single-cell-workflow", styleProfile: "consulting-2p5d" });
+  assert.ok(singleCell.length >= 58);
+  assert.ok(singleCell.some((node) => node.kind === "text" && node.payload.text?.includes("Single-cell multiomics capture-to-state figure")));
+  assert.ok(singleCell.some((node) => node.kind === "text" && node.payload.text?.includes("RNA/ATAC readout")));
+  assert.ok(singleCell.some((node) => node.kind === "plot" && node.payload.spec.plotType === "embedding-scatter"));
+  assert.ok(singleCell.some((node) => node.kind === "plot" && node.payload.spec.plotType === "bar" && node.payload.spec.title === "Evidence layers"));
+  for (const assetId of ["scrna-droplet", "cell-barcode", "umi-tag", "read-pair", "sequencing-read", "expression-matrix", "chromatin", "peak-call", "genome-browser-track", "embedding-space", "cell-neighborhood", "variant-snp", "copy-number"]) {
+    assert.ok(singleCell.some((node) => node.kind === "symbol" && node.payload.assetId === assetId), `${assetId} should appear in single-cell multiomics flagship`);
+  }
+  assert.ok(singleCell.some((node) => node.kind === "symbol" && node.payload.layoutHint === "single-cell-workflow:capture-droplet"));
+  assert.ok(singleCell.some((node) => node.kind === "symbol" && node.payload.layoutHint === "single-cell-workflow:genome-browser-track"));
+  assert.ok(singleCell.some((node) => node.kind === "text" && node.payload.text === "Review queue"));
+  assert.ok(singleCell.every((node) => node.payload.workflowPack === "single-cell-multiomics" && node.payload.templateId === "single-cell-workflow"));
+
+  const embeddingResults = createWorkflowFigureNodes({ templateId: "embedding-results", styleProfile: "consulting-2p5d" });
+  assert.ok(embeddingResults.length >= 58);
+  assert.ok(embeddingResults.some((node) => node.kind === "text" && node.payload.text?.includes("Single-cell embedding and marker evidence")));
+  assert.ok(embeddingResults.some((node) => node.kind === "text" && node.payload.text === "Marker heatmap and lineage anchors"));
+  assert.ok(embeddingResults.some((node) => node.kind === "text" && node.payload.text === "Cell-state callouts"));
+  assert.ok(embeddingResults.some((node) => node.kind === "text" && node.payload.text === "Review before export"));
+  assert.ok(embeddingResults.some((node) => node.kind === "plot" && node.payload.spec.plotType === "embedding-scatter" && node.payload.spec.title === "Cell-state embedding"));
+  assert.ok(embeddingResults.some((node) => node.kind === "plot" && node.payload.spec.plotType === "heatmap" && node.payload.spec.title === "Marker program"));
+  for (const assetId of ["embedding-space", "cell-neighborhood", "gene-locus", "expression-matrix", "cell-t", "cell-b", "cell-macrophage", "cell-stem", "cell-dividing", "cell-immune"]) {
+    assert.ok(embeddingResults.some((node) => node.kind === "symbol" && node.payload.assetId === assetId), `${assetId} should appear in embedding-results template`);
+  }
+  assert.ok(embeddingResults.some((node) => node.kind === "symbol" && node.payload.layoutHint === "embedding-results:embedding-space"));
+  assert.ok(embeddingResults.some((node) => node.kind === "symbol" && node.payload.layoutHint === "embedding-results:myeloid-anchor"));
+  assert.ok(embeddingResults.every((node) => !String(node.payload.text ?? "").includes("Agent template: embedding-results")));
+  assert.ok(embeddingResults.every((node) => node.payload.workflowPack === "single-cell-multiomics" && node.payload.templateId === "embedding-results"));
+
+  const cellState = createWorkflowFigureNodes({ templateId: "cell-state-summary", styleProfile: "consulting-2p5d" });
+  assert.ok(cellState.length >= 62);
+  assert.ok(cellState.some((node) => node.kind === "text" && node.payload.text?.includes("Single-cell cell-state summary")));
+  assert.ok(cellState.some((node) => node.kind === "text" && node.payload.text === "State trajectory hypothesis"));
+  assert.ok(cellState.some((node) => node.kind === "text" && node.payload.text === "Composition and marker support"));
+  assert.ok(cellState.some((node) => node.kind === "text" && node.payload.text === "Editable state evidence chain"));
+  assert.ok(cellState.some((node) => node.kind === "text" && node.payload.text === "Review before export"));
+  assert.ok(cellState.some((node) => node.kind === "plot" && node.payload.spec.plotType === "bar" && node.payload.spec.title === "State composition"));
+  assert.ok(cellState.some((node) => node.kind === "connector" && node.style.lineStyle === "dashed"));
+  for (const assetId of ["cell-stem", "cell-dividing", "cell-immune", "cell-macrophage", "cell-neighborhood", "embedding-space", "expression-matrix", "gene-locus"]) {
+    assert.ok(cellState.some((node) => node.kind === "symbol" && node.payload.assetId === assetId), `${assetId} should appear in cell-state-summary template`);
+  }
+  assert.ok(cellState.some((node) => node.kind === "symbol" && node.payload.layoutHint === "cell-state-summary:state-cycling"));
+  assert.ok(cellState.some((node) => node.kind === "symbol" && node.payload.layoutHint === "cell-state-summary:marker-support-locus"));
+  assert.ok(cellState.every((node) => !String(node.payload.text ?? "").includes("Agent template: cell-state-summary")));
+  assert.ok(cellState.every((node) => node.payload.workflowPack === "single-cell-multiomics" && node.payload.templateId === "cell-state-summary"));
+
+  const multiome = createWorkflowFigureNodes({ templateId: "multiome-assay-summary", styleProfile: "consulting-2p5d" });
+  assert.ok(multiome.length >= 50);
+  assert.ok(multiome.some((node) => node.kind === "text" && node.payload.text?.includes("Single-cell multiome RNA + ATAC summary")));
+  assert.ok(multiome.some((node) => node.kind === "text" && node.payload.text === "Joint capture to paired modalities"));
+  assert.ok(multiome.some((node) => node.kind === "text" && node.payload.text === "RNA expression evidence"));
+  assert.ok(multiome.some((node) => node.kind === "text" && node.payload.text === "ATAC accessibility evidence"));
+  assert.ok(multiome.some((node) => node.kind === "text" && node.payload.text === "Concordance and review"));
+  assert.ok(multiome.some((node) => node.kind === "plot" && node.payload.spec.plotType === "bar" && node.payload.spec.title === "RNA expression"));
+  assert.ok(multiome.some((node) => node.kind === "plot" && node.payload.spec.plotType === "line" && node.payload.spec.title === "Peak signal"));
+  assert.ok(multiome.some((node) => node.kind === "plot" && node.payload.spec.plotType === "heatmap" && node.payload.spec.title === "RNA/ATAC concordance"));
+  for (const assetId of ["scrna-droplet", "cell-barcode", "read-pair", "expression-matrix", "chromatin", "peak-call", "genome-browser-track", "nucleosome"]) {
+    assert.ok(multiome.some((node) => node.kind === "symbol" && node.payload.assetId === assetId), `${assetId} should appear in multiome-assay-summary template`);
+  }
+  assert.ok(multiome.some((node) => node.kind === "symbol" && node.payload.layoutHint === "multiome-assay-summary:rna-expression-matrix"));
+  assert.ok(multiome.some((node) => node.kind === "symbol" && node.payload.layoutHint === "multiome-assay-summary:genome-track"));
+  assert.ok(multiome.every((node) => !String(node.payload.text ?? "").includes("Agent template: multiome-assay-summary")));
+  assert.ok(multiome.every((node) => node.payload.workflowPack === "single-cell-multiomics" && node.payload.templateId === "multiome-assay-summary"));
+
   const drug = createWorkflowFigureNodes({ templateId: "drug-discovery-funnel", styleProfile: "consulting-2p5d" });
   assert.ok(drug.length >= 58);
   assert.ok(drug.some((node) => node.kind === "text" && node.payload.text?.includes("Drug discovery target-to-candidate funnel")));
-  assert.ok(drug.some((node) => node.kind === "text" && node.payload.text?.includes("Decision spine: validate biology")));
+  assert.ok(drug.some((node) => node.kind === "text" && node.payload.text?.includes("Target-to-hit evidence board")));
+  assert.ok(drug.some((node) => node.kind === "text" && node.payload.text?.includes("DMPK, safety, and nomination gate")));
+  assert.ok(drug.some((node) => node.kind === "text" && node.payload.text === "Candidate evidence path"));
+  assert.ok(drug.every((node) => !String(node.payload.text ?? "").includes("Decision spine: validate biology")));
   for (const status of ["source-linked", "editable SAR", "QA gate"]) {
     assert.ok(drug.some((node) => node.kind === "text" && node.payload.text === status), `${status} status chip should appear in drug-discovery flagship`);
   }
@@ -1896,7 +2131,8 @@ test("priority flagship templates generate commercial editable figure structures
   for (const assetId of ["target-validation", "compound-library", "medicinal-chemistry-cycle", "target-engagement", "sar-table", "pk-profile", "ind-enabling-package"]) {
     assert.ok(drug.some((node) => node.kind === "symbol" && node.payload.assetId === assetId), `${assetId} should appear in drug-discovery flagship`);
   }
-  assert.ok(drug.some((node) => node.kind === "symbol" && node.payload.layoutHint?.startsWith("drug-discovery-funnel:stage-")));
+  assert.ok(drug.some((node) => node.kind === "symbol" && node.payload.layoutHint === "drug-discovery-funnel:evidence-target-validation"));
+  assert.ok(drug.some((node) => node.kind === "symbol" && node.payload.layoutHint === "drug-discovery-funnel:gate-candidate-nomination"));
   assert.ok(drug.every((node) => node.payload.workflowPack === "drug-discovery" && node.payload.templateId === "drug-discovery-funnel"));
 
   const protein = createWorkflowFigureNodes({ templateId: "protein-engineering-platform", styleProfile: "consulting-2p5d" });
@@ -1916,33 +2152,42 @@ test("priority flagship templates generate commercial editable figure structures
   const synthetic = createWorkflowFigureNodes({ templateId: "synthetic-biology-platform", styleProfile: "consulting-2p5d" });
   assert.ok(synthetic.length >= 58);
   assert.ok(synthetic.some((node) => node.kind === "text" && node.payload.text?.includes("Synthetic biology design-build-test-learn platform")));
-  assert.ok(synthetic.some((node) => node.kind === "text" && node.payload.text?.includes("Decision spine: design circuit")));
+  assert.ok(synthetic.some((node) => node.kind === "text" && node.payload.text?.includes("Genetic circuit design canvas")));
+  assert.ok(synthetic.some((node) => node.kind === "text" && node.payload.text === "DBTL trace"));
+  assert.ok(synthetic.every((node) => !String(node.payload.text ?? "").includes("Decision spine: design circuit")));
   assert.ok(synthetic.some((node) => node.kind === "text" && node.payload.text === "containment-review"));
   assert.ok(synthetic.some((node) => node.kind === "plot" && node.payload.spec.plotType === "line" && node.payload.spec.title === "Sensor response"));
   assert.ok(synthetic.some((node) => node.kind === "plot" && node.payload.spec.plotType === "bar" && node.payload.spec.title === "Pathway output"));
   for (const assetId of ["genetic-circuit", "dna-assembly", "chassis-cell", "biosensor-circuit", "kill-switch", "promoter-library", "synthetic-operon", "metabolic-pathway-engineering"]) {
     assert.ok(synthetic.some((node) => node.kind === "symbol" && node.payload.assetId === assetId), `${assetId} should appear in synthetic-biology flagship`);
   }
-  assert.ok(synthetic.some((node) => node.kind === "symbol" && node.payload.layoutHint?.startsWith("synthetic-biology-platform:stage-")));
+  assert.ok(synthetic.some((node) => node.kind === "symbol" && node.payload.layoutHint === "synthetic-biology-platform:circuit-map"));
+  assert.ok(synthetic.some((node) => node.kind === "symbol" && node.payload.layoutHint === "synthetic-biology-platform:containment-gate"));
   assert.ok(synthetic.every((node) => node.payload.workflowPack === "synthetic-biology" && node.payload.templateId === "synthetic-biology-platform"));
 
   const microbiome = createWorkflowFigureNodes({ templateId: "microbiome-infectious-disease-platform", styleProfile: "consulting-2p5d" });
   assert.ok(microbiome.length >= 70);
   assert.ok(microbiome.some((node) => node.kind === "text" && node.payload.text?.includes("Microbiome and infectious disease evidence workflow")));
-  assert.ok(microbiome.some((node) => node.kind === "text" && node.payload.text?.includes("Decision spine: community context")));
+  assert.ok(microbiome.some((node) => node.kind === "text" && node.payload.text?.includes("Host-microbe interface map")));
+  assert.ok(microbiome.some((node) => node.kind === "text" && node.payload.text?.includes("AMR and outbreak review")));
+  assert.ok(microbiome.some((node) => node.kind === "text" && node.payload.text === "Evidence path"));
+  assert.ok(microbiome.every((node) => !String(node.payload.text ?? "").includes("Decision spine: community context")));
   assert.ok(microbiome.some((node) => node.kind === "text" && node.payload.text === "source-and-containment-review"));
   assert.ok(microbiome.some((node) => node.kind === "plot" && node.payload.spec.plotType === "line" && node.payload.spec.title === "Infection load"));
   assert.ok(microbiome.some((node) => node.kind === "plot" && node.payload.spec.plotType === "bar" && node.payload.spec.title === "AMR signals"));
   for (const assetId of ["microbiome-community", "mucosal-barrier", "pathogen-host-interaction", "metagenomic-read", "antimicrobial-resistance", "gut-microbiome", "amr-gene", "outbreak-cluster"]) {
     assert.ok(microbiome.some((node) => node.kind === "symbol" && node.payload.assetId === assetId), `${assetId} should appear in microbiome infectious disease flagship`);
   }
-  assert.ok(microbiome.some((node) => node.kind === "symbol" && node.payload.layoutHint?.startsWith("microbiome-infectious-disease-platform:stage-")));
+  assert.ok(microbiome.some((node) => node.kind === "symbol" && node.payload.layoutHint === "microbiome-infectious-disease-platform:interface-community"));
+  assert.ok(microbiome.some((node) => node.kind === "symbol" && node.payload.layoutHint === "microbiome-infectious-disease-platform:review-outbreak"));
   assert.ok(microbiome.every((node) => node.payload.workflowPack === "microbiome-infectious-disease" && node.payload.templateId === "microbiome-infectious-disease-platform"));
 
   const cellTherapy = createWorkflowFigureNodes({ templateId: "cell-therapy-manufacturing-platform", styleProfile: "consulting-2p5d" });
   assert.ok(cellTherapy.length >= 70);
   assert.ok(cellTherapy.some((node) => node.kind === "text" && node.payload.text?.includes("Cell therapy vein-to-vein manufacturing workflow")));
-  assert.ok(cellTherapy.some((node) => node.kind === "text" && node.payload.text?.includes("Decision spine: patient material")));
+  assert.ok(cellTherapy.some((node) => node.kind === "text" && node.payload.text?.includes("Vein-to-vein manufacturing map")));
+  assert.ok(cellTherapy.some((node) => node.kind === "text" && node.payload.text?.includes("Vein-to-vein path")));
+  assert.ok(cellTherapy.every((node) => !String(node.payload.text ?? "").includes("Decision spine: patient material")));
   assert.ok(cellTherapy.some((node) => node.kind === "text" && node.payload.text === "toxicity-and-followup-review"));
   assert.ok(cellTherapy.some((node) => node.kind === "plot" && node.payload.spec.plotType === "line" && node.payload.spec.title === "Potency"));
   assert.ok(cellTherapy.some((node) => node.kind === "plot" && node.payload.spec.plotType === "bar" && node.payload.spec.title === "Release QC"));
@@ -1950,7 +2195,8 @@ test("priority flagship templates generate commercial editable figure structures
   for (const assetId of ["leukapheresis", "viral-vector-transduction", "cell-expansion", "release-testing", "patient-infusion", "car-t-cell", "tumor-antigen", "potency-assay", "infusion-bag", "cytokine-release"]) {
     assert.ok(cellTherapy.some((node) => node.kind === "symbol" && node.payload.assetId === assetId), `${assetId} should appear in cell-therapy flagship`);
   }
-  assert.ok(cellTherapy.some((node) => node.kind === "symbol" && node.payload.layoutHint?.startsWith("cell-therapy-manufacturing-platform:stage-")));
+  assert.ok(cellTherapy.some((node) => node.kind === "symbol" && node.payload.layoutHint === "cell-therapy-manufacturing-platform:vein-leukapheresis"));
+  assert.ok(cellTherapy.some((node) => node.kind === "symbol" && node.payload.layoutHint === "cell-therapy-manufacturing-platform:safety-cytokine"));
   assert.ok(cellTherapy.every((node) => node.payload.workflowPack === "cell-therapy" && node.payload.templateId === "cell-therapy-manufacturing-platform"));
 
   const microscopy = createWorkflowFigureNodes({ templateId: "microscopy-image-analysis-pipeline", styleProfile: "consulting-2p5d" });
@@ -1970,37 +2216,46 @@ test("priority flagship templates generate commercial editable figure structures
   const labAutomation = createWorkflowFigureNodes({ templateId: "lab-automation-platform", styleProfile: "consulting-2p5d" });
   assert.ok(labAutomation.length >= 80);
   assert.ok(labAutomation.some((node) => node.kind === "text" && node.payload.text?.includes("Lab automation assay execution platform")));
-  assert.ok(labAutomation.some((node) => node.kind === "text" && node.payload.text?.includes("Decision spine: deck setup")));
+  assert.ok(labAutomation.some((node) => node.kind === "text" && node.payload.text?.includes("Robotic workcell deck map")));
+  assert.ok(labAutomation.every((node) => !String(node.payload.text ?? "").includes("Decision spine: deck setup")));
   assert.ok(labAutomation.some((node) => node.kind === "text" && node.payload.text === "operator-review-and-qc-signoff"));
   assert.ok(labAutomation.some((node) => node.kind === "plot" && node.payload.spec.plotType === "line" && node.payload.spec.title === "Run QC"));
   for (const assetId of ["assay-scheduler", "automated-liquid-handler", "robotic-arm", "plate-reader", "lims-dashboard", "deck-layout", "tip-rack", "reagent-reservoir", "plate-384", "plate-stack", "plate-handler", "barcode-scanner", "incubator-stack", "sample-tracker", "automation-orchestrator", "qc-gate-automation", "lab-sensor"]) {
     assert.ok(labAutomation.some((node) => node.kind === "symbol" && node.payload.assetId === assetId), `${assetId} should appear in lab automation flagship`);
   }
-  assert.ok(labAutomation.some((node) => node.kind === "symbol" && node.payload.layoutHint?.startsWith("lab-automation-platform:stage-")));
+  assert.ok(labAutomation.some((node) => node.kind === "symbol" && node.payload.layoutHint?.startsWith("lab-automation-platform:workcell-")));
+  assert.ok(labAutomation.some((node) => node.kind === "text" && node.payload.text === "Sample identity ribbon"));
   assert.ok(labAutomation.every((node) => node.payload.workflowPack === "lab-automation" && node.payload.templateId === "lab-automation-platform"));
 
   const anatomy = createWorkflowFigureNodes({ templateId: "anatomy-organ-system-overview", styleProfile: "consulting-2p5d" });
   assert.ok(anatomy.length >= 80);
   assert.ok(anatomy.some((node) => node.kind === "text" && node.payload.text?.includes("Anatomy organ system context map")));
-  assert.ok(anatomy.some((node) => node.kind === "text" && node.payload.text?.includes("Decision spine: organ context")));
+  assert.ok(anatomy.some((node) => node.kind === "text" && node.payload.text?.includes("Cross-organ atlas map")));
+  assert.ok(anatomy.some((node) => node.kind === "text" && node.payload.text === "Organ evidence path"));
+  assert.ok(anatomy.every((node) => !String(node.payload.text ?? "").includes("Decision spine: organ context")));
   assert.ok(anatomy.some((node) => node.kind === "text" && node.payload.text === "clinical-context-review"));
   assert.ok(anatomy.some((node) => node.kind === "plot" && node.payload.spec.plotType === "line" && node.payload.spec.title === "Endpoint trend"));
   for (const assetId of ["anatomy-overview", "organ-axis-brain-lung-gut", "organ-sample-flow", "tissue-biomarker-panel", "clinical-endpoint-card", "brain", "lung", "gut", "kidney", "heart", "intestinal-villus", "renal-nephron", "hepatic-lobule", "blood-vessel", "human-cohort", "patient-organ-cohort"]) {
     assert.ok(anatomy.some((node) => node.kind === "symbol" && node.payload.assetId === assetId), `${assetId} should appear in anatomy organ systems flagship`);
   }
-  assert.ok(anatomy.some((node) => node.kind === "symbol" && node.payload.layoutHint?.startsWith("anatomy-organ-system-overview:stage-")));
+  assert.ok(anatomy.some((node) => node.kind === "symbol" && node.payload.layoutHint === "anatomy-organ-system-overview:atlas-overview"));
+  assert.ok(anatomy.some((node) => node.kind === "symbol" && node.payload.layoutHint === "anatomy-organ-system-overview:clinical-endpoint"));
   assert.ok(anatomy.every((node) => node.payload.workflowPack === "anatomy-organ-systems" && node.payload.templateId === "anatomy-organ-system-overview"));
 
   const methods = createWorkflowFigureNodes({ templateId: "methods-protocol-overview", styleProfile: "consulting-2p5d" });
   assert.ok(methods.length >= 80);
   assert.ok(methods.some((node) => node.kind === "text" && node.payload.text?.includes("Methods and protocol overview")));
-  assert.ok(methods.some((node) => node.kind === "text" && node.payload.text?.includes("Decision spine: sample preparation")));
+  assert.ok(methods.some((node) => node.kind === "text" && node.payload.text?.includes("Protocol bench board")));
+  assert.ok(methods.some((node) => node.kind === "text" && node.payload.text?.includes("Controls + caveat review")));
+  assert.ok(methods.some((node) => node.kind === "text" && node.payload.text === "Method evidence path"));
+  assert.ok(methods.every((node) => !String(node.payload.text ?? "").includes("Decision spine: sample preparation")));
   assert.ok(methods.some((node) => node.kind === "text" && node.payload.text === "method-caveat-review"));
   assert.ok(methods.some((node) => node.kind === "plot" && node.payload.spec.plotType === "line" && node.payload.spec.title === "QC signal"));
   for (const assetId of ["sample-prep-workflow", "reagent-mastermix", "pcr-amplification", "qpcr-assay", "protocol-qc-gate", "serial-dilution", "plate-96", "replicate-layout", "control-sample-set", "incubation-step", "wash-step", "magnetic-bead-cleanup", "western-blot-workflow", "elisa-assay", "standard-curve", "protocol-checklist", "method-safety-note"]) {
     assert.ok(methods.some((node) => node.kind === "symbol" && node.payload.assetId === assetId), `${assetId} should appear in methods and protocols flagship`);
   }
-  assert.ok(methods.some((node) => node.kind === "symbol" && node.payload.layoutHint?.startsWith("methods-protocol-overview:stage-")));
+  assert.ok(methods.some((node) => node.kind === "symbol" && node.payload.layoutHint === "methods-protocol-overview:bench-sample-prep"));
+  assert.ok(methods.some((node) => node.kind === "symbol" && node.payload.layoutHint === "methods-protocol-overview:review-qc-gate"));
   assert.ok(methods.every((node) => node.payload.workflowPack === "methods-and-protocols" && node.payload.templateId === "methods-protocol-overview"));
 
   const grant = createWorkflowFigureNodes({ templateId: "grant-consulting-one-slide", styleProfile: "consulting-2p5d" });

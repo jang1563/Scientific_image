@@ -35,7 +35,7 @@ const metrics = {
   qualityBudgets: {
     factoryTemplateRisks: audit.summary.factoryTemplateRisks,
     highRiskPremiumAssets: audit.summary.highRiskPremiumAssets,
-    factoryTemplateRiskBudget: 7,
+    factoryTemplateRiskBudget: 0,
     highRiskPremiumAssetWarningBudget: 20
   }
 };

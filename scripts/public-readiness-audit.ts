@@ -87,7 +87,7 @@ assertGate(browseableAssets.length >= quality.summary.totalAssets, "Browseable a
 assertGate(quality.summary.workflowPacks >= 18, `Expected at least 18 workflow packs, found ${quality.summary.workflowPacks}.`);
 assertGate(templates.length >= 70, `Expected at least 70 templates, found ${templates.length}.`);
 assertGate(signatureHeroAssets >= 380, "Expected at least 380 signature/hero assets.");
-assertGate(audit.summary.factoryTemplateRisks <= 7, `Factory template risk budget exceeded: ${audit.summary.factoryTemplateRisks}.`);
+assertGate(audit.summary.factoryTemplateRisks === 0, `Factory template risk budget exceeded: ${audit.summary.factoryTemplateRisks}.`);
 warnGate(audit.summary.highRiskPremiumAssets <= 20, `High-risk premium asset count is above current budget: ${audit.summary.highRiskPremiumAssets}.`);
 
 const readme = readFileSync("README.md", "utf8");
