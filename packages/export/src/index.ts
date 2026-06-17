@@ -279,12 +279,13 @@ function renderPlotSvg(spec: PlotSpec, width: number, height: number): string {
   const barPlot = spec.plotType === "bar";
   const theme = plotTheme(spec);
   const footerItems = journalPlotFooterItems(spec);
+  const compactFooterPadding = compact && footerItems.length ? Math.min(14, footerItems.length * 6 + 2) : 0;
   const margin = compact
     ? {
         left: compactHeatmap ? 66 : 48,
         right: compactHeatmap ? 58 : 18,
         top: compactHeatmap ? 32 : 28,
-        bottom: (barPlot ? 44 : compactHeatmap ? 36 : 28) + Math.min(24, footerItems.length * 10 + 4)
+        bottom: (barPlot ? 44 : compactHeatmap ? 36 : 28) + compactFooterPadding
       }
     : {
         left: 56,
@@ -305,7 +306,7 @@ function renderPlotSvg(spec: PlotSpec, width: number, height: number): string {
   const frame = `<rect class="plot-frame${compact ? " plot-compact-frame" : ""}" x="0" y="0" width="${fmt(width)}" height="${fmt(height)}" rx="10" fill="${theme.frameFill}" stroke="${theme.frameStroke}"/>`;
   const axes = `<path d="M${margin.left},${height - margin.bottom} H${width - margin.right} M${margin.left},${height - margin.bottom} V${margin.top}" stroke="${theme.axis}" stroke-width="${compact ? 1 : 1.5}" fill="none"/>`;
   const labels = compact
-    ? `<text class="plot-axis-label-y" transform="translate(15 ${fmt(margin.top + plotHeight / 2)}) rotate(-90)" text-anchor="middle" font-family="Arial, sans-serif" font-size="8.1" font-weight="700" fill="${theme.muted}">${escapeXml(shortPlotLabel(yAxisLabel, footerItems.length ? 40 : 12))}</text><text class="plot-axis-label-x" x="${fmt(margin.left + plotWidth / 2)}" y="${fmt(height - (footerItems.length ? footerItems.length * 8 + 13 : 8))}" text-anchor="middle" font-family="Arial, sans-serif" font-size="8.2" font-weight="700" fill="${theme.muted}">${escapeXml(shortPlotLabel(xAxisLabel, footerItems.length ? 52 : 14))}</text>${renderCompactPlotFooterItems(width, height, footerItems, theme)}`
+    ? `<text class="plot-axis-label-y" transform="translate(15 ${fmt(margin.top + plotHeight / 2)}) rotate(-90)" text-anchor="middle" font-family="Arial, sans-serif" font-size="8.1" font-weight="700" fill="${theme.muted}">${escapeXml(shortPlotLabel(yAxisLabel, footerItems.length ? 40 : 12))}</text><text class="plot-axis-label-x" x="${fmt(margin.left + plotWidth / 2)}" y="${fmt(height - (footerItems.length ? footerItems.length * 7 + 12 : 8))}" text-anchor="middle" font-family="Arial, sans-serif" font-size="8.2" font-weight="700" fill="${theme.muted}">${escapeXml(shortPlotLabel(xAxisLabel, footerItems.length ? 52 : 14))}</text>${renderCompactPlotFooterItems(width, height, footerItems, theme)}`
     : `${renderPlotAxisLabels(xAxisLabel, yAxisLabel, width, height, margin, barPlot, footerItems.length, theme)}${renderPlotFooterItems(spec, width, height, footerItems, theme)}`;
   if (spec.plotType === "heatmap" && xColumn && yColumn && valueColumn) {
     return `${frame}${title}${renderHeatmap(rows, xColumn, yColumn, valueColumn, margin.left, margin.top, plotWidth, plotHeight, theme)}${labels}`;
@@ -387,10 +388,18 @@ function renderPlotFooterItems(spec: PlotSpec, width: number, height: number, it
 
 function renderCompactPlotFooterItems(width: number, height: number, items: { className: string; label: string; text: string }[], theme: PlotTheme): string {
   if (!items.length) return "";
-  const startY = height - (items.length - 1) * 8 - 6;
+  const startY = height - (items.length - 1) * 7 - 5;
   return items
-    .map((item, index) => `<text class="${item.className}" x="${fmt(width / 2)}" y="${fmt(startY + index * 8)}" text-anchor="middle" font-family="Arial, sans-serif" font-size="6.8" font-weight="650" fill="${theme.muted}">${escapeXml(`${item.label}: ${shortPlotLabel(item.text, 66)}`)}</text>`)
+    .map((item, index) => `<text class="${item.className} plot-compact-footer" data-compact-footer="true" x="${fmt(width / 2)}" y="${fmt(startY + index * 7)}" text-anchor="middle" font-family="Arial, sans-serif" font-size="6.4" font-weight="650" fill="${theme.muted}">${escapeXml(compactFooterText(item))}</text>`)
     .join("");
+}
+
+function compactFooterText(item: { className: string; label: string; text: string }): string {
+  if (item.className === "plot-source-data-note") {
+    const [sourceData] = item.text.split(" - ");
+    return `${item.label}: ${shortPlotLabel(`${sourceData.trim()} / replace source data`, 68)}`;
+  }
+  return `${item.label}: ${shortPlotLabel(item.text, 68)}`;
 }
 
 function renderScatterLike(spec: PlotSpec, x: number, y: number, width: number, height: number, groupColumn?: string, theme = plotTheme(spec)): string {
@@ -618,7 +627,8 @@ function renderVolcanoPlot(points: { rawX: number; rawY: number; group: string; 
     `<path class="plot-volcano-threshold-line" d="M${fmt(leftThresholdX)},${fmt(y)} V${fmt(y + height)} M${fmt(rightThresholdX)},${fmt(y)} V${fmt(y + height)}" stroke="${theme.muted}" stroke-width="0.8" stroke-dasharray="4 5" opacity="0.62"/>`,
     `<path class="plot-volcano-threshold-line" d="M${fmt(x)},${fmt(thresholdY)} H${fmt(x + width)}" stroke="${theme.mode === "publication" ? "#111827" : "#f59e0b"}" stroke-width="0.9" stroke-dasharray="4 5" opacity="0.78"/>`,
     `<path class="plot-volcano-zero-line" d="M${fmt(sx(0))},${fmt(y)} V${fmt(y + height)}" stroke="${theme.grid}" stroke-width="0.8" opacity="0.72"/>`,
-    `<text class="plot-volcano-threshold-label" x="${fmt(x + 5)}" y="${fmt(Math.max(y + 10, thresholdY - 4))}" font-family="Arial, sans-serif" font-size="7.6" font-weight="700" fill="${theme.label}">p=1e-4</text>`,
+    `<text class="plot-volcano-threshold-label" x="${fmt(x + 5)}" y="${fmt(Math.max(y + 10, thresholdY - 4))}" font-family="Arial, sans-serif" font-size="7.6" font-weight="700" fill="${theme.label}">adj. P &lt; 1e-4</text>`,
+    `<text class="plot-volcano-effect-threshold-label" x="${fmt(sx(0))}" y="${fmt(y + 10)}" text-anchor="middle" font-family="Arial, sans-serif" font-size="7.2" font-weight="700" fill="${theme.muted}">|log2FC| = 1</text>`,
     compact ? "" : `<text class="plot-volcano-direction-label" x="${fmt(x + 7)}" y="${fmt(y + height - 6)}" font-family="Arial, sans-serif" font-size="7.6" font-weight="800" fill="${theme.color("down")}">depleted</text><text class="plot-volcano-direction-label" x="${fmt(x + width - 7)}" y="${fmt(y + height - 6)}" text-anchor="end" font-family="Arial, sans-serif" font-size="7.6" font-weight="800" fill="${theme.color("up")}">enriched</text>`
   ].join("");
   const marks = points
@@ -651,7 +661,7 @@ function renderVolcanoPlot(points: { rawX: number; rawY: number; group: string; 
     })
     .join("");
   const legendX = x + width - 92;
-  const legendY = compact ? y - 8 : y + 9;
+  const legendY = y + 9;
   const legend = `<g class="plot-volcano-legend" transform="translate(${fmt(legendX)} ${fmt(legendY)})"><circle cx="0" cy="0" r="3.4" fill="${theme.color("up")}"/><text x="8" y="3" font-family="Arial, sans-serif" font-size="7.8" font-weight="700" fill="${theme.muted}">up hit</text><circle cx="45" cy="0" r="3.4" fill="${theme.color("down")}"/><text x="53" y="3" font-family="Arial, sans-serif" font-size="7.8" font-weight="700" fill="${theme.muted}">down</text></g>`;
   return `<g class="plot-volcano-layer">${grid}${guides}${marks}${labels}${legend}</g>`;
 }
@@ -698,6 +708,10 @@ function renderGroupedPlot(spec: PlotSpec, x: number, y: number, width: number, 
   const baseline = sy(0);
   const tickValues = uniqueNumbers([minValue, 0, maxValue / 2, maxValue]).filter((value) => value >= minValue && value <= maxValue);
   const guides = tickValues.map((value) => `<g class="plot-bar-axis-tick"><path class="plot-bar-grid" d="M${fmt(x)},${fmt(sy(value))} H${fmt(x + width)}" stroke="${theme.grid}" stroke-width="${value === 0 ? "1" : "0.75"}" opacity="${value === 0 ? "0.9" : "0.62"}"/><text x="${fmt(x - 7)}" y="${fmt(sy(value) + 3)}" text-anchor="end" font-size="7.6" font-family="Arial" font-weight="700" fill="${theme.muted}">${escapeXml(fmt(value))}</text></g>`).join("");
+  const threshold = spec.plotType === "bar" ? plotThresholdValue(spec) : undefined;
+  const thresholdGuide = threshold !== undefined && threshold >= minValue && threshold <= maxValue
+    ? `<g class="plot-bar-threshold" data-threshold="${escapeXml(fmt(threshold))}"><path class="plot-bar-threshold-line" d="M${fmt(x)},${fmt(sy(threshold))} H${fmt(x + width)}" stroke="${theme.mode === "publication" ? "#111827" : "#f59e0b"}" stroke-width="0.9" stroke-dasharray="4 4" opacity="0.78"/><text class="plot-bar-threshold-label" x="${fmt(x + width - 4)}" y="${fmt(Math.max(y + 9, sy(threshold) - 4))}" text-anchor="end" font-size="${compact ? "7.2" : "8.2"}" font-family="Arial" font-weight="760" fill="${theme.label}">threshold = ${escapeXml(fmt(threshold))}</text></g>`
+    : "";
   const bars = valuesByGroup
     .map((entry, index) => {
       const cx = x + band * index + band / 2;
@@ -727,7 +741,17 @@ function renderGroupedPlot(spec: PlotSpec, x: number, y: number, width: number, 
       return `<path d="M${fmt(cx)},${fmt(sy(min))} V${fmt(sy(max))}" stroke="${theme.text}"/><rect x="${fmt(cx - band * 0.22)}" y="${fmt(sy(q3))}" width="${fmt(band * 0.44)}" height="${fmt(Math.max(1, sy(q1) - sy(q3)))}" fill="${theme.fieldFill}" stroke="${theme.color(entry.group)}"/><path d="M${fmt(cx - band * 0.22)},${fmt(sy(q2))} H${fmt(cx + band * 0.22)}" stroke="${theme.color(entry.group)}" stroke-width="2"/><text x="${fmt(cx)}" y="${fmt(labelY)}" text-anchor="middle" font-size="${fmt(labelFont)}" font-family="Arial" fill="${theme.label}">${escapeXml(label)}</text>`;
     })
     .join("");
-  return `<g class="plot-bar-layer">${guides}${bars}</g>`;
+  return `<g class="plot-bar-layer">${guides}${thresholdGuide}${bars}</g>`;
+}
+
+function plotThresholdValue(spec: PlotSpec): number | undefined {
+  const metadata = journalPlotMetadata(spec);
+  if (typeof metadata.threshold === "number" && Number.isFinite(metadata.threshold)) return metadata.threshold;
+  if (typeof metadata.threshold === "string" && Number.isFinite(Number(metadata.threshold))) return Number(metadata.threshold);
+  const rowThresholds = uniqueNumbers(spec.table.rows
+    .map((row) => Number(row.threshold))
+    .filter(Number.isFinite));
+  return rowThresholds.length === 1 ? rowThresholds[0] : undefined;
 }
 
 function renderBarCategoryLabel(label: string, x: number, y: number, fontSize: number, maxChars: number, maxLines: number, theme: PlotTheme): string {
