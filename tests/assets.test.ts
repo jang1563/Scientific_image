@@ -598,7 +598,8 @@ test("wetlab instrument assets expose distinct premium editable part markers", (
     "plate-96": [/asset-plate-frame/, /asset-plate-well/, /asset-plate-hit-well/],
     "plate-384": [/asset-plate384-frame/, /asset-plate384-well/, /asset-plate384-hit-well/],
     pipette: [/asset-pipette-body/, /asset-pipette-slim-barrel/, /asset-pipette-plunger/, /asset-pipette-volume-window/, /asset-pipette-tip/, /asset-pipette-fine-tip/, /asset-pipette-droplet/, /asset-pipette-thumb-button/, /asset-pipette-finger-hook/, /asset-pipette-target-well/, /asset-pipette-grip-ridges/, /asset-pipette-ejector-collar/, /asset-pipette-barrel-highlight/, /asset-instrument-material-highlight/],
-    centrifuge: [/asset-centrifuge-body/, /asset-centrifuge-lid/, /asset-centrifuge-lid-seam/, /asset-centrifuge-hinge/, /asset-centrifuge-rotor/, /asset-centrifuge-rotor-bowl/, /asset-centrifuge-rotor-hub/, /asset-centrifuge-rotor-arm/, /asset-centrifuge-swing-bucket/, /asset-centrifuge-tube-slot/, /asset-centrifuge-balance-tube/, /asset-centrifuge-spin-arrow/, /asset-centrifuge-control-panel/, /asset-centrifuge-display/, /asset-centrifuge-status-light/, /asset-centrifuge-lid-lock/, /asset-instrument-material-highlight/]
+    centrifuge: [/asset-centrifuge-body/, /asset-centrifuge-lid/, /asset-centrifuge-lid-seam/, /asset-centrifuge-hinge/, /asset-centrifuge-rotor/, /asset-centrifuge-rotor-bowl/, /asset-centrifuge-rotor-hub/, /asset-centrifuge-rotor-arm/, /asset-centrifuge-swing-bucket/, /asset-centrifuge-tube-slot/, /asset-centrifuge-balance-tube/, /asset-centrifuge-spin-arrow/, /asset-centrifuge-control-panel/, /asset-centrifuge-display/, /asset-centrifuge-status-light/, /asset-centrifuge-lid-lock/, /asset-instrument-material-highlight/],
+    incubator: [/asset-incubator-body/, /asset-incubator-door-gasket/, /asset-incubator-shelf/, /asset-incubator-shelf-rail/, /asset-incubator-culture-vessel/, /asset-incubator-t-flask/, /asset-incubator-erlenmeyer/, /asset-incubator-culture-plate/, /asset-incubator-media-line/, /asset-incubator-control-panel/, /asset-incubator-door-handle/, /asset-incubator-temperature-display/, /asset-incubator-temperature-glyph/, /asset-incubator-co2-curve/, /asset-incubator-status-light/, /asset-incubator-environment/, /asset-incubator-humidity-droplet/, /asset-incubator-airflow/, /asset-instrument-material-highlight/]
   };
 
   for (const [assetId, markers] of Object.entries(expectedMarkers)) {
@@ -618,7 +619,7 @@ test("wetlab instrument assets expose distinct premium editable part markers", (
 });
 
 test("wetlab instrument publication-line style remains export-clean line art", () => {
-  for (const assetId of ["microscope", "sequencer", "nanopore", "flow-cytometry", "cell-sorter", "plate-96", "plate-384", "pipette", "centrifuge"]) {
+  for (const assetId of ["microscope", "sequencer", "nanopore", "flow-cytometry", "cell-sorter", "plate-96", "plate-384", "pipette", "centrifuge", "incubator"]) {
     const lineSvg = renderPremiumAssetSvg(assetId, { styleProfile: "publication-line" });
     assert.match(lineSvg, /data-style-profile="publication-line"/);
     assert.match(lineSvg, /data-accent="#111827"/);
