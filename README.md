@@ -43,6 +43,7 @@ node scripts/reviewer-status.ts
 node --test tests/*.test.ts
 node scripts/portfolio-metrics.ts
 node scripts/public-readiness-audit.ts
+node scripts/public-demo-visual-qa.ts
 node scripts/agent-acceptance-smoke.ts
 ```
 

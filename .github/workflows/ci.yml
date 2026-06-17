@@ -29,6 +29,7 @@ jobs:
           node --check scripts/serve-static.ts
           node --check scripts/build-npm-package.ts
           node --check scripts/portfolio-metrics.ts
+          node --check scripts/public-demo-visual-qa.ts
           node --check scripts/reviewer-status.ts
           node --check scripts/npm-package-readiness.ts
           node --check scripts/public-readiness-audit.ts
@@ -44,6 +45,9 @@ jobs:
 
       - name: Public readiness audit
         run: node scripts/public-readiness-audit.ts
+
+      - name: Public demo visual QA
+        run: node scripts/public-demo-visual-qa.ts
 
       - name: Public example freshness
         run: |

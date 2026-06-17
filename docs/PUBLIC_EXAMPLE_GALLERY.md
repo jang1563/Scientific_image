@@ -24,6 +24,12 @@ Check that generated examples stay in sync with tracked source:
 git diff --exit-code docs/examples
 ```
 
+Run the public-demo visual QA gate:
+
+```bash
+node scripts/public-demo-visual-qa.ts
+```
+
 Run the public portfolio gate:
 
 ```bash
@@ -34,4 +40,5 @@ node scripts/public-readiness-audit.ts
 
 - Every example is rendered from editable scene graph nodes.
 - Template IDs, workflow packs, style profiles, asset IDs, and review/export warnings stay inspectable through code and tests.
+- `scripts/public-demo-visual-qa.ts` links each README example to template QA, 48px/120px/slide-size pack visual QA, and exact Office fallback assets.
 - The local demo URLs load editable scenes in the static web workspace after `node scripts/serve-static.ts apps/web 4173`.
