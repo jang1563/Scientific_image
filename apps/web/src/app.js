@@ -383,6 +383,7 @@ function fallbackSemanticSlots(assetId) {
 }
 
 sourceText.value = defaultNotes;
+syncWorkflowControls();
 renderAll();
 loadAssetCoverageReport();
 loadPremiumAssets();
@@ -1977,6 +1978,7 @@ async function loadWorkflowTemplates() {
     const payload = await response.json();
     if (Array.isArray(payload.templates) && payload.templates.length) {
       workflowTemplates = mergeWorkflowTemplates(payload.templates, staticWorkflowTemplates);
+      syncWorkflowControls();
       renderAll();
     }
   } catch {
@@ -2013,6 +2015,7 @@ async function loadWorkflowPacks() {
     const payload = await response.json();
     if (Array.isArray(payload.workflowPacks) && payload.workflowPacks.length) {
       workflowPacks = mergeWorkflowPacks(payload.workflowPacks, realisticWorkflowPacks);
+      syncWorkflowControls();
       renderAll();
       await loadWorkflowPackGallery(assetWorkflowPack?.value || workflowPacks[0]?.id);
       await loadWorkflowPackVisualQaGallery(assetWorkflowPack?.value || workflowPacks[0]?.id);
@@ -2021,6 +2024,44 @@ async function loadWorkflowPacks() {
     // Static fallback pack tabs remain usable without the API server.
     workflowPacks = mergeWorkflowPacks(workflowPacks, realisticWorkflowPacks);
   }
+}
+
+function syncWorkflowControls() {
+  syncWorkflowPackSelect();
+  syncWorkflowFigureSelect();
+}
+
+function syncWorkflowPackSelect() {
+  if (!assetWorkflowPack) return;
+  const current = assetWorkflowPack.value;
+  const options = [
+    { value: "", label: "All packs" },
+    ...workflowPacks.map((pack) => ({ value: pack.id, label: pack.name ?? workflowLabel(pack.id) }))
+  ];
+  setSelectOptions(assetWorkflowPack, options, current);
+  assetWorkflowPack.dataset.registryBacked = "true";
+  assetWorkflowPack.dataset.workflowPackCount = String(workflowPacks.length);
+}
+
+function syncWorkflowFigureSelect() {
+  if (!workflowTemplate) return;
+  const current = workflowTemplate.value || assetWorkflowPack?.value || workflowPacks[0]?.id || "";
+  const options = workflowPacks.map((pack) => {
+    const flagship = workflowTemplates.find((template) => template.id === pack.flagshipTemplateId) ?? workflowTemplates.find((template) => template.workflowPack === pack.id);
+    const label = flagship ? `${pack.name ?? workflowLabel(pack.id)} - ${flagship.name}` : (pack.name ?? workflowLabel(pack.id));
+    return { value: pack.id, label };
+  });
+  setSelectOptions(workflowTemplate, options, current);
+  workflowTemplate.dataset.registryBacked = "true";
+  workflowTemplate.dataset.workflowPackCount = String(workflowPacks.length);
+  workflowTemplate.dataset.workflowTemplateCount = String(workflowTemplates.length);
+}
+
+function setSelectOptions(select, options, preferredValue) {
+  const fallbackValue = options.some((option) => option.value === preferredValue) ? preferredValue : (options[0]?.value ?? "");
+  const nextMarkup = options.map((option) => `<option value="${escapeAttr(option.value)}">${escapeXml(option.label)}</option>`).join("");
+  if (select.innerHTML !== nextMarkup) select.innerHTML = nextMarkup;
+  select.value = fallbackValue;
 }
 
 function mergeWorkflowPacks(primary, extra) {

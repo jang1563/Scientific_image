@@ -21,6 +21,10 @@ test("web inspector exposes premium asset contract and part-level controls", asy
   assert.match(app, /asset-preview-scale-strip/);
   assert.match(app, /publicDemos/);
   assert.match(app, /renderPublicDemoLauncher/);
+  assert.match(app, /syncWorkflowControls/);
+  assert.match(app, /syncWorkflowPackSelect/);
+  assert.match(app, /syncWorkflowFigureSelect/);
+  assert.match(app, /dataset\.registryBacked = "true"/);
   assert.match(app, /launchPublicDemo/);
   assert.match(app, /initialPublicDemoId/);
   assert.match(app, /resolvePublicDemoId/);
@@ -59,6 +63,10 @@ test("static web server exposes the premium asset catalog without the API server
     assert.ok(assets.assets.length >= 466);
     assert.equal(packs.workflowPacks.length, 18);
     assert.equal(templates.templates.length, 77);
+    assert.ok(packs.workflowPacks.every((pack: { id: string; templates: string[]; flagshipTemplateId?: string }) => pack.id && pack.templates.length >= 4 && pack.flagshipTemplateId));
+    assert.ok(packs.workflowPacks.some((pack: { id: string }) => pack.id === "synthetic-biology"));
+    assert.ok(packs.workflowPacks.some((pack: { id: string }) => pack.id === "drug-discovery"));
+    assert.ok(templates.templates.some((template: { id: string; workflowPack: string }) => template.id === "synthetic-biology-platform" && template.workflowPack === "synthetic-biology"));
   } finally {
     server.kill();
   }
