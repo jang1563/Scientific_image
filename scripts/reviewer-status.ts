@@ -56,6 +56,7 @@ const status = {
   ci: {
     workflowPresent: Boolean(workflow),
     nodeVersionPinnedTo24: /node-version:\s*["']?24["']?/.test(workflow),
+    modernActionRuntime: /actions\/checkout@v([6-9]|\d{2,})/.test(workflow) && /actions\/setup-node@v([6-9]|\d{2,})/.test(workflow),
     node24ActionRuntimeForced: workflow.includes("FORCE_JAVASCRIPT_ACTIONS_TO_NODE24"),
     badgePresentInReadme: /actions\/workflows\/ci\.yml\/badge\.svg/.test(readme)
   },

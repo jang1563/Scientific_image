@@ -14,7 +14,8 @@ test("reviewer status reports no-install repo readiness and CI wiring", () => {
   assert.equal(status.portfolio.templates, 77);
   assert.equal(status.ci.workflowPresent, true);
   assert.equal(status.ci.nodeVersionPinnedTo24, true);
-  assert.equal(status.ci.node24ActionRuntimeForced, true);
+  assert.equal(status.ci.modernActionRuntime, true);
+  assert.equal(status.ci.node24ActionRuntimeForced, false);
   assert.equal(status.ci.badgePresentInReadme, true);
   assert.equal(status.checks.tests.status, "skipped");
   assert.equal(status.checks.publicReadinessAudit.status, "passed");
