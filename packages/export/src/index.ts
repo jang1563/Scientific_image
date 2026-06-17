@@ -278,9 +278,20 @@ function renderPlotSvg(spec: PlotSpec, width: number, height: number): string {
   const compactHeatmap = compact && spec.plotType === "heatmap";
   const barPlot = spec.plotType === "bar";
   const theme = plotTheme(spec);
+  const footerItems = journalPlotFooterItems(spec);
   const margin = compact
-    ? { left: compactHeatmap ? 66 : 48, right: compactHeatmap ? 58 : 18, top: compactHeatmap ? 32 : 28, bottom: barPlot ? 44 : compactHeatmap ? 36 : 28 }
-    : { left: 56, right: compactHeatmap ? 70 : 24, top: 42, bottom: barPlot ? 54 : 48 };
+    ? {
+        left: compactHeatmap ? 66 : 48,
+        right: compactHeatmap ? 58 : 18,
+        top: compactHeatmap ? 32 : 28,
+        bottom: (barPlot ? 44 : compactHeatmap ? 36 : 28) + Math.min(24, footerItems.length * 10 + 4)
+      }
+    : {
+        left: 56,
+        right: compactHeatmap ? 70 : 24,
+        top: 42,
+        bottom: (barPlot ? 54 : 48) + Math.min(30, footerItems.length * 12)
+      };
   const plotWidth = Math.max(10, width - margin.left - margin.right);
   const plotHeight = Math.max(10, height - margin.top - margin.bottom);
   const rows = spec.table.rows;
@@ -288,12 +299,14 @@ function renderPlotSvg(spec: PlotSpec, width: number, height: number): string {
   const yColumn = spec.encodings.y;
   const valueColumn = spec.encodings.value;
   const groupColumn = spec.encodings.group ?? spec.encodings.color;
+  const xAxisLabel = journalAxisLabel(spec, "x", xColumn ?? "");
+  const yAxisLabel = journalAxisLabel(spec, "y", spec.plotType === "volcano" ? `-log10(${yColumn ?? "p"})` : yColumn ?? valueColumn ?? "");
   const title = `<text x="${fmt(width / 2)}" y="${compact ? 18 : 24}" text-anchor="middle" font-family="Arial, sans-serif" font-size="${compact ? 12.5 : 18}" font-weight="760" fill="${theme.text}">${escapeXml(spec.title)}</text>`;
   const frame = `<rect class="plot-frame${compact ? " plot-compact-frame" : ""}" x="0" y="0" width="${fmt(width)}" height="${fmt(height)}" rx="10" fill="${theme.frameFill}" stroke="${theme.frameStroke}"/>`;
   const axes = `<path d="M${margin.left},${height - margin.bottom} H${width - margin.right} M${margin.left},${height - margin.bottom} V${margin.top}" stroke="${theme.axis}" stroke-width="${compact ? 1 : 1.5}" fill="none"/>`;
   const labels = compact
-    ? `<text transform="translate(15 ${fmt(margin.top + plotHeight / 2)}) rotate(-90)" text-anchor="middle" font-family="Arial, sans-serif" font-size="8.5" font-weight="700" fill="${theme.muted}">${escapeXml(shortPlotLabel(spec.plotType === "volcano" ? `-log10(${yColumn ?? "p"})` : yColumn ?? valueColumn ?? "", 12))}</text><text x="${fmt(margin.left + plotWidth / 2)}" y="${fmt(height - 8)}" text-anchor="middle" font-family="Arial, sans-serif" font-size="8.8" font-weight="700" fill="${theme.muted}">${escapeXml(shortPlotLabel(xColumn ?? "", 14))}</text>`
-    : `<text x="${fmt(width / 2)}" y="${fmt(height - 12)}" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" fill="${theme.label}">${escapeXml(xColumn ?? "")}</text><text transform="translate(16 ${fmt(height / 2)}) rotate(-90)" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" fill="${theme.label}">${escapeXml(spec.plotType === "volcano" ? `-log10(${yColumn ?? "p"})` : yColumn ?? valueColumn ?? "")}</text>`;
+    ? `<text class="plot-axis-label-y" transform="translate(15 ${fmt(margin.top + plotHeight / 2)}) rotate(-90)" text-anchor="middle" font-family="Arial, sans-serif" font-size="8.1" font-weight="700" fill="${theme.muted}">${escapeXml(shortPlotLabel(yAxisLabel, footerItems.length ? 40 : 12))}</text><text class="plot-axis-label-x" x="${fmt(margin.left + plotWidth / 2)}" y="${fmt(height - (footerItems.length ? footerItems.length * 8 + 13 : 8))}" text-anchor="middle" font-family="Arial, sans-serif" font-size="8.2" font-weight="700" fill="${theme.muted}">${escapeXml(shortPlotLabel(xAxisLabel, footerItems.length ? 52 : 14))}</text>${renderCompactPlotFooterItems(width, height, footerItems, theme)}`
+    : `${renderPlotAxisLabels(xAxisLabel, yAxisLabel, width, height, margin, barPlot, footerItems.length, theme)}${renderPlotFooterItems(spec, width, height, footerItems, theme)}`;
   if (spec.plotType === "heatmap" && xColumn && yColumn && valueColumn) {
     return `${frame}${title}${renderHeatmap(rows, xColumn, yColumn, valueColumn, margin.left, margin.top, plotWidth, plotHeight, theme)}${labels}`;
   }
@@ -301,12 +314,83 @@ function renderPlotSvg(spec: PlotSpec, width: number, height: number): string {
     return `${frame}${title}${axes}${renderGroupedPlot(spec, margin.left, margin.top, plotWidth, plotHeight, theme)}${labels}`;
   }
   if (spec.plotType === "line" && xColumn && yColumn) {
-    return `${frame}${title}${axes}${renderLinePlot(spec, margin.left, margin.top, plotWidth, plotHeight)}${labels}`;
+    return `${frame}${title}${axes}${renderLinePlot(spec, margin.left, margin.top, plotWidth, plotHeight, theme)}${labels}`;
   }
   if (xColumn && yColumn) {
     return `${frame}${title}${axes}${renderScatterLike(spec, margin.left, margin.top, plotWidth, plotHeight, groupColumn, theme)}${labels}`;
   }
   return `${frame}${title}<text x="${fmt(width / 2)}" y="${fmt(height / 2)}" text-anchor="middle" fill="${theme.muted}" font-family="Arial, sans-serif" font-size="16">Plot encodings incomplete</text>`;
+}
+
+function journalPlotMetadata(spec: PlotSpec): Record<string, unknown> {
+  const extended = spec as PlotSpec & { journalPlot?: unknown };
+  return typeof extended.journalPlot === "object" && extended.journalPlot !== null ? extended.journalPlot as Record<string, unknown> : {};
+}
+
+function journalAxisLabel(spec: PlotSpec, axis: "x" | "y", fallback: string): string {
+  const metadata = journalPlotMetadata(spec);
+  const axisLabels = metadata.axisLabels;
+  if (typeof axisLabels === "object" && axisLabels !== null) {
+    const label = (axisLabels as Record<string, unknown>)[axis];
+    if (typeof label === "string" && label.trim()) return label;
+  }
+  const axes = (spec as PlotSpec & { axes?: unknown }).axes;
+  if (typeof axes === "object" && axes !== null) {
+    const label = (axes as Record<string, unknown>)[axis];
+    if (typeof label === "string" && label.trim()) return label;
+  }
+  return fallback;
+}
+
+function journalPlotFooterItems(spec: PlotSpec): { className: string; label: string; text: string }[] {
+  const metadata = journalPlotMetadata(spec);
+  const extended = spec as PlotSpec & { legend?: unknown; sourceDataNote?: unknown };
+  const legend = typeof metadata.legend === "string" && metadata.legend.trim()
+    ? metadata.legend
+    : typeof extended.legend === "string" && extended.legend.trim()
+      ? extended.legend
+      : "";
+  const sourceData = typeof metadata.sourceData === "string" && metadata.sourceData.trim() ? metadata.sourceData : "";
+  const sourceDataNote = typeof metadata.sourceDataNote === "string" && metadata.sourceDataNote.trim()
+    ? metadata.sourceDataNote
+    : typeof extended.sourceDataNote === "string" && extended.sourceDataNote.trim()
+      ? extended.sourceDataNote
+      : "";
+  const items: { className: string; label: string; text: string }[] = [];
+  if (legend) items.push({ className: "plot-journal-legend", label: "Legend", text: legend });
+  if (sourceData || sourceDataNote) {
+    items.push({
+      className: "plot-source-data-note",
+      label: "Source data",
+      text: [sourceData, sourceDataNote].filter(Boolean).join(" - ")
+    });
+  }
+  return items;
+}
+
+function renderPlotAxisLabels(xAxisLabel: string, yAxisLabel: string, width: number, height: number, margin: { left: number; right: number; top: number; bottom: number }, barPlot: boolean, footerLineCount: number, theme: PlotTheme): string {
+  const axisY = height - margin.bottom;
+  const xLabelY = axisY + Math.min(barPlot ? 41 : 31, margin.bottom - (footerLineCount ? footerLineCount * 11 + 12 : 12));
+  return `<text class="plot-axis-label-x" x="${fmt(margin.left + (width - margin.left - margin.right) / 2)}" y="${fmt(xLabelY)}" text-anchor="middle" font-family="Arial, sans-serif" font-size="12.2" font-weight="${theme.mode === "publication" ? "700" : "650"}" fill="${theme.label}">${escapeXml(xAxisLabel)}</text><text class="plot-axis-label-y" transform="translate(16 ${fmt(margin.top + (height - margin.top - margin.bottom) / 2)}) rotate(-90)" text-anchor="middle" font-family="Arial, sans-serif" font-size="12.2" font-weight="${theme.mode === "publication" ? "700" : "650"}" fill="${theme.label}">${escapeXml(yAxisLabel)}</text>`;
+}
+
+function renderPlotFooterItems(spec: PlotSpec, width: number, height: number, items: { className: string; label: string; text: string }[], theme: PlotTheme): string {
+  const footerItems = items.length
+    ? items
+    : [{ className: "plot-footer", label: "Plot", text: `${spec.table.rows.length} rows / editable PlotSpec` }];
+  const fontSize = items.length ? 8.2 : 9.2;
+  const startY = height - (footerItems.length - 1) * 10 - 7;
+  return footerItems
+    .map((item, index) => `<text class="${item.className}" x="${fmt(width / 2)}" y="${fmt(startY + index * 10)}" text-anchor="middle" font-family="Arial, sans-serif" font-size="${fmt(fontSize)}" font-weight="${item.className === "plot-footer" ? "700" : "650"}" fill="${theme.muted}">${escapeXml(`${item.label}: ${shortPlotLabel(item.text, 92)}`)}</text>`)
+    .join("");
+}
+
+function renderCompactPlotFooterItems(width: number, height: number, items: { className: string; label: string; text: string }[], theme: PlotTheme): string {
+  if (!items.length) return "";
+  const startY = height - (items.length - 1) * 8 - 6;
+  return items
+    .map((item, index) => `<text class="${item.className}" x="${fmt(width / 2)}" y="${fmt(startY + index * 8)}" text-anchor="middle" font-family="Arial, sans-serif" font-size="6.8" font-weight="650" fill="${theme.muted}">${escapeXml(`${item.label}: ${shortPlotLabel(item.text, 66)}`)}</text>`)
+    .join("");
 }
 
 function renderScatterLike(spec: PlotSpec, x: number, y: number, width: number, height: number, groupColumn?: string, theme = plotTheme(spec)): string {
@@ -572,18 +656,26 @@ function renderVolcanoPlot(points: { rawX: number; rawY: number; group: string; 
   return `<g class="plot-volcano-layer">${grid}${guides}${marks}${labels}${legend}</g>`;
 }
 
-function renderLinePlot(spec: PlotSpec, x: number, y: number, width: number, height: number): string {
+function renderLinePlot(spec: PlotSpec, x: number, y: number, width: number, height: number, theme: PlotTheme): string {
   const xColumn = spec.encodings.x as string;
   const yColumn = spec.encodings.y as string;
   const points = spec.table.rows
     .map((row) => ({ rawX: Number(row[xColumn]), rawY: Number(row[yColumn]) }))
     .filter((point) => Number.isFinite(point.rawX) && Number.isFinite(point.rawY))
     .sort((a, b) => a.rawX - b.rawX);
+  if (!points.length) return "";
   const sx = linearScale(points.map((point) => point.rawX), x, x + width);
   const sy = linearScale(points.map((point) => point.rawY), y + height, y);
   const d = points.map((point, index) => `${index === 0 ? "M" : "L"}${fmt(sx(point.rawX))},${fmt(sy(point.rawY))}`).join(" ");
-  const compact = height < 45;
-  return `<path d="${d}" fill="none" stroke="#2563eb" stroke-width="${compact ? 2.2 : 3}"/>${points.map((point) => `<circle cx="${fmt(sx(point.rawX))}" cy="${fmt(sy(point.rawY))}" r="${compact ? 3 : 4}" fill="#2563eb" stroke="#ffffff" stroke-width="${compact ? 0.8 : 0}"/>`).join("")}`;
+  const compact = height < 45 || width < 240;
+  const stroke = theme.color("line");
+  const yValues = points.map((point) => point.rawY);
+  const tickValues = uniqueNumbers([Math.min(...yValues), Math.max(...yValues) / 2, Math.max(...yValues)]).slice(0, 4);
+  const guides = tickValues
+    .map((value) => `<path class="plot-line-grid" d="M${fmt(x)},${fmt(sy(value))} H${fmt(x + width)}" stroke="${theme.grid}" stroke-width="0.65" opacity="0.58"/>`)
+    .join("");
+  const marks = points.map((point) => `<circle class="plot-line-point" cx="${fmt(sx(point.rawX))}" cy="${fmt(sy(point.rawY))}" r="${compact ? 2.8 : 3.8}" fill="${stroke}" stroke="${theme.pointStroke}" stroke-width="${theme.mode === "publication" ? "0.8" : "1"}"/>`).join("");
+  return `<g class="plot-line-layer">${guides}<path class="plot-line-path" d="${d}" fill="none" stroke="${stroke}" stroke-width="${compact ? 1.7 : 2.4}" stroke-linecap="round" stroke-linejoin="round"/>${marks}</g>`;
 }
 
 function renderGroupedPlot(spec: PlotSpec, x: number, y: number, width: number, height: number, theme = plotTheme(spec)): string {

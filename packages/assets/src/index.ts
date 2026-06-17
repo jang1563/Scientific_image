@@ -8330,7 +8330,7 @@ function createPerturbSeqJournalTemplateNodes(template: WorkflowTemplate, input:
       axisLabels: { x: "log2 fold-change vs non-targeting control", y: "-log10 adjusted P value" },
       units: { x: "log2 fold-change", y: "-log10 adjusted P" },
       legend: "Gene program / hit direction",
-      sourceData: "source-data-placeholder.tsv",
+      sourceData: "source-perturb-seq-results.tsv",
       sourceDataNote: "Synthetic fixture for layout QA; replace with source data."
     }
   } as never, createTransform(resultPanel.x + 24, resultPanel.y + 52, 424, 146)));
