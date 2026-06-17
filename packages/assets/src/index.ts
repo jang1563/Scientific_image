@@ -985,6 +985,7 @@ export interface JournalFigureQaReport {
     decorativeDepthNodeCount: number;
     uiCardShapeCount: number;
     plotMetadataReviewCount: number;
+    plotTypographyReviewCount: number;
     missingProvenanceCount: number;
     needsCitationCount: number;
     unsupportedClaimCount: number;
@@ -6543,6 +6544,7 @@ export function getJournalFigureQa(templateId: string, input: {
   const decorativeDepthNodes = nodes.filter(journalDecorativeDepthNode);
   const uiCardShapes = nodes.filter(journalUiCardShapeNode);
   const plotMetadataReviewNodes = nodes.filter(journalPlotNeedsMetadataReview);
+  const plotTypographyReviewNodes = nodes.filter(journalPlotNeedsTypographyReview);
   const blockingIssues: JournalFigureQaIssue[] = [];
   const visualIssues: JournalFigureQaIssue[] = [];
   const provenanceIssues: JournalFigureQaIssue[] = [];
@@ -6657,6 +6659,21 @@ export function getJournalFigureQa(templateId: string, input: {
       nodeIds: plotMetadataReviewNodes.map((node) => node.id)
     });
   }
+  if (plotTypographyReviewNodes.length) {
+    plotIssues.push({
+      severity: "warning",
+      kind: "plot",
+      message: `${plotTypographyReviewNodes.length} compact plot node(s) need label-density and typography review before manuscript use.`,
+      nodeIds: plotTypographyReviewNodes.map((node) => node.id)
+    });
+    actionItems.push({
+      severity: "warning",
+      kind: "coverage",
+      title: "Review compact plot labels",
+      action: "Increase plot size, reduce labeled points/categories, abbreviate labels, or move dense labels into a legend/caption for manuscript-safe output.",
+      nodeIds: plotTypographyReviewNodes.map((node) => node.id)
+    });
+  }
 
   const exportWarnings = [...baseTemplateQa.exportWarnings];
   if (styleProfile !== "publication-line") {
@@ -6664,6 +6681,9 @@ export function getJournalFigureQa(templateId: string, input: {
   }
   if (plotMetadataReviewNodes.length) {
     exportWarnings.push(`${plotMetadataReviewNodes.length} plot node(s) need explicit journal axis/legend/source-data review.`);
+  }
+  if (plotTypographyReviewNodes.length) {
+    exportWarnings.push(`${plotTypographyReviewNodes.length} compact plot node(s) need manuscript label-density review.`);
   }
   if (baseTemplateQa.premiumFallbackAssetIds.length) {
     exportWarnings.push(`Journal PPTX/DOCX fallback review must name assets: ${describeTemplateQaList(baseTemplateQa.premiumFallbackAssetIds, 8)}.`);
@@ -6675,6 +6695,7 @@ export function getJournalFigureQa(templateId: string, input: {
     - Math.min(18, decorativeDepthNodes.length * 2)
     - Math.min(18, Math.max(0, uiCardShapes.length - 4) * 2)
     - Math.min(12, plotMetadataReviewNodes.length * 6)
+    - Math.min(10, plotTypographyReviewNodes.length * 4)
     - Math.min(12, baseTemplateQa.needsCitationCount * 2)
     - (baseTemplateQa.premiumFallbackAssetIds.length ? 4 : 0)
   )));
@@ -6706,6 +6727,7 @@ export function getJournalFigureQa(templateId: string, input: {
       decorativeDepthNodeCount: decorativeDepthNodes.length,
       uiCardShapeCount: uiCardShapes.length,
       plotMetadataReviewCount: plotMetadataReviewNodes.length,
+      plotTypographyReviewCount: plotTypographyReviewNodes.length,
       missingProvenanceCount: baseTemplateQa.missingProvenanceCount,
       needsCitationCount: baseTemplateQa.needsCitationCount,
       unsupportedClaimCount: baseTemplateQa.unsupportedClaimCount,
@@ -6773,6 +6795,46 @@ function journalPlotNeedsMetadataReview(node: SceneNode): boolean {
   );
   const hasSourceDataMetadata = Boolean(journalPlot.sourceData || journalPlot.sourceDataNote || spec.sourceDataNote);
   return !(hasAxisMetadata && hasLegendMetadata && hasSourceDataMetadata);
+}
+
+function journalPlotNeedsTypographyReview(node: SceneNode): boolean {
+  if (node.kind !== "plot") return false;
+  const payload = nodePayloadObject(node);
+  const spec = typeof payload.spec === "object" && payload.spec !== null ? payload.spec as Record<string, unknown> : {};
+  const plotType = String(spec.plotType ?? "");
+  const encodings = typeof spec.encodings === "object" && spec.encodings !== null ? spec.encodings as Record<string, unknown> : {};
+  const table = typeof spec.table === "object" && spec.table !== null ? spec.table as Record<string, unknown> : {};
+  const rows = Array.isArray(table.rows) ? table.rows.filter((row): row is Record<string, unknown> => typeof row === "object" && row !== null) : [];
+  if (!rows.length) return false;
+  const width = node.transform.width;
+  const height = node.transform.height;
+  const compact = width < 460 || height < 170;
+  if (!compact) return false;
+  const xColumn = typeof encodings.x === "string" ? encodings.x : "";
+  const yColumn = typeof encodings.y === "string" ? encodings.y : "";
+  const labelColumn = typeof encodings.label === "string" ? encodings.label : "";
+
+  if (["volcano", "scatter", "embedding-scatter"].includes(plotType) && labelColumn) {
+    const labelCount = uniqueValues(rows.map((row) => String(row[labelColumn] ?? "").trim()).filter(Boolean)).length;
+    const labelBudget = Math.max(6, Math.floor(width / 55));
+    return labelCount > labelBudget;
+  }
+  if (["bar", "box", "violin", "dot"].includes(plotType) && xColumn) {
+    const labels = uniqueValues(rows.map((row) => String(row[xColumn] ?? "").trim()).filter(Boolean));
+    const band = width / Math.max(labels.length, 1);
+    const longLabelCount = labels.filter((label) => label.length > Math.max(11, Math.floor(band / 6.5))).length;
+    return labels.length > Math.max(4, Math.floor(width / 76)) || (longLabelCount >= 2 && band < 86);
+  }
+  if (plotType === "heatmap" && xColumn && yColumn) {
+    const xLabels = uniqueValues(rows.map((row) => String(row[xColumn] ?? "").trim()).filter(Boolean));
+    const yLabels = uniqueValues(rows.map((row) => String(row[yColumn] ?? "").trim()).filter(Boolean));
+    const labelBudget = Math.max(10, Math.floor((width + height) / 58));
+    return xLabels.length + yLabels.length > labelBudget;
+  }
+  if (plotType === "line") {
+    return rows.length > Math.max(5, Math.floor(width / 24)) && (width < 160 || height < 90);
+  }
+  return false;
 }
 
 function nodePayloadObject(node: SceneNode): Record<string, unknown> {

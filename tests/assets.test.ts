@@ -2031,6 +2031,17 @@ test("journal figure QA separates manuscript readiness from deck polish", () => 
   assert.ok(deckOnly.nextAction.includes("talks/decks"));
 });
 
+test("journal figure QA flags dense compact plot labels before manuscript use", () => {
+  const journal = getJournalFigureQa("manuscript-results-figure", { styleProfile: "publication-line" });
+
+  assert.equal(journal.templateId, "manuscript-results-figure");
+  assert.equal(journal.status, "journal-draft");
+  assert.ok(journal.counts.plotTypographyReviewCount >= 2);
+  assert.ok(journal.plotIssues.some((issue) => issue.kind === "plot" && issue.message.includes("label-density")));
+  assert.ok(journal.exportWarnings.some((warning) => warning.includes("manuscript label-density review")));
+  assert.ok(journal.actionItems.some((item) => item.title === "Review compact plot labels"));
+});
+
 test("perturb-seq journal template passes manuscript-safe QA gate", () => {
   const template = getWorkflowTemplate("perturb-seq-workflow-journal");
   const pack = listWorkflowPacks().find((candidate) => candidate.id === "perturb-seq-crispr");
@@ -2056,6 +2067,7 @@ test("perturb-seq journal template passes manuscript-safe QA gate", () => {
   assert.equal(journal.counts.decorativeDepthNodeCount, 0);
   assert.equal(journal.counts.uiCardShapeCount, 0);
   assert.equal(journal.counts.plotMetadataReviewCount, 0);
+  assert.equal(journal.counts.plotTypographyReviewCount, 0);
   assert.deepEqual(journal.visualIssues, []);
   assert.deepEqual(journal.plotIssues, []);
 });
@@ -2087,6 +2099,7 @@ test("spatial transcriptomics journal template passes manuscript-safe QA gate", 
   assert.equal(journal.counts.decorativeDepthNodeCount, 0);
   assert.equal(journal.counts.uiCardShapeCount, 0);
   assert.equal(journal.counts.plotMetadataReviewCount, 0);
+  assert.equal(journal.counts.plotTypographyReviewCount, 0);
   assert.deepEqual(journal.visualIssues, []);
   assert.deepEqual(journal.plotIssues, []);
 });
@@ -2118,6 +2131,7 @@ test("AI biosecurity journal template passes manuscript-safe QA gate", () => {
   assert.equal(journal.counts.decorativeDepthNodeCount, 0);
   assert.equal(journal.counts.uiCardShapeCount, 0);
   assert.equal(journal.counts.plotMetadataReviewCount, 0);
+  assert.equal(journal.counts.plotTypographyReviewCount, 0);
   assert.deepEqual(journal.visualIssues, []);
   assert.deepEqual(journal.plotIssues, []);
 });
