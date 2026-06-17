@@ -597,7 +597,7 @@ test("wetlab instrument assets expose distinct premium editable part markers", (
     "cell-sorter": [/asset-sorter-body/, /asset-sorter-droplet-stream/, /asset-sorter-gate/, /asset-sorter-collection-bin/, /asset-sorter-gating-plot/, /asset-sorter-deflection-plates/, /asset-sorter-tube/, /asset-sorter-nozzle/, /asset-sorter-cabinet/, /asset-sorter-monitor/, /asset-sorter-emergency-stop/, /asset-instrument-material-highlight/, /asset-instrument-side-rim/, /asset-instrument-foot/, /asset-instrument-fastener/],
     "plate-96": [/asset-plate-frame/, /asset-plate-well/, /asset-plate-hit-well/],
     "plate-384": [/asset-plate384-frame/, /asset-plate384-well/, /asset-plate384-hit-well/],
-    pipette: [/asset-pipette-body/, /asset-pipette-plunger/, /asset-pipette-volume-window/, /asset-pipette-tip/, /asset-pipette-droplet/, /asset-pipette-thumb-button/, /asset-pipette-finger-hook/, /asset-pipette-target-well/, /asset-pipette-grip-ridges/, /asset-pipette-ejector-collar/, /asset-pipette-barrel-highlight/, /asset-instrument-material-highlight/]
+    pipette: [/asset-pipette-body/, /asset-pipette-slim-barrel/, /asset-pipette-plunger/, /asset-pipette-volume-window/, /asset-pipette-tip/, /asset-pipette-fine-tip/, /asset-pipette-droplet/, /asset-pipette-thumb-button/, /asset-pipette-finger-hook/, /asset-pipette-target-well/, /asset-pipette-grip-ridges/, /asset-pipette-ejector-collar/, /asset-pipette-barrel-highlight/, /asset-instrument-material-highlight/]
   };
 
   for (const [assetId, markers] of Object.entries(expectedMarkers)) {
