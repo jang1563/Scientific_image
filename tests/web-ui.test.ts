@@ -74,15 +74,18 @@ test("static web server exposes the premium asset catalog without the API server
 
 async function waitForServer(url: string): Promise<void> {
   const started = Date.now();
-  while (Date.now() - started < 5000) {
+  let lastStatus = "";
+  while (Date.now() - started < 15000) {
     try {
       const response = await fetch(url);
       if (response.ok) return;
+      lastStatus = `${response.status} ${response.statusText}`;
     } catch {
-      await new Promise((resolve) => setTimeout(resolve, 50));
+      lastStatus = "connection not ready";
     }
+    await new Promise((resolve) => setTimeout(resolve, 100));
   }
-  throw new Error(`Timed out waiting for ${url}`);
+  throw new Error(`Timed out waiting for ${url} (${lastStatus})`);
 }
 
 async function getFreePort(): Promise<number> {
