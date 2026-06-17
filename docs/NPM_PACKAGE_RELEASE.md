@@ -14,6 +14,8 @@ Package target:
 
 The package ships runtime JS under `dist/` plus source files for inspection. The `prepack` step runs `node scripts/build-npm-package.ts`, which emits package-safe JS from the TypeScript source. The MCP server starts from `bin/scientific-image-mcp.js` and imports `dist/packages/mcp/src/server.js` when the package is installed.
 
+Strict npm publish readiness requires `npm` and `tsc` on `PATH`. If either tool is missing, `node scripts/npm-package-readiness.ts` returns a short JSON diagnostic with the missing commands and points reviewers back to the no-install verification path instead of printing a Node stack trace.
+
 ## User Install Path
 
 After the package is published, users can connect an MCP client with `npx`:
@@ -57,6 +59,7 @@ npx -y -p @jang1563/scientific-image scientific-image-mcp-doctor
 Run these commands before publishing:
 
 ```bash
+node scripts/reviewer-status.ts
 node scripts/npm-package-readiness.ts
 node scripts/public-readiness-audit.ts
 node --test tests/*.test.ts

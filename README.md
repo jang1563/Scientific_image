@@ -30,7 +30,7 @@ What this repo is meant to demonstrate:
 
 1. Look at the generated SVG examples below; they are produced from editable scene nodes, not screenshots.
 2. Skim the portfolio metrics and the [Repository Index](docs/REPOSITORY_INDEX.md).
-3. Run `node --test tests/*.test.ts` and `node scripts/public-readiness-audit.ts`.
+3. Run `node scripts/reviewer-status.ts` for the no-install status summary, then inspect any failing gate.
 4. Start the local workspace with `node scripts/serve-static.ts apps/web 4173`.
 5. Inspect the agent path with `node scripts/agent-acceptance-smoke.ts`.
 
@@ -39,11 +39,14 @@ What this repo is meant to demonstrate:
 No package install is required in the intended Node 24 environment. Run the verification path first:
 
 ```bash
+node scripts/reviewer-status.ts
 node --test tests/*.test.ts
 node scripts/portfolio-metrics.ts
 node scripts/public-readiness-audit.ts
 node scripts/agent-acceptance-smoke.ts
 ```
+
+`node scripts/reviewer-status.ts` runs the no-install reviewer checks and reports CI wiring, portfolio metrics, public audit state, test gate status, and whether stricter npm publish tooling is available. Run `node --test tests/*.test.ts` separately for the authoritative full-suite result. The strict npm package gate still requires `npm` and `tsc`; when they are missing, the readiness script reports a clear JSON diagnostic instead of a stack trace.
 
 Then start the local static workspace:
 
@@ -72,7 +75,7 @@ Open one of the editable public demos:
 - Local-first web workspace, API, and MCP server share the same scene graph.
 - Agent-ready contract: agents use `workflowPack`, `templateId`, `assetId`, `styleProfile`, semantic slots, and editable appearance overrides instead of raw screenshots.
 - Export-aware pipeline: SVG/PDF/PPTX/DOCX paths emit exact fallback and provenance warnings.
-- Verification target: `node --test tests/*.test.ts` and `node scripts/public-readiness-audit.ts`.
+- Verification target: `node scripts/reviewer-status.ts`, `node --test tests/*.test.ts`, and `node scripts/public-readiness-audit.ts`.
 
 For a reviewer-oriented Repository Index, see [docs/REPOSITORY_INDEX.md](docs/REPOSITORY_INDEX.md). For MCP/Codex/Claude setup, see [docs/MCP_CLIENT_SETUP.md](docs/MCP_CLIENT_SETUP.md) and [docs/AGENT_QUICKSTART.md](docs/AGENT_QUICKSTART.md). For npm package readiness, see [docs/NPM_PACKAGE_RELEASE.md](docs/NPM_PACKAGE_RELEASE.md). For a metrics-based Portfolio Scorecard, see [docs/PORTFOLIO_SCORECARD.md](docs/PORTFOLIO_SCORECARD.md). For public release rules, see [docs/PUBLIC_RELEASE_CHECKLIST.md](docs/PUBLIC_RELEASE_CHECKLIST.md).
 

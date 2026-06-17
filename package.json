@@ -47,6 +47,7 @@
     "scripts/npm-package-readiness.ts",
     "scripts/portfolio-metrics.ts",
     "scripts/public-readiness-audit.ts",
+    "scripts/reviewer-status.ts",
     "scripts/serve-static.ts",
     "docs/",
     ".mcp.json.example",
@@ -62,6 +63,7 @@
   },
   "scripts": {
     "test": "node --test tests/*.test.ts",
+    "status:reviewer": "node scripts/reviewer-status.ts",
     "metrics": "node scripts/portfolio-metrics.ts",
     "agent:smoke": "node scripts/agent-acceptance-smoke.ts",
     "examples:public": "node scripts/generate-public-examples.ts",

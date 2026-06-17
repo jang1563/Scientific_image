@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
 import { readFile } from "node:fs/promises";
+import { createServer } from "node:net";
 import { fileURLToPath } from "node:url";
 
 test("web inspector exposes premium asset contract and part-level controls", async () => {
@@ -42,7 +43,7 @@ test("web inspector exposes premium asset contract and part-level controls", asy
 
 test("static web server exposes the premium asset catalog without the API server", async () => {
   const cwd = fileURLToPath(new URL("../", import.meta.url));
-  const port = 4300 + Math.floor(Math.random() * 500);
+  const port = await getFreePort();
   const server = spawn(process.execPath, ["scripts/serve-static.ts", "apps/web", String(port)], {
     cwd,
     stdio: "ignore"
@@ -74,4 +75,16 @@ async function waitForServer(url: string): Promise<void> {
     }
   }
   throw new Error(`Timed out waiting for ${url}`);
+}
+
+async function getFreePort(): Promise<number> {
+  return await new Promise((resolve, reject) => {
+    const probe = createServer();
+    probe.once("error", reject);
+    probe.listen(0, "127.0.0.1", () => {
+      const address = probe.address();
+      const port = typeof address === "object" && address ? address.port : 0;
+      probe.close(() => resolve(port));
+    });
+  });
 }

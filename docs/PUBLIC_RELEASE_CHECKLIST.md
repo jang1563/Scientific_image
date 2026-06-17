@@ -5,6 +5,7 @@ Use this checklist before changing repository visibility, sharing a link with re
 ## Required Gates
 
 - `node --test tests/*.test.ts` passes.
+- `node scripts/reviewer-status.ts` passes and reports current metrics, CI wiring, public audit state, and package tooling availability.
 - `node scripts/public-readiness-audit.ts` passes.
 - README and `docs/PORTFOLIO_SCORECARD.md` reflect current asset, workflow-pack, template, and test posture.
 - GitHub Actions CI is present and linked from the README.
@@ -34,7 +35,7 @@ Do not commit:
 
 ## Release Loop
 
-1. Run tests and public audit.
+1. Run reviewer status, tests, and public audit.
 2. Read `README.md`, `docs/REPOSITORY_INDEX.md`, and `docs/PORTFOLIO_SCORECARD.md` as if you are an external reviewer.
 3. Fix the highest-signal gap only.
 4. Re-run verification.

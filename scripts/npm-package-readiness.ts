@@ -32,6 +32,31 @@ const npmEnv = {
   npm_config_cache: process.env.npm_config_cache ?? join(tmpdir(), "scientific-image-npm-cache"),
   npm_config_loglevel: process.env.npm_config_loglevel ?? "error"
 };
+const requiredTooling = ["npm", "tsc"];
+const missingTooling = requiredTooling.filter((command) => !commandExists(command));
+
+if (missingTooling.length) {
+  console.log(JSON.stringify({
+    ok: false,
+    name: pkg.name,
+    version: pkg.version,
+    mode: "strict-npm-package-readiness",
+    packageTooling: {
+      available: false,
+      required: requiredTooling,
+      missing: missingTooling
+    },
+    noInstallReviewerPath: [
+      "node scripts/reviewer-status.ts",
+      "node --test tests/*.test.ts",
+      "node scripts/public-readiness-audit.ts",
+      "node scripts/agent-acceptance-smoke.ts"
+    ],
+    nextAction: "Install npm and TypeScript package tooling before running the strict npm publish readiness gate.",
+    failures: missingTooling.map((command) => `required package tooling is missing from PATH: ${command}`)
+  }, null, 2));
+  process.exit(1);
+}
 
 assertGate(pkg.name === "@jang1563/scientific-image", "package name should be the public scoped registry name.");
 assertGate(Boolean(pkg.version), "package version is required.");
@@ -48,6 +73,7 @@ for (const file of [
   "bin/scientific-image-mcp.js",
   "bin/scientific-image-mcp-doctor.js",
   "scripts/build-npm-package.ts",
+  "scripts/reviewer-status.ts",
   "tsconfig.npm.json",
   "packages/mcp/src/server.ts",
   "packages/agent/src/index.ts",
@@ -115,6 +141,7 @@ for (const file of [
   "packages/scene/src/index.ts",
   "packages/export/src/index.ts",
   "scripts/build-npm-package.ts",
+  "scripts/reviewer-status.ts",
   "docs/MCP_CLIENT_SETUP.md",
   "docs/AGENT_QUICKSTART.md",
   "docs/NPM_PACKAGE_RELEASE.md",
@@ -169,4 +196,9 @@ function mkPackDir(): string {
   rmSync(dir, { recursive: true, force: true });
   mkdirSync(dir, { recursive: true });
   return dir;
+}
+
+function commandExists(command: string): boolean {
+  const probe = spawnSync(command, ["--version"], { encoding: "utf8" });
+  return !probe.error && probe.status === 0;
 }
