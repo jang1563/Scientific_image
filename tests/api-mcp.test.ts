@@ -147,6 +147,11 @@ test("local API exposes premium asset search, render, and recommendations", asyn
     assert.ok(templates.templates.some((template: { id: string }) => template.id === "manuscript-results-figure"));
     assert.ok(templates.templates.every((template: { workflowPack: string }) => template.workflowPack === "publication-results-panels"));
 
+    const journalTemplates = await fetch(`${base}/assets/workflow-templates?figureIntent=journal-figure`).then((response) => response.json());
+    assert.equal(journalTemplates.templates.length, 3);
+    assert.ok(journalTemplates.templates.every((template: { figureIntent: string; recommendedStyleProfile: string }) => template.figureIntent === "journal-figure" && template.recommendedStyleProfile === "publication-line"));
+    assert.ok(journalTemplates.templates.some((template: { id: string }) => template.id === "perturb-seq-workflow-journal"));
+
     const templateQa = await fetch(`${base}/assets/workflow-templates/ai-biosecurity-pipeline/qa?styleProfile=consulting-2p5d`).then((response) => response.json());
     assert.equal(templateQa.qa.templateId, "ai-biosecurity-pipeline");
     assert.equal(templateQa.qa.outOfBoundsCount, 0);
@@ -702,6 +707,16 @@ test("MCP tools run premium deck workflow", async () => {
   });
   const templatePayload = JSON.parse((templates.result as { content: { text: string }[] }).content[0].text);
   assert.ok(templatePayload.templates.some((template: { id: string }) => template.id === "ai-biosecurity-pipeline"));
+
+  const journalTemplates = await handleJsonRpc({
+    jsonrpc: "2.0",
+    id: 101,
+    method: "tools/call",
+    params: { name: "list_workflow_templates", arguments: { figureIntent: "journal-figure" } }
+  });
+  const journalTemplatePayload = JSON.parse((journalTemplates.result as { content: { text: string }[] }).content[0].text);
+  assert.equal(journalTemplatePayload.templates.length, 3);
+  assert.ok(journalTemplatePayload.templates.every((template: { figureIntent: string; recommendedStyleProfile: string }) => template.figureIntent === "journal-figure" && template.recommendedStyleProfile === "publication-line"));
 
   await handleJsonRpc({
     jsonrpc: "2.0",

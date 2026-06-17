@@ -158,6 +158,7 @@ let dragState = null;
 let activeAssetFilter = "featured";
 let activeAssetQualityFilter = "all";
 let selectedWorkflowTemplateId = "manuscript-results-figure";
+let activeTemplateFigureIntent = "all";
 let deliveryNotice = "";
 let workflowPacks = [
   { id: "perturb-seq-crispr", name: "Perturb-seq / CRISPR", flagshipTemplateId: "perturb-seq-workflow" },
@@ -1590,6 +1591,7 @@ function renderPackQualitySummary() {
   const localAssets = curatedAssets.filter((asset) => (asset.workflowPacks ?? []).includes(packId));
   const localTemplates = workflowTemplates.filter((template) => template.workflowPack === packId || (pack?.templates ?? []).includes(template.id));
   const localPremiumCount = localAssets.filter((asset) => ["signature", "hero"].includes(asset.qualityTier)).length;
+  const journalTemplateCount = localTemplates.filter((template) => templateFigureIntent(template) === "journal-figure").length;
   const isRealisticPack = packId.startsWith("realistic-");
   const quality = gallery?.quality ?? {
     assetCount: localAssets.length,
@@ -1606,7 +1608,8 @@ function renderPackQualitySummary() {
   const exportSnapshot = gallery?.exportSnapshot;
   const exportMarkup = packExportSnapshotMarkup(exportSnapshot, quality);
   const visualQa = packVisualQaMarkup(packId);
-  packQualitySummary.innerHTML = `<div class="pack-summary-head"><div><strong>${escapeXml(pack?.name ?? workflowLabel(packId))}</strong><span>${quality.assetCount} assets / ${quality.signatureOrHeroCount} premium / ${quality.templateCount} templates${escapeXml(flagshipSummary)}</span></div><div class="pack-qa-status ${escapeAttr(quality.qaStatus)}">${escapeXml(status)}</div></div>${exportMarkup}${visualQa}`;
+  const journalLine = journalTemplateCount ? ` / ${journalTemplateCount} journal` : "";
+  packQualitySummary.innerHTML = `<div class="pack-summary-head"><div><strong>${escapeXml(pack?.name ?? workflowLabel(packId))}</strong><span>${quality.assetCount} assets / ${quality.signatureOrHeroCount} premium / ${quality.templateCount} templates${escapeXml(journalLine)}${escapeXml(flagshipSummary)}</span></div><div class="pack-qa-status ${escapeAttr(quality.qaStatus)}">${escapeXml(status)}</div></div>${exportMarkup}${visualQa}`;
 }
 
 function renderPublicDemoLauncher() {
@@ -1760,29 +1763,78 @@ function renderAssets() {
   assetList.querySelectorAll(".asset-card").forEach((card) => card.addEventListener("click", () => addAssetNode(card.dataset.assetId)));
 }
 
+const TEMPLATE_FIGURE_INTENTS = [
+  { id: "all", label: "All" },
+  { id: "journal-figure", label: "Journal" },
+  { id: "talk-slide", label: "Deck" },
+  { id: "hybrid-template", label: "Hybrid" }
+];
+
+function templateFigureIntent(template) {
+  if (template.figureIntent) return template.figureIntent;
+  if (template.recommendedStyleProfile === "publication-line") return "journal-figure";
+  if (template.recommendedStyleProfile === "scientific-editorial-realism" || template.layout === "hybrid-template") return "hybrid-template";
+  return "talk-slide";
+}
+
+function templateFigureIntentLabel(intent) {
+  if (intent === "journal-figure") return "Journal-safe";
+  if (intent === "hybrid-template") return "Hybrid";
+  if (intent === "talk-slide") return "Deck";
+  return "Template";
+}
+
+function templateIntentToolbarMarkup(packTemplates) {
+  return `<div class="template-gallery-toolbar" aria-label="Template figure intent filters">
+    ${TEMPLATE_FIGURE_INTENTS.map((intent) => {
+      const count = intent.id === "all" ? packTemplates.length : packTemplates.filter((template) => templateFigureIntent(template) === intent.id).length;
+      return `<button class="template-intent-filter ${activeTemplateFigureIntent === intent.id ? "active" : ""}" data-template-intent="${escapeAttr(intent.id)}" type="button">${escapeXml(intent.label)} <span>${escapeXml(String(count))}</span></button>`;
+    }).join("")}
+  </div>`;
+}
+
+function templateIntentBadgesMarkup(template) {
+  const intent = templateFigureIntent(template);
+  const styleProfile = template.recommendedStyleProfile || "consulting-2p5d";
+  const journalReady = intent === "journal-figure" ? `<span class="template-intent-badge journal-ready">journal-ready path</span>` : "";
+  return `<div class="template-intent-row"><span class="template-intent-badge ${escapeAttr(intent)}">${escapeXml(templateFigureIntentLabel(intent))}</span><span class="template-intent-badge style">${escapeXml(styleProfile)}</span>${journalReady}</div>`;
+}
+
 function renderTemplateGallery() {
   if (!templateGallery) return;
   const selectedPack = assetWorkflowPack?.value || "";
   const styleProfile = currentAssetStyleProfile();
-  let templates = workflowTemplates.filter((template) => !selectedPack || template.workflowPack === selectedPack);
-  if (!templates.length) templates = workflowTemplates.slice(0, 6);
-  templateGallery.innerHTML = templates.slice(0, 6).map((template) => {
+  const packTemplates = workflowTemplates.filter((template) => !selectedPack || template.workflowPack === selectedPack);
+  const templates = packTemplates.length ? packTemplates : workflowTemplates.slice(0, 6);
+  const visibleTemplates = templates.filter((template) => activeTemplateFigureIntent === "all" || templateFigureIntent(template) === activeTemplateFigureIntent);
+  const templateCards = visibleTemplates.slice(0, 6).map((template) => {
     const qa = templateQaFor(template);
     const qaStatus = qa?.qaStatus ?? "unknown";
     const isActive = template.id === selectedWorkflowTemplateId;
     const exportSummary = templateExportReadinessMarkup(qa, isActive);
     const primaryAction = templatePrimaryAction(qa);
+    const previewStyle = template.recommendedStyleProfile || styleProfile;
+    const intent = templateFigureIntent(template);
     return `
-    <button class="template-card ${isActive ? "active" : ""} qa-${escapeAttr(qaStatus)}" data-workflow-pack="${escapeAttr(template.workflowPack)}" data-template-id="${escapeAttr(template.id)}" type="button" title="${escapeAttr(template.description)}" aria-pressed="${isActive ? "true" : "false"}">
-      <div class="template-preview">${templatePreviewSvg(template, styleProfile)}</div>
+    <button class="template-card ${isActive ? "active" : ""} qa-${escapeAttr(qaStatus)} intent-${escapeAttr(intent)}" data-workflow-pack="${escapeAttr(template.workflowPack)}" data-template-id="${escapeAttr(template.id)}" type="button" title="${escapeAttr(template.description)}" aria-pressed="${isActive ? "true" : "false"}">
+      <div class="template-preview">${templatePreviewSvg(template, previewStyle)}</div>
       <div class="template-name">${escapeXml(template.name)}</div>
       <div class="template-meta">${escapeXml(template.layout)} / ${escapeXml(workflowLabel(template.workflowPack))}</div>
+      ${templateIntentBadgesMarkup(template)}
       ${qa ? `<div class="template-qa-row"><span class="template-qa-badge ${escapeAttr(qa.qaStatus)}">${escapeXml(qa.qaStatus.replace(/-/g, " "))}</span><span>${escapeXml(String(qa.score))}</span>${qa.exportReadiness?.pptx?.premiumAssetFallbackCount ? `<span>${escapeXml(String(qa.exportReadiness.pptx.premiumAssetFallbackCount))} SVG</span>` : ""}${qa.exportReadiness?.pptx?.plotFallbackCount ? `<span>${escapeXml(String(qa.exportReadiness.pptx.plotFallbackCount))} plot</span>` : ""}</div>` : ""}
       ${exportSummary}
       ${primaryAction ? `<div class="template-action ${escapeAttr(primaryAction.severity)}">${escapeXml(primaryAction.title)}</div>` : ""}
     </button>
   `;
   }).join("");
+  const emptyState = visibleTemplates.length ? "" : `<div class="template-empty-state">No ${escapeXml(templateFigureIntentLabel(activeTemplateFigureIntent).toLowerCase())} templates in this pack yet.</div>`;
+  templateGallery.innerHTML = `${templateIntentToolbarMarkup(templates)}<div class="template-gallery-grid">${templateCards}${emptyState}</div>`;
+  templateGallery.querySelectorAll("[data-template-intent]").forEach((button) => {
+    button.addEventListener("click", () => {
+      activeTemplateFigureIntent = button.dataset.templateIntent || "all";
+      renderTemplateGallery();
+    });
+  });
   templateGallery.querySelectorAll(".template-card").forEach((card) => {
     card.addEventListener("click", () => selectWorkflowTemplateCard(card));
   });
@@ -1791,10 +1843,14 @@ function renderTemplateGallery() {
 function selectWorkflowTemplateCard(card) {
   const pack = card.dataset.workflowPack;
   selectedWorkflowTemplateId = card.dataset.templateId || selectedWorkflowTemplateId;
+  const selectedTemplate = workflowTemplates.find((template) => template.id === selectedWorkflowTemplateId);
   if (workflowTemplate && pack) workflowTemplate.value = pack;
   if (assetWorkflowPack && pack) assetWorkflowPack.value = pack;
   if (pack) {
-    if (syncStyleProfileForPack(pack)) {
+    const previousStyleProfile = currentAssetStyleProfile();
+    const packStyleChanged = syncStyleProfileForPack(pack);
+    if (assetStyleProfile && selectedTemplate?.recommendedStyleProfile) assetStyleProfile.value = selectedTemplate.recommendedStyleProfile;
+    if (packStyleChanged || currentAssetStyleProfile() !== previousStyleProfile) {
       workflowPackGalleries.clear();
       workflowPackVisualQaGalleries.clear();
     }

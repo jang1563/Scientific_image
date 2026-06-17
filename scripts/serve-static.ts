@@ -77,7 +77,10 @@ function handleCatalogRoute(request: IncomingMessage, response: ServerResponse, 
 
   if (parts[1] === "workflow-templates") {
     sendJson(response, 200, {
-      templates: listWorkflowTemplates({ workflowPack: url.searchParams.get("workflowPack") ?? undefined })
+      templates: listWorkflowTemplates({
+        workflowPack: url.searchParams.get("workflowPack") ?? undefined,
+        figureIntent: url.searchParams.get("figureIntent") ?? undefined
+      })
     });
     return true;
   }

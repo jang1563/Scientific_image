@@ -881,11 +881,14 @@ export interface WorkflowTemplate {
   description: string;
   layout: "workflow" | "multi-panel" | "pipeline" | "results" | "architecture" | "hybrid-template";
   recommendedStyleProfile: AssetStyleProfile;
+  figureIntent?: WorkflowTemplateFigureIntent;
   previewAssetIds: string[];
   nodeKinds: SceneNode["kind"][];
   agentUseHints: string[];
   qaChecklist: string[];
 }
+
+export type WorkflowTemplateFigureIntent = "journal-figure" | "talk-slide" | "hybrid-template";
 
 export interface WorkflowTemplateQaIssue {
   severity: "pass" | "warning" | "error";
@@ -5577,29 +5580,45 @@ export function listWorkflowPacks(): WorkflowPack[] {
   return PREMIUM_WORKFLOW_PACKS.map((pack) => ({ ...pack, assetIds: [...pack.assetIds], templates: [...pack.templates], agentUseHints: [...pack.agentUseHints] }));
 }
 
-export function listWorkflowTemplates(input: { workflowPack?: string } = {}): WorkflowTemplate[] {
-  const workflowPack = input.workflowPack?.toLowerCase();
-  return PREMIUM_WORKFLOW_TEMPLATES
-    .filter((template) => !workflowPack || template.workflowPack.toLowerCase() === workflowPack)
-    .map((template) => ({
-      ...template,
-      previewAssetIds: [...template.previewAssetIds],
-      nodeKinds: [...template.nodeKinds],
-      agentUseHints: [...template.agentUseHints],
-      qaChecklist: [...template.qaChecklist]
-    }));
+function normalizeWorkflowTemplateFigureIntent(input?: string): WorkflowTemplateFigureIntent | undefined {
+  const value = input?.toLowerCase().trim();
+  if (!value || value === "all") return undefined;
+  if (["journal", "journal-figure", "paper", "manuscript", "publication", "publication-line"].includes(value)) return "journal-figure";
+  if (["talk", "talk-slide", "deck", "deck-premium", "consulting", "consulting-deck"].includes(value)) return "talk-slide";
+  if (["hybrid", "hybrid-template", "realistic", "scientific-editorial-realism"].includes(value)) return "hybrid-template";
+  return undefined;
 }
 
-export function getWorkflowTemplate(templateId: string): WorkflowTemplate {
-  const template = WORKFLOW_TEMPLATE_BY_ID.get(templateId);
-  if (!template) throw new Error(`Workflow template not found: ${templateId}`);
+export function workflowTemplateFigureIntent(template: WorkflowTemplate): WorkflowTemplateFigureIntent {
+  if (template.recommendedStyleProfile === "publication-line") return "journal-figure";
+  if (template.recommendedStyleProfile === "scientific-editorial-realism" || template.layout === "hybrid-template") return "hybrid-template";
+  return "talk-slide";
+}
+
+function workflowTemplateCopy(template: WorkflowTemplate): WorkflowTemplate {
   return {
     ...template,
+    figureIntent: workflowTemplateFigureIntent(template),
     previewAssetIds: [...template.previewAssetIds],
     nodeKinds: [...template.nodeKinds],
     agentUseHints: [...template.agentUseHints],
     qaChecklist: [...template.qaChecklist]
   };
+}
+
+export function listWorkflowTemplates(input: { workflowPack?: string; figureIntent?: string } = {}): WorkflowTemplate[] {
+  const workflowPack = input.workflowPack?.toLowerCase();
+  const figureIntent = normalizeWorkflowTemplateFigureIntent(input.figureIntent);
+  return PREMIUM_WORKFLOW_TEMPLATES
+    .filter((template) => !workflowPack || template.workflowPack.toLowerCase() === workflowPack)
+    .filter((template) => !figureIntent || workflowTemplateFigureIntent(template) === figureIntent)
+    .map(workflowTemplateCopy);
+}
+
+export function getWorkflowTemplate(templateId: string): WorkflowTemplate {
+  const template = WORKFLOW_TEMPLATE_BY_ID.get(templateId);
+  if (!template) throw new Error(`Workflow template not found: ${templateId}`);
+  return workflowTemplateCopy(template);
 }
 
 export function getWorkflowPack(packId: string): WorkflowPack {

@@ -34,7 +34,8 @@ import {
   renderRealisticAssetSvg,
   searchAssets,
   validatePremiumAssetRegistry,
-  validateRealisticAssetRegistry
+  validateRealisticAssetRegistry,
+  workflowTemplateFigureIntent
 } from "../packages/assets/src/index.ts";
 import { addNode, createProject } from "../packages/scene/src/index.ts";
 import { createCuratedSymbolNode } from "../packages/assets/src/index.ts";
@@ -1225,9 +1226,19 @@ test("premium style profiles and workflow packs are queryable", () => {
 
   const templates = listWorkflowTemplates();
   assert.ok(templates.length >= 25);
+  assert.ok(templates.every((template) => template.figureIntent === workflowTemplateFigureIntent(template)));
   assert.ok(templates.every((template) => template.previewAssetIds.length >= 4));
   assert.ok(templates.every((template) => template.agentUseHints.length && template.qaChecklist.length));
   assert.ok(templates.some((template) => template.id === "manuscript-results-figure" && template.layout === "multi-panel"));
+  const journalTemplates = listWorkflowTemplates({ figureIntent: "journal-figure" });
+  assert.equal(journalTemplates.length, 3);
+  assert.deepEqual(journalTemplates.map((template) => template.id).sort(), [
+    "ai-biosecurity-pipeline-journal",
+    "perturb-seq-workflow-journal",
+    "spatial-results-panel-journal"
+  ]);
+  assert.ok(journalTemplates.every((template) => template.recommendedStyleProfile === "publication-line"));
+  assert.deepEqual(listWorkflowTemplates({ workflowPack: "ai-biosecurity-eval", figureIntent: "journal-figure" }).map((template) => template.id), ["ai-biosecurity-pipeline-journal"]);
   const spatialTemplates = listWorkflowTemplates({ workflowPack: "spatial-transcriptomics" });
   assert.ok(spatialTemplates.every((template) => template.workflowPack === "spatial-transcriptomics"));
   assert.equal(getWorkflowTemplate("ai-biosecurity-pipeline").workflowPack, "ai-biosecurity-eval");

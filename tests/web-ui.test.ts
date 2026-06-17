@@ -58,11 +58,14 @@ test("static web server exposes the premium asset catalog without the API server
     const assets = await fetch(`http://127.0.0.1:${port}/assets?limit=500`).then((response) => response.json());
     const packs = await fetch(`http://127.0.0.1:${port}/assets/workflow-packs`).then((response) => response.json());
     const templates = await fetch(`http://127.0.0.1:${port}/assets/workflow-templates`).then((response) => response.json());
+    const journalTemplates = await fetch(`http://127.0.0.1:${port}/assets/workflow-templates?figureIntent=journal-figure`).then((response) => response.json());
 
     assert.equal(assets.count, 496);
     assert.ok(assets.assets.length >= 466);
     assert.equal(packs.workflowPacks.length, 18);
     assert.equal(templates.templates.length, 80);
+    assert.equal(journalTemplates.templates.length, 3);
+    assert.ok(journalTemplates.templates.every((template: { figureIntent: string }) => template.figureIntent === "journal-figure"));
     assert.ok(packs.workflowPacks.every((pack: { id: string; templates: string[]; flagshipTemplateId?: string }) => pack.id && pack.templates.length >= 4 && pack.flagshipTemplateId));
     assert.ok(packs.workflowPacks.some((pack: { id: string }) => pack.id === "synthetic-biology"));
     assert.ok(packs.workflowPacks.some((pack: { id: string }) => pack.id === "drug-discovery"));

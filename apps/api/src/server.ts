@@ -208,7 +208,12 @@ export async function handleRequest(request: IncomingMessage, response: ServerRe
   }
 
   if (parts[0] === "assets" && request.method === "GET" && parts[1] === "workflow-templates") {
-    sendJson(response, 200, { templates: listWorkflowTemplates({ workflowPack: url.searchParams.get("workflowPack") ?? undefined }) });
+    sendJson(response, 200, {
+      templates: listWorkflowTemplates({
+        workflowPack: url.searchParams.get("workflowPack") ?? undefined,
+        figureIntent: url.searchParams.get("figureIntent") ?? undefined
+      })
+    });
     return;
   }
 

@@ -385,7 +385,12 @@ const tools = [
     inputSchema: {
       type: "object",
       properties: {
-        workflowPack: { type: "string" }
+        workflowPack: { type: "string" },
+        figureIntent: {
+          type: "string",
+          enum: ["journal-figure", "talk-slide", "hybrid-template", "all"],
+          description: "Filter templates by manuscript/journal, talk/deck, or hybrid realistic figure intent."
+        }
       }
     }
   },
@@ -839,7 +844,12 @@ async function callTool(name: string, args: Record<string, unknown>): Promise<un
 	    return { workflowPacks: listWorkflowPacks() };
 	  }
   if (name === "list_workflow_templates") {
-    return { templates: listWorkflowTemplates({ workflowPack: args.workflowPack ? String(args.workflowPack) : undefined }) };
+    return {
+      templates: listWorkflowTemplates({
+        workflowPack: args.workflowPack ? String(args.workflowPack) : undefined,
+        figureIntent: args.figureIntent ? String(args.figureIntent) : undefined
+      })
+    };
   }
   if (name === "get_workflow_pack_gallery") {
     return {
