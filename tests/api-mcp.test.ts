@@ -156,6 +156,13 @@ test("local API exposes premium asset search, render, and recommendations", asyn
     assert.ok(templateQa.qa.exportReadiness.pptx.fallbackAssets.some((asset: { assetId: string; assetRecipe: string }) => asset.assetId === "risk-gate" && asset.assetRecipe === "hero-risk-gate"));
     assert.ok(templateQa.qa.actionItems.some((item: { title: string }) => item.title === "Resolve claim citations"));
 
+    const journalQa = await fetch(`${base}/assets/workflow-templates/perturb-seq-workflow/journal-qa?styleProfile=publication-line`).then((response) => response.json());
+    assert.equal(journalQa.qa.templateId, "perturb-seq-workflow");
+    assert.equal(journalQa.qa.figureIntent, "journal-figure");
+    assert.equal(journalQa.qa.status, "journal-draft");
+    assert.ok(journalQa.qa.counts.uiCardShapeCount > 4);
+    assert.ok(journalQa.qa.plotIssues.some((issue: { kind: string }) => issue.kind === "plot"));
+
     const report = await fetch(`${base}/assets/quality-report`).then((response) => response.json());
     assert.equal(report.report.summary.totalAssets, 466);
     assert.ok(report.report.benchmarks.some((benchmark: { id: string }) => benchmark.id === "biorender"));
@@ -883,6 +890,19 @@ test("MCP tools expose premium asset search, preview, recommendation, and insert
   assert.equal(templateQaPayload.qa.exportReadiness.pptx.premiumAssetFallbackCount, templateQaPayload.qa.premiumFallbackAssetIds.length);
   assert.ok(templateQaPayload.qa.exportReadiness.pptx.fallbackAssets.some((asset: { assetId: string; exportBehavior: string }) => asset.assetId === "risk-gate" && asset.exportBehavior === "embed-svg-fallback"));
   assert.ok(templateQaPayload.qa.actionItems.some((item: { title: string }) => item.title === "Resolve claim citations"));
+
+  const journalQa = await handleJsonRpc({
+    jsonrpc: "2.0",
+    id: 2850,
+    method: "tools/call",
+    params: { name: "get_journal_figure_qa", arguments: { templateId: "perturb-seq-workflow", style: "publication-line" } }
+  });
+  const journalQaPayload = JSON.parse((journalQa.result as { content: { text: string }[] }).content[0].text);
+  assert.equal(journalQaPayload.qa.templateId, "perturb-seq-workflow");
+  assert.equal(journalQaPayload.qa.status, "journal-draft");
+  assert.equal(journalQaPayload.qa.figureIntent, "journal-figure");
+  assert.ok(journalQaPayload.qa.visualIssues.some((issue: { kind: string }) => issue.kind === "layout"));
+  assert.ok(journalQaPayload.qa.actionItems.some((item: { title: string }) => item.title === "Add journal plot metadata"));
 
   const packRecommendation = await handleJsonRpc({
     jsonrpc: "2.0",

@@ -11,7 +11,7 @@ import {
   type SceneOperation,
   type SourceDocumentKind
 } from "../../scene/src/index.ts";
-import { compactAssetSearchResults, compactAssetSetRecommendation, createAssetBrief, createCuratedSymbolNode, createFlagshipWorkflowDemoNodes, createRealisticImageNode, createWorkflowFigureNodes, createWorkflowTemplateSpec, getAnyAsset, getAssetCoverageGapReport, getAssetIndex, getAssetOntology, getAssetQualityReport, getCommercialVisualAudit, getRealisticAssetGallery, getWorkflowPackExportSnapshot, getWorkflowPackGallery, getWorkflowPackQuality, getWorkflowPackVisualQaGallery, getWorkflowTemplate, getWorkflowTemplateQa, listWorkflowPacks, listWorkflowTemplates, recommendAssetSet, recommendAssetsForSlide, recommendWorkflowPack, renderPremiumAssetSvg, searchAssets } from "../../assets/src/index.ts";
+import { compactAssetSearchResults, compactAssetSetRecommendation, createAssetBrief, createCuratedSymbolNode, createFlagshipWorkflowDemoNodes, createRealisticImageNode, createWorkflowFigureNodes, createWorkflowTemplateSpec, getAnyAsset, getAssetCoverageGapReport, getAssetIndex, getAssetOntology, getAssetQualityReport, getCommercialVisualAudit, getJournalFigureQa, getRealisticAssetGallery, getWorkflowPackExportSnapshot, getWorkflowPackGallery, getWorkflowPackQuality, getWorkflowPackVisualQaGallery, getWorkflowTemplate, getWorkflowTemplateQa, listWorkflowPacks, listWorkflowTemplates, recommendAssetSet, recommendAssetsForSlide, recommendWorkflowPack, renderPremiumAssetSvg, searchAssets } from "../../assets/src/index.ts";
 import { createPlotNode, createPlotSpec, parseDelimited } from "../../plotting/src/index.ts";
 import { exportProject } from "../../export/src/index.ts";
 import { getAgentManifest, listAgentResources, readAgentResource } from "../../agent/src/index.ts";
@@ -422,6 +422,21 @@ const tools = [
       properties: {
         templateId: { type: "string" },
         styleProfile: { type: "string" },
+        pageWidth: { type: "number" },
+        pageHeight: { type: "number" }
+      }
+    }
+  },
+  {
+    name: "get_journal_figure_qa",
+    description: "Return manuscript/journal-safe figure QA for one workflow template, including publication-line styling, plot metadata, provenance, and export-readiness issues.",
+    inputSchema: {
+      type: "object",
+      required: ["templateId"],
+      properties: {
+        templateId: { type: "string" },
+        styleProfile: { type: "string" },
+        style: { type: "string" },
         pageWidth: { type: "number" },
         pageHeight: { type: "number" }
       }
@@ -844,6 +859,15 @@ async function callTool(name: string, args: Record<string, unknown>): Promise<un
     return {
       qa: getWorkflowTemplateQa(String(args.templateId), {
         styleProfile: args.styleProfile ? String(args.styleProfile) : undefined,
+        pageWidth: args.pageWidth === undefined ? undefined : Number(args.pageWidth),
+        pageHeight: args.pageHeight === undefined ? undefined : Number(args.pageHeight)
+      })
+    };
+  }
+  if (name === "get_journal_figure_qa") {
+    return {
+      qa: getJournalFigureQa(String(args.templateId), {
+        styleProfile: styleProfileArg(args),
         pageWidth: args.pageWidth === undefined ? undefined : Number(args.pageWidth),
         pageHeight: args.pageHeight === undefined ? undefined : Number(args.pageHeight)
       })

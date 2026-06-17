@@ -17,7 +17,7 @@ import {
   type SceneOperation,
   type SourceDocumentKind
 } from "../../../packages/scene/src/index.ts";
-import { compactAssetSetRecommendation, createAssetBrief, createFlagshipWorkflowDemoNodes, createRealisticImageNode, createUploadAsset, createWorkflowFigureNodes, createWorkflowTemplateSpec, getAnyAsset, getAssetCoverageGapReport, getAssetOntology, getAssetQualityReport, getCommercialVisualAudit, getRealisticAssetGallery, getWorkflowPackExportSnapshot, getWorkflowPackGallery, getWorkflowPackQuality, getWorkflowPackVisualQaGallery, getWorkflowTemplate, getWorkflowTemplateQa, listAssets, listRealisticAssets, listWorkflowPacks, listWorkflowTemplates, recommendAssetSet, recommendAssetsForSlide, recommendWorkflowPack, renderPremiumAssetSvg, searchAssets } from "../../../packages/assets/src/index.ts";
+import { compactAssetSetRecommendation, createAssetBrief, createFlagshipWorkflowDemoNodes, createRealisticImageNode, createUploadAsset, createWorkflowFigureNodes, createWorkflowTemplateSpec, getAnyAsset, getAssetCoverageGapReport, getAssetOntology, getAssetQualityReport, getCommercialVisualAudit, getJournalFigureQa, getRealisticAssetGallery, getWorkflowPackExportSnapshot, getWorkflowPackGallery, getWorkflowPackQuality, getWorkflowPackVisualQaGallery, getWorkflowTemplate, getWorkflowTemplateQa, listAssets, listRealisticAssets, listWorkflowPacks, listWorkflowTemplates, recommendAssetSet, recommendAssetsForSlide, recommendWorkflowPack, renderPremiumAssetSvg, searchAssets } from "../../../packages/assets/src/index.ts";
 import { createPlotNode, createPlotSpec, parseDelimited } from "../../../packages/plotting/src/index.ts";
 import { exportProject } from "../../../packages/export/src/index.ts";
 import { getAgentManifest, listAgentResources, readAgentResource } from "../../../packages/agent/src/index.ts";
@@ -188,6 +188,17 @@ export async function handleRequest(request: IncomingMessage, response: ServerRe
   if (parts[0] === "assets" && request.method === "GET" && parts[1] === "workflow-templates" && parts[2] && parts[3] === "qa") {
     sendJson(response, 200, {
       qa: getWorkflowTemplateQa(parts[2], {
+        styleProfile: styleProfileFromSearchParams(url.searchParams),
+        pageWidth: url.searchParams.has("pageWidth") ? Number(url.searchParams.get("pageWidth")) : undefined,
+        pageHeight: url.searchParams.has("pageHeight") ? Number(url.searchParams.get("pageHeight")) : undefined
+      })
+    });
+    return;
+  }
+
+  if (parts[0] === "assets" && request.method === "GET" && parts[1] === "workflow-templates" && parts[2] && parts[3] === "journal-qa") {
+    sendJson(response, 200, {
+      qa: getJournalFigureQa(parts[2], {
         styleProfile: styleProfileFromSearchParams(url.searchParams),
         pageWidth: url.searchParams.has("pageWidth") ? Number(url.searchParams.get("pageWidth")) : undefined,
         pageHeight: url.searchParams.has("pageHeight") ? Number(url.searchParams.get("pageHeight")) : undefined

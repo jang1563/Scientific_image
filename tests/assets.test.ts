@@ -14,6 +14,7 @@ import {
   getAssetOntology,
   getAssetQualityReport,
   getCommercialVisualAudit,
+  getJournalFigureQa,
   getWorkflowPackExportSnapshot,
   getWorkflowPackGallery,
   getWorkflowPackVisualQaGallery,
@@ -1993,6 +1994,29 @@ test("workflow template QA reports bounds provenance claims and export fallback"
   assert.equal(qa.exportReadiness.docx.status, "figure-panel");
   assert.ok(qa.actionItems.some((item) => item.kind === "claim" && item.title === "Resolve claim citations"));
   assert.ok(qa.actionItems.some((item) => item.kind === "export" && item.title === "Confirm premium asset fallback"));
+});
+
+test("journal figure QA separates manuscript readiness from deck polish", () => {
+  const base = getWorkflowTemplateQa("perturb-seq-workflow", { styleProfile: "publication-line" });
+  const journal = getJournalFigureQa("perturb-seq-workflow", { styleProfile: "publication-line" });
+
+  assert.equal(journal.templateId, "perturb-seq-workflow");
+  assert.equal(journal.figureIntent, "journal-figure");
+  assert.equal(journal.styleProfile, "publication-line");
+  assert.equal(journal.status, "journal-draft");
+  assert.ok(journal.score < base.score);
+  assert.ok(journal.counts.uiCardShapeCount > 4);
+  assert.ok(journal.counts.plotMetadataReviewCount >= 1);
+  assert.ok(journal.visualIssues.some((issue) => issue.kind === "layout" && issue.message.includes("product slide")));
+  assert.ok(journal.plotIssues.some((issue) => issue.kind === "plot" && issue.message.includes("axis")));
+  assert.ok(journal.exportWarnings.some((warning) => warning.includes("journal axis/legend")));
+  assert.ok(journal.actionItems.some((item) => item.title === "Reduce UI-card framing"));
+  assert.ok(journal.actionItems.some((item) => item.title === "Add journal plot metadata"));
+
+  const deckOnly = getJournalFigureQa("perturb-seq-workflow", { styleProfile: "consulting-2p5d" });
+  assert.equal(deckOnly.status, "deck-only");
+  assert.ok(deckOnly.visualIssues.some((issue) => issue.kind === "style" && issue.message.includes("publication-line")));
+  assert.ok(deckOnly.nextAction.includes("talks/decks"));
 });
 
 test("publication results workflow pack creates editable multi-panel figure nodes", () => {

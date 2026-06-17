@@ -960,6 +960,43 @@ export interface WorkflowTemplateQaReport {
   actionItems: WorkflowTemplateQaActionItem[];
 }
 
+export type JournalFigureQaStatus = "journal-ready" | "journal-draft" | "deck-only" | "needs-redesign";
+
+export interface JournalFigureQaIssue {
+  severity: "info" | "warning" | "error";
+  kind: "style" | "layout" | "provenance" | "claim" | "plot" | "export";
+  message: string;
+  nodeIds: string[];
+}
+
+export interface JournalFigureQaReport {
+  templateId: string;
+  workflowPack: string;
+  figureIntent: "journal-figure";
+  styleProfile: AssetStyleProfile;
+  pageSize: { width: number; height: number };
+  status: JournalFigureQaStatus;
+  score: number;
+  baseTemplateQa: WorkflowTemplateQaReport;
+  counts: {
+    decorativeDepthNodeCount: number;
+    uiCardShapeCount: number;
+    plotMetadataReviewCount: number;
+    missingProvenanceCount: number;
+    needsCitationCount: number;
+    unsupportedClaimCount: number;
+    outOfBoundsCount: number;
+    textOverflowCount: number;
+  };
+  blockingIssues: JournalFigureQaIssue[];
+  visualIssues: JournalFigureQaIssue[];
+  provenanceIssues: JournalFigureQaIssue[];
+  plotIssues: JournalFigureQaIssue[];
+  exportWarnings: string[];
+  actionItems: WorkflowTemplateQaActionItem[];
+  nextAction: string;
+}
+
 export interface WorkflowPackQuality {
   packId: string;
   assetCount: number;
@@ -6432,6 +6469,258 @@ export function getWorkflowTemplateQa(templateId: string, input: {
     issues,
     actionItems
   };
+}
+
+export function getJournalFigureQa(templateId: string, input: {
+  styleProfile?: AssetStyleProfile | string;
+  pageWidth?: number;
+  pageHeight?: number;
+} = {}): JournalFigureQaReport {
+  const template = getWorkflowTemplate(templateId);
+  const styleProfile = normalizeAssetStyleProfile(input.styleProfile ?? "publication-line") as AssetStyleProfile;
+  const baseTemplateQa = getWorkflowTemplateQa(template.id, {
+    styleProfile,
+    pageWidth: input.pageWidth,
+    pageHeight: input.pageHeight
+  });
+  const nodes = createWorkflowFigureNodes({ templateId: template.id, styleProfile });
+  const decorativeDepthNodes = nodes.filter(journalDecorativeDepthNode);
+  const uiCardShapes = nodes.filter(journalUiCardShapeNode);
+  const plotMetadataReviewNodes = nodes.filter(journalPlotNeedsMetadataReview);
+  const blockingIssues: JournalFigureQaIssue[] = [];
+  const visualIssues: JournalFigureQaIssue[] = [];
+  const provenanceIssues: JournalFigureQaIssue[] = [];
+  const plotIssues: JournalFigureQaIssue[] = [];
+  const actionItems = baseTemplateQa.actionItems.filter((item) => item.severity !== "pass");
+
+  if (baseTemplateQa.outOfBoundsCount) {
+    blockingIssues.push({
+      severity: "error",
+      kind: "layout",
+      message: `${baseTemplateQa.outOfBoundsCount} object(s) extend outside the export bounds; journal figures cannot rely on clipped slide exports.`,
+      nodeIds: baseIssueNodeIds(baseTemplateQa, "bounds")
+    });
+  }
+  if (baseTemplateQa.textOverflowCount) {
+    blockingIssues.push({
+      severity: "error",
+      kind: "layout",
+      message: `${baseTemplateQa.textOverflowCount} text object(s) may overflow; manuscript labels must fit without clipping.`,
+      nodeIds: baseIssueNodeIds(baseTemplateQa, "text-overflow")
+    });
+  }
+  if (baseTemplateQa.missingProvenanceCount) {
+    blockingIssues.push({
+      severity: "error",
+      kind: "provenance",
+      message: `${baseTemplateQa.missingProvenanceCount} object(s) are missing source/license metadata.`,
+      nodeIds: baseIssueNodeIds(baseTemplateQa, "provenance")
+    });
+  }
+  if (baseTemplateQa.unsupportedClaimCount) {
+    blockingIssues.push({
+      severity: "error",
+      kind: "claim",
+      message: `${baseTemplateQa.unsupportedClaimCount} unsupported scientific claim object(s) must be removed or sourced before manuscript use.`,
+      nodeIds: baseIssueNodeIds(baseTemplateQa, "claim")
+    });
+  }
+  if (styleProfile !== "publication-line") {
+    visualIssues.push({
+      severity: "warning",
+      kind: "style",
+      message: `Journal QA expects publication-line; ${styleProfile} is treated as deck/talk styling until a manuscript variant is rendered.`,
+      nodeIds: []
+    });
+    actionItems.push({
+      severity: "warning",
+      kind: "coverage",
+      title: "Switch to publication-line before manuscript review",
+      action: "Use publication-line or create a journal-safe template variant before using this figure in a paper.",
+      nodeIds: []
+    });
+  }
+  if (decorativeDepthNodes.length) {
+    visualIssues.push({
+      severity: "warning",
+      kind: "style",
+      message: `${decorativeDepthNodes.length} node(s) still use decorative depth/shadow; journal-safe figures should remove glossy deck depth.`,
+      nodeIds: decorativeDepthNodes.map((node) => node.id)
+    });
+    actionItems.push({
+      severity: "warning",
+      kind: "coverage",
+      title: "Remove decorative depth",
+      action: `Set depth to none/surface or redraw ${decorativeDepthNodes.length} object(s) as line art for publication-line output.`,
+      nodeIds: decorativeDepthNodes.map((node) => node.id)
+    });
+  }
+  if (uiCardShapes.length > 4) {
+    visualIssues.push({
+      severity: "warning",
+      kind: "layout",
+      message: `${uiCardShapes.length} large rounded/card-like shape(s) make the figure read like a product slide; journal-safe figures should use panel grids and minimal frames.`,
+      nodeIds: uiCardShapes.map((node) => node.id)
+    });
+    actionItems.push({
+      severity: "warning",
+      kind: "coverage",
+      title: "Reduce UI-card framing",
+      action: "Convert rounded cards/badges into manuscript panels, panel labels, scale bars, or plain line-art grouping.",
+      nodeIds: uiCardShapes.map((node) => node.id)
+    });
+  }
+  if (baseTemplateQa.needsCitationCount) {
+    provenanceIssues.push({
+      severity: "warning",
+      kind: "claim",
+      message: `${baseTemplateQa.needsCitationCount} claim/data object(s) still need citations or user confirmation.`,
+      nodeIds: baseIssueNodeIds(baseTemplateQa, "claim")
+    });
+  }
+  if (baseTemplateQa.missingProvenanceCount) {
+    provenanceIssues.push({
+      severity: "error",
+      kind: "provenance",
+      message: "Missing provenance blocks journal-ready status; include source data, license, citation, or private/unverified label.",
+      nodeIds: baseIssueNodeIds(baseTemplateQa, "provenance")
+    });
+  }
+  if (plotMetadataReviewNodes.length) {
+    plotIssues.push({
+      severity: "warning",
+      kind: "plot",
+      message: `${plotMetadataReviewNodes.length} plot node(s) need journal axis labels, units/source-data note, threshold/legend review, or explicit journalPlot metadata.`,
+      nodeIds: plotMetadataReviewNodes.map((node) => node.id)
+    });
+    actionItems.push({
+      severity: "warning",
+      kind: "coverage",
+      title: "Add journal plot metadata",
+      action: "Add explicit axis labels, units/source-data notes, legends, and threshold annotations to every manuscript plot.",
+      nodeIds: plotMetadataReviewNodes.map((node) => node.id)
+    });
+  }
+
+  const exportWarnings = [...baseTemplateQa.exportWarnings];
+  if (styleProfile !== "publication-line") {
+    exportWarnings.push(`Journal QA expected publication-line, but received ${styleProfile}.`);
+  }
+  if (plotMetadataReviewNodes.length) {
+    exportWarnings.push(`${plotMetadataReviewNodes.length} plot node(s) need explicit journal axis/legend/source-data review.`);
+  }
+  if (baseTemplateQa.premiumFallbackAssetIds.length) {
+    exportWarnings.push(`Journal PPTX/DOCX fallback review must name assets: ${describeTemplateQaList(baseTemplateQa.premiumFallbackAssetIds, 8)}.`);
+  }
+
+  const score = Math.max(0, Math.min(100, Math.round(
+    baseTemplateQa.score
+    - (styleProfile !== "publication-line" ? 30 : 0)
+    - Math.min(18, decorativeDepthNodes.length * 2)
+    - Math.min(18, Math.max(0, uiCardShapes.length - 4) * 2)
+    - Math.min(12, plotMetadataReviewNodes.length * 6)
+    - Math.min(12, baseTemplateQa.needsCitationCount * 2)
+    - (baseTemplateQa.premiumFallbackAssetIds.length ? 4 : 0)
+  )));
+  const status: JournalFigureQaStatus = blockingIssues.some((issue) => issue.severity === "error")
+    ? "needs-redesign"
+    : styleProfile !== "publication-line"
+      ? "deck-only"
+      : visualIssues.length || provenanceIssues.length || plotIssues.length || baseTemplateQa.exportWarnings.length
+        ? "journal-draft"
+        : "journal-ready";
+  const nextAction = status === "needs-redesign"
+    ? "Fix blocking layout, provenance, claim, or text-fit issues before journal-safe template work."
+    : status === "deck-only"
+      ? "Use this template for talks/decks only, or create a journal-safe publication-line variant before manuscript use."
+      : status === "journal-draft"
+        ? "Iterate a journal-safe variant: reduce UI framing/depth, resolve citations/provenance, and add explicit plot axis/legend metadata."
+        : "Ready for manuscript figure review; keep scene JSON, source data, citations, and export QA with the figure.";
+
+  return {
+    templateId: template.id,
+    workflowPack: template.workflowPack,
+    figureIntent: "journal-figure",
+    styleProfile,
+    pageSize: baseTemplateQa.pageSize,
+    status,
+    score,
+    baseTemplateQa,
+    counts: {
+      decorativeDepthNodeCount: decorativeDepthNodes.length,
+      uiCardShapeCount: uiCardShapes.length,
+      plotMetadataReviewCount: plotMetadataReviewNodes.length,
+      missingProvenanceCount: baseTemplateQa.missingProvenanceCount,
+      needsCitationCount: baseTemplateQa.needsCitationCount,
+      unsupportedClaimCount: baseTemplateQa.unsupportedClaimCount,
+      outOfBoundsCount: baseTemplateQa.outOfBoundsCount,
+      textOverflowCount: baseTemplateQa.textOverflowCount
+    },
+    blockingIssues,
+    visualIssues,
+    provenanceIssues,
+    plotIssues,
+    exportWarnings,
+    actionItems: actionItems.length
+      ? actionItems
+      : [{
+          severity: "pass",
+          kind: "coverage",
+          title: "Journal-ready automated gate passed",
+          action: "Continue with human scientific review, source-data verification, and final journal formatting.",
+          nodeIds: []
+        }],
+    nextAction
+  };
+}
+
+function baseIssueNodeIds(report: WorkflowTemplateQaReport, kind: WorkflowTemplateQaIssue["kind"]): string[] {
+  return report.issues
+    .filter((issue) => issue.kind === kind)
+    .flatMap((issue) => issue.nodeIds);
+}
+
+function journalDecorativeDepthNode(node: SceneNode): boolean {
+  const depth = node.style.depth;
+  return depth === "raised" || depth === "floating" || depth === "hero" || node.style.shadow === true;
+}
+
+function journalUiCardShapeNode(node: SceneNode): boolean {
+  if (node.kind !== "shape") return false;
+  const payload = nodePayloadObject(node);
+  const shape = String(payload.shape ?? "");
+  const label = String(payload.label ?? node.name ?? "").toLowerCase();
+  const largeEnough = node.transform.width >= 90 && node.transform.height >= 32;
+  if (!largeEnough) return false;
+  return shape === "round-rect" || /\b(card|panel|review|source|export|qa|trace|badge)\b/.test(label);
+}
+
+function journalPlotNeedsMetadataReview(node: SceneNode): boolean {
+  if (node.kind !== "plot") return false;
+  const payload = nodePayloadObject(node);
+  const spec = typeof payload.spec === "object" && payload.spec !== null ? payload.spec as Record<string, unknown> : {};
+  const journalPlot = typeof spec.journalPlot === "object" && spec.journalPlot !== null ? spec.journalPlot as Record<string, unknown> : {};
+  const axes = typeof spec.axes === "object" && spec.axes !== null ? spec.axes as Record<string, unknown> : {};
+  const encodings = typeof spec.encodings === "object" && spec.encodings !== null ? spec.encodings as Record<string, unknown> : {};
+  const hasAxisMetadata = Boolean(
+    journalPlot.axisLabels ||
+    journalPlot.units ||
+    spec.axisLabels ||
+    (axes.x && axes.y) ||
+    (spec.xLabel && spec.yLabel)
+  );
+  const hasLegendMetadata = Boolean(
+    journalPlot.legend ||
+    spec.legend ||
+    spec.legendTitle ||
+    !encodings.color
+  );
+  const hasSourceDataMetadata = Boolean(journalPlot.sourceData || journalPlot.sourceDataNote || spec.sourceDataNote);
+  return !(hasAxisMetadata && hasLegendMetadata && hasSourceDataMetadata);
+}
+
+function nodePayloadObject(node: SceneNode): Record<string, unknown> {
+  return typeof node.payload === "object" && node.payload !== null ? node.payload as Record<string, unknown> : {};
 }
 
 function estimateTemplateNodeCount(template: WorkflowTemplate): number {
