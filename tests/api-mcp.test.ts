@@ -163,6 +163,12 @@ test("local API exposes premium asset search, render, and recommendations", asyn
     assert.ok(journalQa.qa.counts.uiCardShapeCount > 4);
     assert.ok(journalQa.qa.plotIssues.some((issue: { kind: string }) => issue.kind === "plot"));
 
+    const journalReadyQa = await fetch(`${base}/assets/workflow-templates/perturb-seq-workflow-journal/journal-qa?styleProfile=publication-line`).then((response) => response.json());
+    assert.equal(journalReadyQa.qa.templateId, "perturb-seq-workflow-journal");
+    assert.equal(journalReadyQa.qa.status, "journal-ready");
+    assert.equal(journalReadyQa.qa.counts.decorativeDepthNodeCount, 0);
+    assert.equal(journalReadyQa.qa.counts.plotMetadataReviewCount, 0);
+
     const report = await fetch(`${base}/assets/quality-report`).then((response) => response.json());
     assert.equal(report.report.summary.totalAssets, 466);
     assert.ok(report.report.benchmarks.some((benchmark: { id: string }) => benchmark.id === "biorender"));
@@ -904,6 +910,17 @@ test("MCP tools expose premium asset search, preview, recommendation, and insert
   assert.ok(journalQaPayload.qa.visualIssues.some((issue: { kind: string }) => issue.kind === "layout"));
   assert.ok(journalQaPayload.qa.actionItems.some((item: { title: string }) => item.title === "Add journal plot metadata"));
 
+  const journalReadyQa = await handleJsonRpc({
+    jsonrpc: "2.0",
+    id: 2851,
+    method: "tools/call",
+    params: { name: "get_journal_figure_qa", arguments: { templateId: "perturb-seq-workflow-journal", style: "publication-line" } }
+  });
+  const journalReadyPayload = JSON.parse((journalReadyQa.result as { content: { text: string }[] }).content[0].text);
+  assert.equal(journalReadyPayload.qa.status, "journal-ready");
+  assert.equal(journalReadyPayload.qa.counts.uiCardShapeCount, 0);
+  assert.equal(journalReadyPayload.qa.counts.plotMetadataReviewCount, 0);
+
   const packRecommendation = await handleJsonRpc({
     jsonrpc: "2.0",
     id: 2901,
@@ -954,6 +971,25 @@ test("MCP tools expose premium asset search, preview, recommendation, and insert
   assert.ok(perturbInsertIds.includes("pooled-screen"));
   assert.ok(perturbInsertIds.includes("sequencer"));
   assert.ok(perturbInsertIds.includes("expression-matrix"));
+
+  const perturbJournalSet = await handleJsonRpc({
+    jsonrpc: "2.0",
+    id: 29022,
+    method: "tools/call",
+    params: {
+      name: "recommend_asset_set",
+      arguments: {
+        title: "Paper figure for Perturb-seq CRISPR screen",
+        sourceText: "manuscript schematic with guide RNA, single-cell readout, volcano plot, and source data notes",
+        workflowPack: "perturb-seq-crispr",
+        responseShape: "compact",
+        limit: 8
+      }
+    }
+  });
+  const perturbJournalSetPayload = JSON.parse((perturbJournalSet.result as { content: { text: string }[] }).content[0].text);
+  assert.equal(perturbJournalSetPayload.recommendation.templateId, "perturb-seq-workflow-journal");
+  assert.equal(perturbJournalSetPayload.recommendation.styleProfile, "publication-line");
 
   const brief = await handleJsonRpc({
     jsonrpc: "2.0",

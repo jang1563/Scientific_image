@@ -254,6 +254,18 @@ let workflowTemplates = [
     qaChecklist: ["Check biological order and connector clarity."]
   },
   {
+    id: "perturb-seq-workflow-journal",
+    workflowPack: "perturb-seq-crispr",
+    name: "Perturb-seq journal workflow figure",
+    description: "Manuscript-safe Perturb-seq schematic with publication-line assets and source/provenance placeholders.",
+    layout: "multi-panel",
+    recommendedStyleProfile: "publication-line",
+    previewAssetIds: ["cell-t", "guide-rna", "scrna-droplet", "expression-matrix", "crispr-cas9", "metric-card"],
+    nodeKinds: ["shape", "text", "symbol", "connector", "plot"],
+    agentUseHints: ["Use for paper, manuscript, and journal-safe Perturb-seq schematics."],
+    qaChecklist: ["Use publication-line styling, plot metadata, and source-data placeholders."]
+  },
+  {
     id: "drug-discovery-funnel",
     workflowPack: "drug-discovery",
     name: "Drug discovery funnel",

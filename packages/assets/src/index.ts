@@ -1073,7 +1073,7 @@ export const PREMIUM_WORKFLOW_PACKS: WorkflowPack[] = [
     description: "CRISPR perturbation, pooled screening, single-cell sequencing, and hit interpretation.",
     flagshipTemplateId: "perturb-seq-workflow",
     assetIds: ["cell-t", "cell-immune", "cell-macrophage", "cell-tumor", "crispr-cas9", "guide-rna", "lentiviral-library", "perturb-seq", "pooled-screen", "arrayed-screen", "knockdown", "activation", "inhibition", "base-editor", "prime-editor", "drug-perturbation", "scrna-droplet", "cell-barcode", "umi-tag", "sequencing-read", "sequencer", "expression-matrix", "gene-locus", "metric-card", "plate-96", "plate-384", "pipette"],
-    templates: ["perturb-seq-workflow", "crispr-screen-results", "hit-validation-panel", "perturb-method-overview"],
+    templates: ["perturb-seq-workflow", "perturb-seq-workflow-journal", "crispr-screen-results", "hit-validation-panel", "perturb-method-overview"],
     agentUseHints: ["Use for CRISPR screen or Perturb-seq workflow slides.", "Pair cells, guide RNA, sequencing, matrix, and result plot in left-to-right process order."]
   },
   {
@@ -1296,6 +1296,18 @@ export const PREMIUM_WORKFLOW_TEMPLATES: WorkflowTemplate[] = [
     nodeKinds: ["shape", "text", "symbol", "connector"],
     agentUseHints: ["Use for methods slides explaining Perturb-seq or pooled CRISPR screens.", "Connect assets in process order and keep each step label under six words."],
     qaChecklist: ["Workflow order is biologically correct.", "Connectors do not cross important labels.", "Methods terms are consistent with source notes."]
+  },
+  {
+    id: "perturb-seq-workflow-journal",
+    workflowPack: "perturb-seq-crispr",
+    name: "Perturb-seq journal workflow figure",
+    description: "Manuscript-safe Perturb-seq schematic with panel-grid layout, line-art assets, explicit plot metadata, and source/provenance placeholders.",
+    layout: "multi-panel",
+    recommendedStyleProfile: "publication-line",
+    previewAssetIds: ["cell-t", "guide-rna", "scrna-droplet", "expression-matrix", "crispr-cas9", "metric-card"],
+    nodeKinds: ["shape", "text", "symbol", "connector", "plot"],
+    agentUseHints: ["Use when the user asks for a paper, manuscript, journal-safe schematic, or publication figure about Perturb-seq.", "Prefer publication-line assets and keep source/provenance notes visible outside the visual panels."],
+    qaChecklist: ["No decorative shadows or rounded deck cards.", "Volcano plot has axis labels, legend, threshold, and source-data note.", "Panel labels and provenance placeholders are visible."]
   },
   {
     id: "spatial-results-panel",
@@ -5023,8 +5035,9 @@ export function recommendAssetSet(input: AssetRecommendationInput & {
   const packRecommendation = input.workflowPack
     ? undefined
     : recommendWorkflowPack(input)[0];
-  const workflowPack = input.workflowPack ?? packRecommendation?.pack.id ?? inferWorkflowPack([input.title, input.narrative, input.layoutIntent, input.sourceText].filter(Boolean).join(" "));
-  const templateId = input.templateId ?? (workflowPack ? getWorkflowPack(workflowPack).flagshipTemplateId : packRecommendation?.recommendedTemplateId);
+  const intentText = [input.title, input.narrative, input.layoutIntent, input.sourceText].filter(Boolean).join(" ");
+  const workflowPack = input.workflowPack ?? packRecommendation?.pack.id ?? inferWorkflowPack(intentText);
+  const templateId = input.templateId ?? recommendedTemplateForIntent(workflowPack, intentText) ?? (workflowPack ? getWorkflowPack(workflowPack).flagshipTemplateId : packRecommendation?.recommendedTemplateId);
   const styleProfile = (normalizeAssetStyleProfile(input.styleProfile ?? (templateId ? getWorkflowTemplate(templateId).recommendedStyleProfile : undefined)) as AssetStyleProfile) ?? "consulting-2p5d";
   const coreResults = coreAssetResultsForWorkflow(workflowPack, styleProfile);
   const searchedRecommendations = recommendAssetsForSlide({
@@ -6626,7 +6639,7 @@ export function getJournalFigureQa(templateId: string, input: {
     ? "needs-redesign"
     : styleProfile !== "publication-line"
       ? "deck-only"
-      : visualIssues.length || provenanceIssues.length || plotIssues.length || baseTemplateQa.exportWarnings.length
+      : visualIssues.length || provenanceIssues.length || plotIssues.length
         ? "journal-draft"
         : "journal-ready";
   const nextAction = status === "needs-redesign"
@@ -7506,6 +7519,7 @@ function createTemplateFigureNodes(pack: WorkflowPack, template: WorkflowTemplat
   stepCount?: number;
 }): SceneNode[] {
   if (template.id === "perturb-seq-workflow") return createPerturbSeqFlagshipTemplateNodes(template, input);
+  if (template.id === "perturb-seq-workflow-journal") return createPerturbSeqJournalTemplateNodes(template, input);
   if (template.id === "single-cell-workflow") return createSingleCellMultiomicsFlagshipTemplateNodes(template, input);
   if (template.id === "embedding-results") return createSingleCellEmbeddingResultsTemplateNodes(template, input);
   if (template.id === "cell-state-summary") return createSingleCellStateSummaryTemplateNodes(template, input);
@@ -8085,6 +8099,231 @@ function createPerturbSeqFlagshipTemplateNodes(template: WorkflowTemplate, input
     })
   );
   return nodes.map((node, index) => ({ ...node, transform: { ...node.transform, z: index } }));
+}
+
+function createPerturbSeqJournalTemplateNodes(template: WorkflowTemplate, input: {
+  styleProfile?: AssetStyleProfile;
+  x?: number;
+  y?: number;
+  width?: number;
+}): SceneNode[] {
+  const styleProfile = "publication-line";
+  const x = input.x ?? 72;
+  const y = input.y ?? 92;
+  const width = input.width ?? 1064;
+  const source = curatedProvenance("Synthetic journal-safe Perturb-seq figure fixture generated by Scientific Image", "Scientific Image perturb-seq journal template fixture");
+  const line: SymbolAppearance = { accent: "#111827", stroke: "#111827", secondary: "#ffffff", fill: "#ffffff", labelColor: "#111827", strokeWidth: 1.35, labelVisible: false };
+  const figureText = (value: string, transform: Transform, style: Style = {}, align: "start" | "middle" | "end" = "start"): SceneNode => {
+    const node = createTextNode(value, transform, {
+      fontFamily: "Arial, Helvetica, sans-serif",
+      fontSize: 11,
+      fontWeight: 650,
+      color: "#111827",
+      ...style
+    });
+    return {
+      ...node,
+      payload: { ...(node.payload as Record<string, unknown>), align } as SceneNode["payload"],
+      claimStatus: "draft-visual"
+    };
+  };
+  const panel = (px: number, py: number, pw: number, ph: number): SceneNode => ({
+    ...createShapeNode("rect", "", createTransform(px, py, pw, ph), {
+      fill: "#ffffff",
+      stroke: "#111827",
+      strokeWidth: 1.05,
+      depth: "surface"
+    }),
+    claimStatus: "draft-visual"
+  });
+  const divider = (px: number, py: number, pw: number): SceneNode => ({
+    ...createShapeNode("line", "", createTransform(px, py, pw, 1), {
+      stroke: "#111827",
+      strokeWidth: 0.8,
+      depth: "none"
+    }),
+    claimStatus: "draft-visual"
+  });
+  const symbol = (
+    assetId: string,
+    label: string,
+    sx: number,
+    sy: number,
+    sw: number,
+    sh: number,
+    semanticRole: string,
+    layoutHint: string
+  ): SceneNode => ({
+    ...createCuratedSymbolNode({
+      assetId,
+      label,
+      x: sx,
+      y: sy,
+      width: sw,
+      height: sh,
+      styleProfile,
+      appearance: line,
+      style: { depth: "surface", stroke: "#111827", strokeWidth: 1.2, color: "#111827" },
+      semanticRole,
+      layoutHint
+    }),
+    claimStatus: "draft-visual"
+  });
+  const label = (value: string, lx: number, ly: number, lw: number): SceneNode => figureText(value, createTransform(lx, ly, lw, 16), {
+    fontSize: 9.3,
+    fontWeight: 700,
+    color: "#111827"
+  }, "middle");
+  const nodes: SceneNode[] = [
+    panel(x - 16, y - 48, width + 32, 528),
+    figureText("Perturb-seq CRISPR screen schematic", createTransform(x, y - 38, 446, 22), {
+      fontSize: 17,
+      fontWeight: 850
+    }),
+    figureText("Journal-safe draft: replace placeholder source data, citations, and thresholds before manuscript submission.", createTransform(x + 456, y - 35, width - 456, 18), {
+      fontSize: 9.6,
+      fontWeight: 650,
+      color: "#374151"
+    }, "end"),
+    divider(x, y - 10, width)
+  ];
+
+  const topY = y + 22;
+  const panelH = 178;
+  const gap = 18;
+  const panelA = { x, y: topY, w: 286, h: panelH };
+  const panelB = { x: x + panelA.w + gap, y: topY, w: 322, h: panelH };
+  const panelC = { x: x + panelA.w + panelB.w + gap * 2, y: topY, w: width - panelA.w - panelB.w - gap * 2, h: panelH };
+  for (const [tag, title, p] of [
+    ["A", "Perturbation design", panelA],
+    ["B", "Single-cell capture", panelB],
+    ["C", "Guide-linked readout", panelC]
+  ] as const) {
+    nodes.push(panel(p.x, p.y, p.w, p.h));
+    nodes.push(figureText(tag, createTransform(p.x + 12, p.y + 10, 20, 18), { fontSize: 15, fontWeight: 850 }));
+    nodes.push(figureText(title, createTransform(p.x + 40, p.y + 11, p.w - 52, 18), { fontSize: 11.5, fontWeight: 760 }));
+    nodes.push(divider(p.x + 12, p.y + 36, p.w - 24));
+  }
+  nodes.push(
+    symbol("cell-t", "Target cells", panelA.x + 24, panelA.y + 56, 76, 62, "input-sample", `${template.id}:panel-a-target-cells`),
+    label("target cells", panelA.x + 18, panelA.y + 124, 90),
+    symbol("guide-rna", "guide RNA", panelA.x + 113, panelA.y + 54, 76, 64, "perturbation-step", `${template.id}:panel-a-guide-rna`),
+    label("guide RNA", panelA.x + 108, panelA.y + 124, 86),
+    symbol("crispr-cas9", "CRISPR-Cas9", panelA.x + 198, panelA.y + 53, 72, 64, "perturbation-step", `${template.id}:panel-a-cas9`),
+    label("Cas9", panelA.x + 195, panelA.y + 124, 74),
+    createConnectorNode([{ x: panelA.x + 100, y: panelA.y + 87 }, { x: panelA.x + 112, y: panelA.y + 87 }], "", { stroke: "#111827", strokeWidth: 1.25 }),
+    createConnectorNode([{ x: panelA.x + 190, y: panelA.y + 87 }, { x: panelA.x + 198, y: panelA.y + 87 }], "", { stroke: "#111827", strokeWidth: 1.25 }),
+    figureText("Library identity and guide assignment are stored as editable scene metadata.", createTransform(panelA.x + 18, panelA.y + 146, panelA.w - 36, 18), {
+      fontSize: 8.8,
+      color: "#374151"
+    }),
+
+    symbol("lentiviral-library", "Pooled delivery", panelB.x + 36, panelB.y + 54, 78, 64, "perturbation-step", `${template.id}:panel-b-delivery`),
+    label("pooled delivery", panelB.x + 26, panelB.y + 124, 100),
+    symbol("scrna-droplet", "Cell + guide barcode", panelB.x + 146, panelB.y + 50, 86, 70, "assay-step", `${template.id}:panel-b-droplet`),
+    label("cell + barcode", panelB.x + 136, panelB.y + 124, 104),
+    symbol("cell-barcode", "Barcode", panelB.x + 246, panelB.y + 54, 62, 62, "assay-step", `${template.id}:panel-b-barcode`),
+    label("UMI/cell tag", panelB.x + 238, panelB.y + 124, 76),
+    createConnectorNode([{ x: panelB.x + 116, y: panelB.y + 86 }, { x: panelB.x + 146, y: panelB.y + 86 }], "", { stroke: "#111827", strokeWidth: 1.25 }),
+    createConnectorNode([{ x: panelB.x + 232, y: panelB.y + 86 }, { x: panelB.x + 246, y: panelB.y + 86 }], "", { stroke: "#111827", strokeWidth: 1.25 }),
+    figureText("Keep MOI, cell-type gating, and guide-capture assumptions in the caption.", createTransform(panelB.x + 18, panelB.y + 146, panelB.w - 36, 18), {
+      fontSize: 8.8,
+      color: "#374151"
+    }),
+
+    symbol("sequencer", "Sequencing", panelC.x + 34, panelC.y + 52, 82, 70, "data-evidence", `${template.id}:panel-c-sequencing`),
+    label("sequencing", panelC.x + 26, panelC.y + 124, 92),
+    symbol("expression-matrix", "Expression matrix", panelC.x + 150, panelC.y + 50, 94, 72, "data-evidence", `${template.id}:panel-c-matrix`),
+    label("cell x gene matrix", panelC.x + 136, panelC.y + 124, 124),
+    symbol("gene-locus", "Hit locus", panelC.x + 286, panelC.y + 56, 76, 62, "output", `${template.id}:panel-c-hit-locus`),
+    label("ranked hit genes", panelC.x + 270, panelC.y + 124, 112),
+    createConnectorNode([{ x: panelC.x + 118, y: panelC.y + 86 }, { x: panelC.x + 150, y: panelC.y + 86 }], "", { stroke: "#111827", strokeWidth: 1.25 }),
+    createConnectorNode([{ x: panelC.x + 244, y: panelC.y + 86 }, { x: panelC.x + 286, y: panelC.y + 86 }], "", { stroke: "#111827", strokeWidth: 1.25 }),
+    figureText("Readout table links perturbation, cell state, effect size, and uncertainty.", createTransform(panelC.x + 18, panelC.y + 146, panelC.w - 36, 18), {
+      fontSize: 8.8,
+      color: "#374151"
+    })
+  );
+  nodes.push(
+    createConnectorNode([{ x: panelA.x + panelA.w, y: panelA.y + 89 }, { x: panelB.x, y: panelB.y + 89 }], "", { stroke: "#111827", strokeWidth: 1.2 }),
+    createConnectorNode([{ x: panelB.x + panelB.w, y: panelB.y + 89 }, { x: panelC.x, y: panelC.y + 89 }], "", { stroke: "#111827", strokeWidth: 1.2 })
+  );
+
+  const lowerY = y + 230;
+  const resultPanel = { x, y: lowerY, w: 694, h: 218 };
+  const reviewPanel = { x: x + resultPanel.w + gap, y: lowerY, w: width - resultPanel.w - gap, h: 218 };
+  nodes.push(panel(resultPanel.x, resultPanel.y, resultPanel.w, resultPanel.h));
+  nodes.push(figureText("D", createTransform(resultPanel.x + 12, resultPanel.y + 10, 20, 18), { fontSize: 15, fontWeight: 850 }));
+  nodes.push(figureText("Effect-size and hit calling", createTransform(resultPanel.x + 40, resultPanel.y + 11, 260, 18), { fontSize: 11.5, fontWeight: 760 }));
+  nodes.push(divider(resultPanel.x + 12, resultPanel.y + 36, resultPanel.w - 24));
+  const volcanoTable = {
+    id: createId("table"),
+    name: "Journal Perturb-seq hit table placeholder",
+    columns: ["gene", "log2FC", "pValue", "program"],
+    rows: [
+      { gene: "STAT1", log2FC: 2.35, pValue: 0.00000008, program: "IFN" },
+      { gene: "IRF7", log2FC: 1.9, pValue: 0.0000006, program: "IFN" },
+      { gene: "MYC", log2FC: -1.4, pValue: 0.00003, program: "growth" },
+      { gene: "CDKN1A", log2FC: 2.1, pValue: 0.000004, program: "cell-cycle" },
+      { gene: "CXCL10", log2FC: 2.8, pValue: 0.00000001, program: "IFN" },
+      { gene: "MKI67", log2FC: -1.7, pValue: 0.000006, program: "cell-cycle" },
+      { gene: "GZMB", log2FC: 1.2, pValue: 0.0004, program: "cytotoxic" }
+    ],
+    source
+  };
+  nodes.push(createPlotNode({
+    id: createId("plot"),
+    plotType: "volcano",
+    title: "Perturbation effect",
+    table: volcanoTable,
+    encodings: { x: "log2FC", y: "pValue", color: "program", label: "gene" },
+    style: { fill: "#ffffff", stroke: "#111827", color: "#111827", depth: "surface" },
+    axes: { x: "log2 fold-change vs non-targeting control", y: "-log10 adjusted P value" },
+    legend: "Program / hit direction",
+    sourceDataNote: "Replace synthetic fixture with source table before submission.",
+    journalPlot: {
+      axisLabels: { x: "log2 fold-change vs non-targeting control", y: "-log10 adjusted P value" },
+      units: { x: "log2 fold-change", y: "-log10 adjusted P" },
+      legend: "Gene program / hit direction",
+      sourceData: "source-data-placeholder.tsv",
+      sourceDataNote: "Synthetic fixture for layout QA; replace with source data."
+    }
+  } as never, createTransform(resultPanel.x + 24, resultPanel.y + 52, 424, 146)));
+  nodes.push(
+    symbol("metric-card", "Effect-size table", resultPanel.x + 486, resultPanel.y + 64, 82, 64, "evaluation-evidence", `${template.id}:panel-d-effect-size`),
+    label("effect-size table", resultPanel.x + 462, resultPanel.y + 132, 132),
+    figureText("Thresholds: |log2FC| >= 1, adjusted P < 1e-4. Replace with study-specific thresholds.", createTransform(resultPanel.x + 466, resultPanel.y + 154, 198, 34), {
+      fontSize: 8.8,
+      color: "#374151"
+    })
+  );
+
+  nodes.push(panel(reviewPanel.x, reviewPanel.y, reviewPanel.w, reviewPanel.h));
+  nodes.push(figureText("E", createTransform(reviewPanel.x + 12, reviewPanel.y + 10, 20, 18), { fontSize: 15, fontWeight: 850 }));
+  nodes.push(figureText("Source and integrity checklist", createTransform(reviewPanel.x + 40, reviewPanel.y + 11, reviewPanel.w - 60, 18), { fontSize: 11.5, fontWeight: 760 }));
+  nodes.push(divider(reviewPanel.x + 12, reviewPanel.y + 36, reviewPanel.w - 24));
+  const checks = [
+    ["Source data", "Attach guide assignment, count matrix, and hit table."],
+    ["Citation", "Add protocol and analysis method references."],
+    ["Processing", "Record QC filters, normalization, and model threshold."],
+    ["Export", "Use SVG/PDF as canonical manuscript export."]
+  ];
+  checks.forEach(([title, detail], index) => {
+    const rowY = reviewPanel.y + 54 + index * 38;
+    nodes.push(figureText(`${index + 1}`, createTransform(reviewPanel.x + 20, rowY, 18, 16), { fontSize: 9.5, fontWeight: 850 }));
+    nodes.push(figureText(title, createTransform(reviewPanel.x + 48, rowY - 1, 92, 16), { fontSize: 9.5, fontWeight: 800 }));
+    nodes.push(figureText(detail, createTransform(reviewPanel.x + 144, rowY - 1, reviewPanel.w - 166, 28), { fontSize: 8.8, color: "#374151" }));
+  });
+  nodes.push(figureText("Caption placeholder: CRISPR perturbations were associated with guide-linked transcriptional programs; replace demo values with cited source data.", createTransform(x, y + 458, width, 34), {
+    fontSize: 9.2,
+    fontWeight: 650,
+    color: "#374151"
+  }));
+  return nodes.map((node, index) => ({
+    ...node,
+    style: node.kind === "plot" ? { ...node.style, stroke: "#111827", depth: "surface" } : node.style,
+    transform: { ...node.transform, z: index }
+  }));
 }
 
 function createSingleCellMultiomicsFlagshipTemplateNodes(template: WorkflowTemplate, input: {
@@ -14702,6 +14941,16 @@ function prefersRealisticForIntent(intent: string): boolean {
   const text = intent.toLowerCase();
   return /realistic|photo|microscopy|histology|h&e|evidence image|context panel|sample image|wetlab context|protocol context|tissue image|editorial realism|segmentation overlay/.test(text)
     && !/mechanism|pathway mechanism|editable schematic|pure vector|symbol-only/.test(text);
+}
+
+function prefersJournalFigureForIntent(intent: string): boolean {
+  return /journal|manuscript|paper|publication|figure panel|multi-panel figure|paper figure|nature|cell figure|methods figure|schematic figure/.test(intent.toLowerCase());
+}
+
+function recommendedTemplateForIntent(workflowPack: string | undefined, intent: string): string | undefined {
+  if (!workflowPack) return undefined;
+  if (workflowPack === "perturb-seq-crispr" && prefersJournalFigureForIntent(intent)) return "perturb-seq-workflow-journal";
+  return undefined;
 }
 
 function inferWorkflowPack(text: string): string | undefined {

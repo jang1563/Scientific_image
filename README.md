@@ -71,7 +71,7 @@ Open one of the editable public demos:
 ## Portfolio Snapshot
 
 - `496` browseable assets in the local gallery: `466` curated structured assets plus `30` realistic fixtures.
-- `429` signature/hero assets across `18` workflow packs and `77` templates.
+- `429` signature/hero assets across `18` workflow packs and `78` templates.
 - Metrics are recomputed from code with `node scripts/portfolio-metrics.ts`.
 - Local-first web workspace, API, and MCP server share the same scene graph.
 - Agent-ready contract: agents use `workflowPack`, `templateId`, `assetId`, `styleProfile`, semantic slots, and editable appearance overrides instead of raw screenshots.

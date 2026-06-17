@@ -143,6 +143,25 @@ test("publication results template exports line and dark style plot themes", () 
   assert.match(darkSvg, /#38bdf8|#34d399|#f87171|#c084fc/);
 });
 
+test("perturb-seq journal template exports manuscript-safe line figure", () => {
+  let project = createProject("Perturb-seq journal fixture", "figure");
+  for (const node of createWorkflowFigureNodes({ templateId: "perturb-seq-workflow-journal", styleProfile: "publication-line" })) {
+    project = addNode(project, node);
+  }
+
+  const svg = String(exportProject(project, { format: "svg" }).data);
+  assert.match(svg, /Perturb-seq CRISPR screen schematic/);
+  assert.match(svg, /data-style-profile="publication-line"/);
+  assert.match(svg, /plot-volcano-layer/);
+  assert.match(svg, /Source data/);
+  assert.doesNotMatch(svg, /data-depth="(?:raised|floating|hero)"/);
+  assert.doesNotMatch(svg, /stroke="#(?:bfdbfe|e9d5ff|fecaca)"/);
+
+  const pptx = exportProject(project, { format: "pptx" });
+  assert.ok(pptx.warnings.some((warning) => warning.includes("perturb-seq-workflow-journal")));
+  assert.ok(pptx.warnings.some((warning) => warning.includes("guide-rna")));
+});
+
 test("priority flagship templates honor publication-line and dark-talk style themes", () => {
   const templateIds = ["perturb-seq-workflow", "spatial-results-panel", "ai-biosecurity-pipeline", "drug-discovery-funnel", "protein-engineering-platform", "synthetic-biology-platform", "microbiome-infectious-disease-platform", "cell-therapy-manufacturing-platform", "microscopy-image-analysis-pipeline", "lab-automation-platform", "anatomy-organ-system-overview"];
 
