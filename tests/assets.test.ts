@@ -941,6 +941,21 @@ test("lab automation broad pack assets expose dedicated premium recipe markers",
   }
 });
 
+test("premium asset preview labels wrap long names inside compact viewBox", () => {
+  const svg = renderPremiumAssetSvg("automated-liquid-handler", {
+    styleProfile: "consulting-2p5d",
+    width: 120,
+    height: 96
+  });
+
+  assert.match(svg, /class="asset-label asset-label-fit"/);
+  assert.match(svg, /class="asset-label-pill"/);
+  assert.match(svg, /data-label-lines="2"/);
+  assert.match(svg, /<tspan x="60" y="[0-9.]+">Automated liquid<\/tspan>/);
+  assert.match(svg, /<tspan x="60" dy="[0-9.]+">handler<\/tspan>/);
+  assert.doesNotMatch(svg, />Automated liquid handler<\/text>/);
+});
+
 test("anatomy organ systems broad pack assets expose dedicated premium recipe markers", () => {
   const expectedMarkers: Record<string, RegExp[]> = {
     "anatomy-overview": [/asset-anatomy-overview/, /asset-anatomy-organ-card/, /asset-anatomy-axis-link/],

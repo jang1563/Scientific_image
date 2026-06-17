@@ -3659,8 +3659,54 @@ function workflowBlock(cx, cy, s, palette) {
   return `${baseLayer(cx, cy, s, palette, "panel")}<rect x="${fmt(cx - 47 * s)}" y="${fmt(cy - 32 * s)}" width="${fmt(94 * s)}" height="${fmt(64 * s)}" rx="${fmt(16 * s)}" fill="${palette.fill}" stroke="${palette.stroke}" stroke-width="${fmt(2.1 * s)}" filter="url(#asset-soft-shadow)"/><path d="M${fmt(cx - 28 * s)},${fmt(cy)} H${fmt(cx + 22 * s)}" stroke="${palette.accent}" stroke-width="${fmt(2.6 * s)}" stroke-linecap="round"/><path d="M${fmt(cx + 12 * s)},${fmt(cy - 11 * s)} L${fmt(cx + 26 * s)},${fmt(cy)} L${fmt(cx + 12 * s)},${fmt(cy + 11 * s)}" fill="none" stroke="${palette.accent}" stroke-width="${fmt(2.6 * s)}" stroke-linecap="round" stroke-linejoin="round"/>`;
 }
 
+function normalizeLabelText(text) {
+  return String(text ?? "").trim().replace(/\s+/g, " ");
+}
+
+function truncateLabelSegment(value, maxChars) {
+  const clean = normalizeLabelText(value);
+  if (clean.length <= maxChars) return clean;
+  if (maxChars <= 3) return clean.slice(0, Math.max(1, maxChars));
+  return `${clean.slice(0, Math.max(1, maxChars - 3)).replace(/[ .-]+$/, "")}...`;
+}
+
+function fitLabelLines(text, maxChars) {
+  const clean = normalizeLabelText(text);
+  if (!clean) return [""];
+  if (clean.length <= maxChars) return [clean];
+  const lines = [];
+  let current = "";
+  for (const word of clean.split(" ")) {
+    const next = current ? `${current} ${word}` : word;
+    if (next.length <= maxChars || !current) {
+      current = next;
+    } else {
+      lines.push(current);
+      current = word;
+    }
+  }
+  if (current) lines.push(current);
+  if (lines.length <= 2) return lines.map((line) => truncateLabelSegment(line, maxChars));
+  return [truncateLabelSegment(lines[0], maxChars), truncateLabelSegment(lines.slice(1).join(" "), maxChars)];
+}
+
 function renderLabel(text, width, height, palette) {
-  return `<text x="${fmt(width / 2)}" y="${fmt(height - 9)}" text-anchor="middle" fill="${palette.text}" font-family="Inter, Arial, sans-serif" font-size="${fmt(Math.max(10, Math.min(14, width / 11)))}" font-weight="700">${escapeXml(text)}</text>`;
+  const fontSize = Math.max(8, Math.min(11.5, width / 13.8, height / 8.2));
+  const maxChars = Math.max(7, Math.floor((width - 14) / (fontSize * 0.56)));
+  const lines = fitLabelLines(text, maxChars);
+  const lineGap = fontSize + 1.4;
+  const baselineY = height - Math.max(6, Math.min(9, height * 0.075));
+  const firstY = lines.length === 1 ? baselineY : baselineY - lineGap;
+  const pillPadY = 2.2;
+  const pillHeight = fontSize + (lines.length - 1) * lineGap + pillPadY * 2;
+  const pillY = Math.max(2, firstY - fontSize + 1.2 - pillPadY);
+  const darkLabel = /^#(?:f|e)/i.test(String(palette.text ?? ""));
+  const pillFill = darkLabel ? "#0f172a" : "#ffffff";
+  const pillStroke = darkLabel ? "#334155" : "#dbe4f0";
+  const tspans = lines.map((line, index) => index === 0
+    ? `<tspan x="${fmt(width / 2)}" y="${fmt(firstY)}">${escapeXml(line)}</tspan>`
+    : `<tspan x="${fmt(width / 2)}" dy="${fmt(lineGap)}">${escapeXml(line)}</tspan>`).join("");
+  return `<g class="asset-label asset-label-fit" data-label-lines="${lines.length}" data-label-max-chars="${maxChars}"><rect class="asset-label-pill" x="${fmt(5)}" y="${fmt(pillY)}" width="${fmt(width - 10)}" height="${fmt(pillHeight)}" rx="${fmt(Math.min(8, pillHeight / 2))}" fill="${pillFill}" stroke="${pillStroke}" stroke-width="${fmt(0.8)}" opacity="0.92"/><text x="${fmt(width / 2)}" text-anchor="middle" fill="${palette.text}" font-family="Inter, Arial, sans-serif" font-size="${fmt(fontSize)}" font-weight="760">${tspans}</text></g>`;
 }
 
 function renderAnchors(width, height) {
