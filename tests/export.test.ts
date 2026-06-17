@@ -162,6 +162,26 @@ test("perturb-seq journal template exports manuscript-safe line figure", () => {
   assert.ok(pptx.warnings.some((warning) => warning.includes("guide-rna")));
 });
 
+test("spatial transcriptomics journal template exports manuscript-safe line figure", () => {
+  let project = createProject("Spatial transcriptomics journal fixture", "figure");
+  for (const node of createWorkflowFigureNodes({ templateId: "spatial-results-panel-journal", styleProfile: "publication-line" })) {
+    project = addNode(project, node);
+  }
+
+  const svg = String(exportProject(project, { format: "svg" }).data);
+  assert.match(svg, /Spatial transcriptomics results schematic/);
+  assert.match(svg, /data-style-profile="publication-line"/);
+  assert.match(svg, /plot-heatmap-layer/);
+  assert.match(svg, /Source and integrity checklist/);
+  assert.match(svg, /source-spatial-expression-table.tsv/);
+  assert.doesNotMatch(svg, /data-depth="(?:raised|floating|hero)"/);
+  assert.doesNotMatch(svg, /stroke="#(?:bfdbfe|e9d5ff|fecaca|d8b4fe)"/);
+
+  const pptx = exportProject(project, { format: "pptx" });
+  assert.ok(pptx.warnings.some((warning) => warning.includes("spatial-results-panel-journal")));
+  assert.ok(pptx.warnings.some((warning) => warning.includes("visium-spot-array")));
+});
+
 test("priority flagship templates honor publication-line and dark-talk style themes", () => {
   const templateIds = ["perturb-seq-workflow", "spatial-results-panel", "ai-biosecurity-pipeline", "drug-discovery-funnel", "protein-engineering-platform", "synthetic-biology-platform", "microbiome-infectious-disease-platform", "cell-therapy-manufacturing-platform", "microscopy-image-analysis-pipeline", "lab-automation-platform", "anatomy-organ-system-overview"];
 

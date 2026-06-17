@@ -290,6 +290,18 @@ let workflowTemplates = [
     qaChecklist: ["Check map color contrast and image provenance."]
   },
   {
+    id: "spatial-results-panel-journal",
+    workflowPack: "spatial-transcriptomics",
+    name: "Spatial transcriptomics journal results panel",
+    description: "Manuscript-safe spatial transcriptomics panel with publication-line assets, heatmap metadata, and source/provenance checklist.",
+    layout: "multi-panel",
+    recommendedStyleProfile: "publication-line",
+    previewAssetIds: ["histology-section", "visium-spot-array", "segmentation-mask", "neighborhood-graph", "gene-locus"],
+    nodeKinds: ["shape", "text", "symbol", "plot", "connector"],
+    agentUseHints: ["Use for paper, manuscript, and journal-safe spatial transcriptomics figures."],
+    qaChecklist: ["Use publication-line styling, explicit plot metadata, and visible source placeholders."]
+  },
+  {
     id: "spatial-realistic-hybrid-panel",
     workflowPack: "realistic-spatial-microscopy",
     name: "Spatial realistic hybrid panel",

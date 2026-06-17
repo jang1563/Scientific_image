@@ -169,6 +169,12 @@ test("local API exposes premium asset search, render, and recommendations", asyn
     assert.equal(journalReadyQa.qa.counts.decorativeDepthNodeCount, 0);
     assert.equal(journalReadyQa.qa.counts.plotMetadataReviewCount, 0);
 
+    const spatialJournalReadyQa = await fetch(`${base}/assets/workflow-templates/spatial-results-panel-journal/journal-qa?styleProfile=publication-line`).then((response) => response.json());
+    assert.equal(spatialJournalReadyQa.qa.templateId, "spatial-results-panel-journal");
+    assert.equal(spatialJournalReadyQa.qa.status, "journal-ready");
+    assert.equal(spatialJournalReadyQa.qa.counts.uiCardShapeCount, 0);
+    assert.equal(spatialJournalReadyQa.qa.counts.plotMetadataReviewCount, 0);
+
     const report = await fetch(`${base}/assets/quality-report`).then((response) => response.json());
     assert.equal(report.report.summary.totalAssets, 466);
     assert.ok(report.report.benchmarks.some((benchmark: { id: string }) => benchmark.id === "biorender"));
@@ -921,6 +927,17 @@ test("MCP tools expose premium asset search, preview, recommendation, and insert
   assert.equal(journalReadyPayload.qa.counts.uiCardShapeCount, 0);
   assert.equal(journalReadyPayload.qa.counts.plotMetadataReviewCount, 0);
 
+  const spatialJournalReadyQa = await handleJsonRpc({
+    jsonrpc: "2.0",
+    id: 2852,
+    method: "tools/call",
+    params: { name: "get_journal_figure_qa", arguments: { templateId: "spatial-results-panel-journal", style: "publication-line" } }
+  });
+  const spatialJournalReadyPayload = JSON.parse((spatialJournalReadyQa.result as { content: { text: string }[] }).content[0].text);
+  assert.equal(spatialJournalReadyPayload.qa.status, "journal-ready");
+  assert.equal(spatialJournalReadyPayload.qa.counts.decorativeDepthNodeCount, 0);
+  assert.equal(spatialJournalReadyPayload.qa.counts.plotMetadataReviewCount, 0);
+
   const packRecommendation = await handleJsonRpc({
     jsonrpc: "2.0",
     id: 2901,
@@ -990,6 +1007,25 @@ test("MCP tools expose premium asset search, preview, recommendation, and insert
   const perturbJournalSetPayload = JSON.parse((perturbJournalSet.result as { content: { text: string }[] }).content[0].text);
   assert.equal(perturbJournalSetPayload.recommendation.templateId, "perturb-seq-workflow-journal");
   assert.equal(perturbJournalSetPayload.recommendation.styleProfile, "publication-line");
+
+  const spatialJournalSet = await handleJsonRpc({
+    jsonrpc: "2.0",
+    id: 29023,
+    method: "tools/call",
+    params: {
+      name: "recommend_asset_set",
+      arguments: {
+        title: "Paper figure for spatial transcriptomics results",
+        sourceText: "manuscript figure with histology, Visium spot array, segmentation mask, neighborhood graph, marker heatmap, and source image provenance",
+        workflowPack: "spatial-transcriptomics",
+        responseShape: "compact",
+        limit: 8
+      }
+    }
+  });
+  const spatialJournalSetPayload = JSON.parse((spatialJournalSet.result as { content: { text: string }[] }).content[0].text);
+  assert.equal(spatialJournalSetPayload.recommendation.templateId, "spatial-results-panel-journal");
+  assert.equal(spatialJournalSetPayload.recommendation.styleProfile, "publication-line");
 
   const brief = await handleJsonRpc({
     jsonrpc: "2.0",

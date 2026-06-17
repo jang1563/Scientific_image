@@ -1381,7 +1381,7 @@ test("premium coverage roadmap exposes 12 month targets and ontology contracts",
   assert.equal(coverage.baseline.totalAssets, 466);
   assert.equal(coverage.baseline.signatureHeroAssets, 401);
   assert.equal(coverage.baseline.workflowPacks, 18);
-  assert.equal(coverage.baseline.templates, 78);
+  assert.equal(coverage.baseline.templates, 79);
   assert.equal(coverage.productWedge, "asset-breadth-library");
   assert.equal(coverage.firstWave, "broad-biology-market");
   assert.equal(coverage.qualityGate, "pack-complete-premium");
@@ -2040,6 +2040,37 @@ test("perturb-seq journal template passes manuscript-safe QA gate", () => {
   assert.equal(qa.needsCitationCount, 0);
 
   const journal = getJournalFigureQa("perturb-seq-workflow-journal", { styleProfile: "publication-line" });
+  assert.equal(journal.status, "journal-ready");
+  assert.equal(journal.counts.decorativeDepthNodeCount, 0);
+  assert.equal(journal.counts.uiCardShapeCount, 0);
+  assert.equal(journal.counts.plotMetadataReviewCount, 0);
+  assert.deepEqual(journal.visualIssues, []);
+  assert.deepEqual(journal.plotIssues, []);
+});
+
+test("spatial transcriptomics journal template passes manuscript-safe QA gate", () => {
+  const template = getWorkflowTemplate("spatial-results-panel-journal");
+  const pack = listWorkflowPacks().find((candidate) => candidate.id === "spatial-transcriptomics");
+  assert.equal(template.recommendedStyleProfile, "publication-line");
+  assert.ok(pack?.templates.includes("spatial-results-panel-journal"));
+
+  const nodes = createWorkflowFigureNodes({ templateId: "spatial-results-panel-journal", styleProfile: "publication-line" });
+  assert.ok(nodes.length >= 40);
+  assert.ok(nodes.some((node) => node.kind === "plot" && node.payload.spec.plotType === "heatmap"));
+  assert.ok(nodes.some((node) => node.kind === "symbol" && node.payload.assetId === "histology-section"));
+  assert.ok(nodes.some((node) => node.kind === "symbol" && node.payload.assetId === "visium-spot-array"));
+  assert.ok(nodes.some((node) => node.kind === "symbol" && node.payload.assetId === "segmentation-mask"));
+  assert.ok(nodes.some((node) => node.kind === "symbol" && node.payload.assetId === "neighborhood-graph"));
+  assert.equal(nodes.filter((node) => ["raised", "floating", "hero"].includes(String(node.style.depth))).length, 0);
+  assert.equal(nodes.filter((node) => node.kind === "shape" && node.payload.shape === "round-rect").length, 0);
+
+  const qa = getWorkflowTemplateQa("spatial-results-panel-journal", { styleProfile: "publication-line" });
+  assert.equal(qa.qaStatus, "premium");
+  assert.equal(qa.outOfBoundsCount, 0);
+  assert.equal(qa.textOverflowCount, 0);
+  assert.equal(qa.needsCitationCount, 0);
+
+  const journal = getJournalFigureQa("spatial-results-panel-journal", { styleProfile: "publication-line" });
   assert.equal(journal.status, "journal-ready");
   assert.equal(journal.counts.decorativeDepthNodeCount, 0);
   assert.equal(journal.counts.uiCardShapeCount, 0);

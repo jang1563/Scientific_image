@@ -62,7 +62,7 @@ test("static web server exposes the premium asset catalog without the API server
     assert.equal(assets.count, 496);
     assert.ok(assets.assets.length >= 466);
     assert.equal(packs.workflowPacks.length, 18);
-    assert.equal(templates.templates.length, 78);
+    assert.equal(templates.templates.length, 79);
     assert.ok(packs.workflowPacks.every((pack: { id: string; templates: string[]; flagshipTemplateId?: string }) => pack.id && pack.templates.length >= 4 && pack.flagshipTemplateId));
     assert.ok(packs.workflowPacks.some((pack: { id: string }) => pack.id === "synthetic-biology"));
     assert.ok(packs.workflowPacks.some((pack: { id: string }) => pack.id === "drug-discovery"));

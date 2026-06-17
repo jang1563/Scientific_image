@@ -10,7 +10,7 @@ This scorecard is the public, reviewer-facing snapshot for the repository. It sh
 | Curated structured assets | `466` total: `386` biology, `80` AI |
 | Premium assets | `429` signature/hero assets |
 | Workflow packs | `18` workflow packs |
-| Templates | `78` workflow templates |
+| Templates | `79` workflow templates |
 | Style profiles | `6`: consulting, publication-line, minimal-flat, dark-talk, risk-warning, realism |
 | Export surfaces | SVG, PDF, PPTX, DOCX |
 | Agent surfaces | Local API, MCP resources, MCP tools, compact asset index |
