@@ -24,6 +24,14 @@ test("web inspector exposes premium asset contract and part-level controls", asy
   assert.match(app, /perturb-seq-workflow-journal/);
   assert.match(app, /spatial-results-panel-journal/);
   assert.match(app, /ai-biosecurity-pipeline-journal/);
+  assert.match(app, /createPerturbSeqJournalWebNodes/);
+  assert.match(app, /createSpatialJournalWebNodes/);
+  assert.match(app, /createAiBiosecurityJournalWebNodes/);
+  assert.match(app, /template\.id === "perturb-seq-workflow-journal"/);
+  assert.match(app, /template\.id === "spatial-results-panel-journal"/);
+  assert.match(app, /template\.id === "ai-biosecurity-pipeline-journal"/);
+  assert.match(app, /layoutIntent: template \? slideLayoutIntentForTemplate\(template\)/);
+  assert.match(app, /page\.background = "#ffffff"/);
   assert.match(app, /syncWorkflowControls/);
   assert.match(app, /syncWorkflowPackSelect/);
   assert.match(app, /syncWorkflowFigureSelect/);

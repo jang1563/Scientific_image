@@ -3569,7 +3569,7 @@ function applyWorkflowFigureSlideMetaToCurrentPage(input) {
       ? workflowFigureSpeakerNotes({ template, pack, mode: input.mode ?? "workflow-figure" })
       : meta.speakerNotes,
     narrativeIntent: template?.description ?? `Editable ${pack?.name ?? "scientific"} workflow figure for source-grounded presentation use.`,
-    layoutIntent: template ? slideLayoutIntentForTemplate(template.layout) : "workflow"
+    layoutIntent: template ? slideLayoutIntentForTemplate(template) : "workflow"
   };
 }
 
@@ -3601,7 +3601,9 @@ function workflowFigureSpeakerNotes(input) {
   return lines.join("\n");
 }
 
-function slideLayoutIntentForTemplate(layout) {
+function slideLayoutIntentForTemplate(templateOrLayout) {
+  const layout = typeof templateOrLayout === "string" ? templateOrLayout : templateOrLayout?.layout;
+  if (templateOrLayout?.recommendedStyleProfile === "publication-line") return "journal-figure";
   if (layout === "results" || layout === "multi-panel") return "results";
   if (layout === "workflow" || layout === "pipeline" || layout === "architecture") return "workflow";
   return "summary";
@@ -3621,6 +3623,9 @@ function addWorkflowFigure(options = {}) {
     : createGenericWorkflowFigureNodes(pack);
   const replaceCurrentPage = Boolean(options.replaceCurrentPage || (isStarterOpeningPage(page) && !options.appendToCurrentPage));
   const baseZ = replaceCurrentPage ? 0 : page.nodes.reduce((max, node) => Math.max(max, node.transform.z), -1) + 1;
+  if (replaceCurrentPage && template?.recommendedStyleProfile === "publication-line") {
+    page.background = "#ffffff";
+  }
   const preparedNodes = nodes.map((node, index) => ({
     ...node,
     transform: { ...node.transform, z: baseZ + index },
@@ -3674,13 +3679,16 @@ function addFlagshipWorkflowDemo() {
 
 function createTemplateFigureNodes(template) {
   if (template.id === "perturb-seq-workflow") return createPerturbSeqFlagshipNodes(template);
+  if (template.id === "perturb-seq-workflow-journal") return createPerturbSeqJournalWebNodes(template);
   if (template.id === "spatial-results-panel") return createSpatialResultsFlagshipNodes(template);
+  if (template.id === "spatial-results-panel-journal") return createSpatialJournalWebNodes(template);
   if (template.id === "spatial-realistic-hybrid-panel") return createSpatialRealisticHybridNodes(template);
   if (template.id === "wetlab-realistic-context-panel") return createWetlabRealisticContextNodes(template);
   if (template.id === "cellular-realistic-evidence-panel") return createCellularRealisticEvidenceNodes(template);
   if (template.id === "space-realistic-context-panel") return createSpaceRealisticContextNodes(template);
   if (template.id === "drug-discovery-funnel") return createDrugDiscoveryFlagshipNodes(template);
   if (template.id === "ai-biosecurity-pipeline") return createAiBiosecurityFlagshipNodes(template);
+  if (template.id === "ai-biosecurity-pipeline-journal") return createAiBiosecurityJournalWebNodes(template);
   if (template.id === "permissioning-ladder") return createPermissioningLadderNodes(template);
   if (template.id === "benchmark-dashboard") return createBenchmarkDashboardNodes(template);
   if (template.id === "review-audit-flow") return createReviewAuditFlowNodes(template);
@@ -4252,6 +4260,183 @@ function createAiBiosecurityFlagshipNodes(template) {
     createShapeNode("round-rect", "", x + Math.round(width * 0.76), y + 260, Math.round(width * 0.24), 150, theme.warningFill, theme.warningStroke, theme.floatingDepth),
     createTemplateSymbol("domain-expert-review", "Expert review", x + Math.round(width * 0.77) + 14, y + 300, 116, 90, `${template.id}:expert-review`, theme.riskSymbolProfile, theme.riskSymbolAppearance),
     createTextNode("Queue: permission, refusal boundary, citation context.", x + Math.round(width * 0.77) + 132, y + 312, Math.round(width * 0.24) - 148, 54, { fontSize: 12, fontWeight: 800, color: theme.warningText, align: "start" })
+  );
+  return nodes;
+}
+
+function createJournalWebToolkit(template, accent = "blue") {
+  const styleProfile = "publication-line";
+  const theme = flagshipStyleTheme(styleProfile, accent);
+  const lineShape = (shape, label, x, y, width, height, fill = "#ffffff", stroke = "#111827", strokeWidth = 1.15) => {
+    const node = createShapeNode(shape, label, x, y, width, height, fill, stroke, "surface");
+    node.style.strokeWidth = strokeWidth;
+    node.style.depth = "surface";
+    return node;
+  };
+  const lineText = (text, x, y, width, height, style = {}) => createTextNode(text, x, y, width, height, {
+    color: theme.heading,
+    fontWeight: 720,
+    align: "start",
+    ...style
+  });
+  const lineSymbol = (assetId, label, x, y, width, height, layoutHint, extraAppearance = {}) => {
+    const node = createTemplateSymbol(assetId, label, x, y, width, height, layoutHint, styleProfile, {
+      ...theme.symbolAppearance,
+      labelVisible: false,
+      ...extraAppearance
+    });
+    node.style.depth = "surface";
+    node.style.strokeWidth = 1.35;
+    node.claimStatus = "draft-visual";
+    return node;
+  };
+  const linePlot = (plotType, title, table, encodings, x, y, width, height, journalPlot = {}) => {
+    const node = createPlotNode(plotType, title, table, encodings, x, y, width, height, {
+      fill: "#ffffff",
+      stroke: "#111827",
+      color: "#111827",
+      depth: "surface"
+    });
+    node.payload.spec.journalPlot = {
+      axisLabels: true,
+      units: "synthetic public fixture",
+      legend: true,
+      sourceDataNote: "Replace synthetic fixture with cited source table before manuscript export.",
+      ...journalPlot
+    };
+    node.payload.spec.sourceDataNote = node.payload.spec.journalPlot.sourceDataNote;
+    node.claimStatus = "user-confirmed";
+    return node;
+  };
+  const panel = (tag, title, x, y, width, height) => [
+    lineShape("rect", "", x, y, width, height),
+    lineText(tag, x + 10, y + 9, 26, 22, { fontSize: 16, fontWeight: 950 }),
+    lineText(title, x + 40, y + 11, width - 54, 20, { fontSize: 12.4, fontWeight: 840 })
+  ];
+  const sourceStrip = (text, x, y, width) => [
+    lineShape("rect", "", x, y, width, 34, "#ffffff", "#374151", 0.9),
+    lineText(text, x + 12, y + 9, width - 24, 16, { fontSize: 9.4, fontWeight: 720, color: "#374151" })
+  ];
+  return { theme, lineShape, lineText, lineSymbol, linePlot, panel, sourceStrip };
+}
+
+function createPerturbSeqJournalWebNodes(template) {
+  const x = 66;
+  const y = 70;
+  const width = 1148;
+  const tk = createJournalWebToolkit(template, "blue");
+  const nodes = [
+    tk.lineShape("rect", "", x - 18, y - 24, width + 36, 584, "#ffffff", "#111827", 1.35),
+    tk.lineText("Perturb-seq CRISPR workflow figure", x, y - 12, 560, 28, { fontSize: 21, fontWeight: 880 }),
+    tk.lineText("Publication-line schematic: perturbation design, single-cell readout, model matrix, and source-data review.", x + 574, y - 8, width - 574, 24, { fontSize: 10.8, fontWeight: 650, color: "#374151", align: "end" })
+  ];
+  [
+    ["A", "Perturbation design", x, y + 42, 260, 170],
+    ["B", "Pooled cell capture", x + 286, y + 42, 260, 170],
+    ["C", "Sequencing readout", x + 572, y + 42, 260, 170],
+    ["D", "Guide-linked matrix", x + 858, y + 42, 290, 170],
+    ["E", "Hit evidence", x, y + 246, 700, 224],
+    ["F", "Source + provenance review", x + 724, y + 246, 424, 224]
+  ].forEach((panel) => nodes.push(...tk.panel(...panel)));
+  nodes.push(
+    tk.lineSymbol("cell-t", "Target cells", x + 28, y + 88, 82, 70, `${template.id}:panel-A-cells`),
+    tk.lineSymbol("guide-rna", "Guide RNA", x + 124, y + 86, 82, 72, `${template.id}:panel-A-grna`),
+    tk.lineSymbol("crispr-cas9", "Cas9", x + 204, y + 88, 44, 66, `${template.id}:panel-A-cas9`),
+    createConnectorNode(x + 262, y + 126, x + 286, y + 126, { stroke: "#111827", strokeWidth: 1.4 }),
+    tk.lineSymbol("lentiviral-library", "Pooled library", x + 318, y + 84, 88, 78, `${template.id}:panel-B-library`),
+    tk.lineSymbol("scrna-droplet", "Single-cell droplet", x + 430, y + 82, 86, 82, `${template.id}:panel-B-droplet`),
+    createConnectorNode(x + 548, y + 126, x + 572, y + 126, { stroke: "#111827", strokeWidth: 1.4 }),
+    tk.lineSymbol("sequencer", "Sequencer", x + 610, y + 84, 88, 78, `${template.id}:panel-C-sequencer`),
+    tk.lineSymbol("cell-barcode", "Barcode", x + 724, y + 88, 76, 68, `${template.id}:panel-C-barcode`),
+    createConnectorNode(x + 834, y + 126, x + 858, y + 126, { stroke: "#111827", strokeWidth: 1.4 }),
+    tk.lineSymbol("expression-matrix", "Expression matrix", x + 904, y + 78, 112, 90, `${template.id}:panel-D-matrix`),
+    tk.lineSymbol("gene-locus", "Hit locus", x + 1030, y + 88, 82, 70, `${template.id}:panel-D-locus`),
+    tk.linePlot("volcano", "Differential effect volcano", demoVolcanoTable(), { x: "log2FC", y: "pValue", color: "cellState", label: "gene" }, x + 24, y + 292, 418, 150, { axisLabels: "log2FC vs -log10(FDR)", legend: "cell-state groups" }),
+    tk.lineSymbol("metric-card", "Effect summary", x + 472, y + 304, 88, 76, `${template.id}:panel-E-metric`),
+    tk.lineText("Candidate hits require guide count QC, replicate support, and cited differential-expression table before final manuscript export.", x + 574, y + 306, 108, 88, { fontSize: 10.2, fontWeight: 700, color: "#374151" }),
+    ...tk.sourceStrip("Source placeholders: guide assignment table, cell QC table, count matrix, DE result table, validation citation.", x + 748, y + 300, 364),
+    ...tk.sourceStrip("Journal QA: no decorative depth; axis/legend metadata attached; PPTX fallback assets remain named.", x + 748, y + 354, 364),
+    tk.lineSymbol("audit-log", "Review ledger", x + 774, y + 400, 88, 62, `${template.id}:panel-F-audit`),
+    tk.lineSymbol("approval-stamp", "Ready for review", x + 892, y + 400, 88, 62, `${template.id}:panel-F-approval`)
+  );
+  return nodes;
+}
+
+function createSpatialJournalWebNodes(template) {
+  const x = 66;
+  const y = 70;
+  const width = 1148;
+  const tk = createJournalWebToolkit(template, "purple");
+  const nodes = [
+    tk.lineShape("rect", "", x - 18, y - 24, width + 36, 584, "#ffffff", "#111827", 1.35),
+    tk.lineText("Spatial transcriptomics results panel", x, y - 12, 560, 28, { fontSize: 21, fontWeight: 880 }),
+    tk.lineText("Publication-line panel grid: tissue region, capture spots, segmentation, neighborhoods, expression summary.", x + 574, y - 8, width - 574, 24, { fontSize: 10.8, fontWeight: 650, color: "#374151", align: "end" })
+  ];
+  [
+    ["A", "Tissue + capture spots", x, y + 42, 344, 194],
+    ["B", "Segmentation mask", x + 376, y + 42, 344, 194],
+    ["C", "Neighborhood graph", x + 752, y + 42, 396, 194],
+    ["D", "Marker expression summary", x, y + 270, 700, 200],
+    ["E", "Image/source processing notes", x + 724, y + 270, 424, 200]
+  ].forEach((panel) => nodes.push(...tk.panel(...panel)));
+  nodes.push(
+    tk.lineSymbol("histology-section", "Histology section", x + 32, y + 92, 116, 92, `${template.id}:panel-A-histology`),
+    tk.lineSymbol("visium-spot-array", "Spot array", x + 176, y + 92, 116, 92, `${template.id}:panel-A-spots`),
+    tk.lineText("Replace fixture with source image and processing notes.", x + 42, y + 194, 250, 18, { fontSize: 9.2, color: "#374151" }),
+    tk.lineSymbol("segmentation-mask", "Segmentation", x + 420, y + 88, 120, 98, `${template.id}:panel-B-mask`),
+    tk.lineSymbol("cell-boundary", "Cell boundary", x + 570, y + 94, 104, 86, `${template.id}:panel-B-boundary`),
+    tk.lineText("Mask version, model, and threshold must be cited.", x + 420, y + 194, 252, 18, { fontSize: 9.2, color: "#374151" }),
+    tk.lineSymbol("neighborhood-graph", "Neighborhood graph", x + 802, y + 86, 138, 104, `${template.id}:panel-C-neighborhood`),
+    tk.lineSymbol("tissue-region", "Region annotation", x + 976, y + 94, 104, 86, `${template.id}:panel-C-region`),
+    tk.linePlot("heatmap", "Marker expression by region", demoSpatialHeatmapTable(), { x: "region", y: "gene", value: "expression" }, x + 26, y + 316, 430, 128, { axisLabels: "region by marker gene", legend: "scaled expression" }),
+    tk.lineSymbol("gene-locus", "Marker gene", x + 484, y + 330, 86, 72, `${template.id}:panel-D-gene`),
+    tk.lineText("Report region annotation, normalization, and source-data table with the figure.", x + 584, y + 326, 96, 76, { fontSize: 9.5, fontWeight: 700, color: "#374151" }),
+    ...tk.sourceStrip("Image provenance: tissue source, staining/imaging metadata, crop/mask policy, segmentation method.", x + 748, y + 324, 364),
+    ...tk.sourceStrip("Plot provenance: expression matrix, region labels, source-data table, color-scale limits.", x + 748, y + 378, 364),
+    tk.lineSymbol("audit-log", "Source ledger", x + 778, y + 424, 78, 52, `${template.id}:panel-E-ledger`),
+    tk.lineSymbol("metric-card", "Scale note", x + 892, y + 424, 78, 52, `${template.id}:panel-E-scale`)
+  );
+  return nodes;
+}
+
+function createAiBiosecurityJournalWebNodes(template) {
+  const x = 66;
+  const y = 70;
+  const width = 1148;
+  const tk = createJournalWebToolkit(template, "risk");
+  const nodes = [
+    tk.lineShape("rect", "", x - 18, y - 24, width + 36, 584, "#ffffff", "#111827", 1.35),
+    tk.lineText("AI biosecurity evaluation schematic", x, y - 12, 560, 28, { fontSize: 21, fontWeight: 880 }),
+    tk.lineText("Publication-line methods figure: benchmark set, classifier, threshold review, human decision, audit evidence.", x + 574, y - 8, width - 574, 24, { fontSize: 10.8, fontWeight: 650, color: "#374151", align: "end" })
+  ];
+  [
+    ["A", "Evaluation sources", x, y + 42, 270, 174],
+    ["B", "Model + calibration", x + 300, y + 42, 338, 174],
+    ["C", "Risk review path", x + 668, y + 42, 480, 174],
+    ["D", "Failure modes", x, y + 250, 584, 220],
+    ["E", "Audit packet", x + 616, y + 250, 532, 220]
+  ].forEach((panel) => nodes.push(...tk.panel(...panel)));
+  nodes.push(
+    tk.lineSymbol("dataset", "Prompt set", x + 28, y + 88, 86, 76, `${template.id}:panel-A-dataset`),
+    tk.lineSymbol("benchmark", "Benchmark", x + 142, y + 88, 86, 76, `${template.id}:panel-A-benchmark`),
+    tk.lineText("Include source snippets, task classes, and exclusion criteria.", x + 32, y + 170, 218, 28, { fontSize: 9.4, fontWeight: 700, color: "#374151" }),
+    tk.lineSymbol("bio-classifier", "Bio classifier", x + 330, y + 88, 88, 76, `${template.id}:panel-B-classifier`),
+    tk.lineSymbol("calibration", "Calibration", x + 444, y + 88, 88, 76, `${template.id}:panel-B-calibration`),
+    tk.linePlot("line", "Calibration curve", demoCalibrationTable(), { x: "confidence", y: "observed", color: "split" }, x + 536, y + 92, 74, 62, { axisLabels: "confidence vs observed risk", legend: "split" }),
+    createConnectorNode(x + 638, y + 128, x + 668, y + 128, { stroke: "#111827", strokeWidth: 1.4 }),
+    tk.lineSymbol("risk-gate", "Risk gate", x + 704, y + 84, 82, 72, `${template.id}:panel-C-risk`),
+    tk.lineSymbol("permission-tier", "Permission", x + 820, y + 84, 82, 72, `${template.id}:panel-C-permission`),
+    tk.lineSymbol("human-review", "Human review", x + 936, y + 84, 82, 72, `${template.id}:panel-C-human`),
+    tk.lineSymbol("audit-log", "Audit log", x + 1050, y + 84, 64, 72, `${template.id}:panel-C-audit`),
+    tk.lineText("Thresholds route high-uncertainty biological requests to human review.", x + 704, y + 168, 380, 28, { fontSize: 9.4, fontWeight: 700, color: "#374151" }),
+    tk.linePlot("bar", "Failure modes by severity", demoFailureModeTable(), { x: "mode", y: "count", color: "severity" }, x + 28, y + 300, 348, 132, { axisLabels: "failure mode vs count", legend: "severity" }),
+    tk.lineSymbol("error-analysis", "Error analysis", x + 408, y + 320, 92, 74, `${template.id}:panel-D-error`),
+    tk.lineText("Report false positives/negatives, confidence intervals, and review-load assumptions.", x + 504, y + 310, 58, 96, { fontSize: 9.2, fontWeight: 700, color: "#374151" }),
+    ...tk.sourceStrip("Audit fields: prompt/source ID, classifier score, threshold version, reviewer rationale, timestamp.", x + 640, y + 302, 464),
+    ...tk.sourceStrip("Safety review: DURC flag, permission tier, escalation outcome, export fallback ledger.", x + 640, y + 356, 464),
+    tk.lineSymbol("durc-flag", "DURC flag", x + 668, y + 414, 78, 56, `${template.id}:panel-E-durc`),
+    tk.lineSymbol("domain-expert-review", "Expert review", x + 790, y + 414, 78, 56, `${template.id}:panel-E-expert`),
+    tk.lineSymbol("approval-stamp", "Decision", x + 912, y + 414, 78, 56, `${template.id}:panel-E-decision`)
   );
   return nodes;
 }
