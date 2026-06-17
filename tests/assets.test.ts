@@ -565,7 +565,7 @@ test("pathogen and biosafety assets have distinct premium vector markers", () =>
     plasmid: [/asset-plasmid-ring/, /asset-plasmid-origin/, /asset-plasmid-cargo/, /asset-plasmid-cut-site/],
     "pathogen-sample": [/asset-pathogen-sample-tube/, /asset-pathogen-sample-particles/, /asset-pathogen-sample-warning/],
     "biohazard-label": [/asset-biohazard-label/, /asset-biohazard-mark/, /asset-biohazard-ring/],
-    "biosafety-cabinet": [/asset-bsc-shell/, /asset-bsc-sash/, /asset-bsc-glass-sash/, /asset-bsc-airflow/, /asset-bsc-work-zone/, /asset-bsc-hepa-filter-grille/, /asset-bsc-sample-tray/, /asset-bsc-warning-badge/]
+    "biosafety-cabinet": [/asset-bsc-shell/, /asset-bsc-side-post/, /asset-bsc-sash/, /asset-bsc-glass-sash/, /asset-bsc-angled-glass-sash/, /asset-bsc-sash-handle/, /asset-bsc-airflow/, /asset-bsc-airflow-curtain/, /asset-bsc-airflow-arrow/, /asset-bsc-work-zone/, /asset-bsc-work-surface/, /asset-bsc-intake-grille/, /asset-bsc-hepa-filter-grille/, /asset-bsc-hepa-slat/, /asset-bsc-sample-tray/, /asset-bsc-pipette/, /asset-bsc-sample-vial/, /asset-bsc-contained-sample/, /asset-bsc-control-panel/, /asset-bsc-status-light/, /asset-bsc-warning-badge/]
   };
 
   for (const [assetId, markers] of Object.entries(expectedMarkers)) {
