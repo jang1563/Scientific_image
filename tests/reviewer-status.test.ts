@@ -12,6 +12,8 @@ test("reviewer status reports no-install repo readiness and CI wiring", () => {
   assert.equal(status.portfolio.curatedStructuredAssets, 466);
   assert.equal(status.portfolio.workflowPacks, 18);
   assert.equal(status.portfolio.templates, 80);
+  assert.equal(status.portfolio.publicExamples, 6);
+  assert.ok(status.portfolio.publicExampleTemplateIds.includes("perturb-seq-workflow-journal"));
   assert.equal(status.ci.workflowPresent, true);
   assert.equal(status.ci.nodeVersionPinnedTo24, true);
   assert.equal(status.ci.modernActionRuntime, true);

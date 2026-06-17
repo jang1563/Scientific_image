@@ -21,6 +21,9 @@ test("web inspector exposes premium asset contract and part-level controls", asy
   assert.match(app, /asset-preview-scale-strip/);
   assert.match(app, /publicDemos/);
   assert.match(app, /renderPublicDemoLauncher/);
+  assert.match(app, /perturb-seq-workflow-journal/);
+  assert.match(app, /spatial-results-panel-journal/);
+  assert.match(app, /ai-biosecurity-pipeline-journal/);
   assert.match(app, /syncWorkflowControls/);
   assert.match(app, /syncWorkflowPackSelect/);
   assert.match(app, /syncWorkflowFigureSelect/);

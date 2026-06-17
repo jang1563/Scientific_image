@@ -15,7 +15,7 @@ This scorecard is the public, reviewer-facing snapshot for the repository. It sh
 | Export surfaces | SVG, PDF, PPTX, DOCX |
 | Agent surfaces | Local API, MCP resources, MCP tools, compact asset index |
 | Agent quickstart | Copy-paste MCP/API path in `docs/AGENT_QUICKSTART.md` |
-| Public visual examples | `3` generated SVG examples under `docs/examples/` |
+| Public visual examples | `6` generated SVG examples under `docs/examples/`: `3` deck-premium and `3` journal-safe |
 | Canonical artifact | Structured scene JSON |
 | Metrics freshness | Recompute with `node scripts/portfolio-metrics.ts`; enforced by `node scripts/public-readiness-audit.ts` |
 

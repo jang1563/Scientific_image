@@ -1,10 +1,12 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import {
+  getJournalFigureQa,
   getWorkflowPackExportSnapshot,
   getWorkflowPackVisualQaGallery,
   getWorkflowTemplate,
-  getWorkflowTemplateQa
+  getWorkflowTemplateQa,
+  workflowTemplateFigureIntent
 } from "../packages/assets/src/index.ts";
 
 type ExampleManifest = {
@@ -14,6 +16,7 @@ type ExampleManifest = {
     title: string;
     templateId: string;
     styleProfile?: string;
+    figureIntent?: string;
   }>;
 };
 
@@ -25,7 +28,9 @@ const examples = manifest.examples ?? [];
 const demoReports = examples.map((example) => {
   const template = getWorkflowTemplate(example.templateId);
   const styleProfile = example.styleProfile ?? template.recommendedStyleProfile;
+  const figureIntent = example.figureIntent ?? template.figureIntent ?? workflowTemplateFigureIntent(template);
   const templateQa = getWorkflowTemplateQa(example.templateId, { styleProfile });
+  const journalQa = figureIntent === "journal-figure" ? getJournalFigureQa(example.templateId, { styleProfile }) : undefined;
   const visualQa = getWorkflowPackVisualQaGallery(template.workflowPack, { styleProfile, limit: 8 });
   const exportSnapshot = getWorkflowPackExportSnapshot(template.workflowPack, { styleProfile });
   const filePath = join("docs/examples", example.filename);
@@ -38,7 +43,8 @@ const demoReports = examples.map((example) => {
     !visualQa.previewSizes.some((size) => size.id === "icon" && size.width === 48) ? "missing 48px icon QA preview" : "",
     !visualQa.previewSizes.some((size) => size.id === "preview" && size.width === 120) ? "missing 120px preview QA" : "",
     !visualQa.previewSizes.some((size) => size.id === "slide") ? "missing slide-size QA preview" : "",
-    !visualQa.renderedAssetIds.length ? "visual QA gallery rendered no assets" : ""
+    !visualQa.renderedAssetIds.length ? "visual QA gallery rendered no assets" : "",
+    journalQa && journalQa.status !== "journal-ready" ? `journal QA status is ${journalQa.status}` : ""
   ].filter(Boolean);
   const reviewReasons = [
     templateQa.needsCitationCount ? `${templateQa.needsCitationCount} citation/review item(s)` : "",
@@ -54,6 +60,7 @@ const demoReports = examples.map((example) => {
     templateId: example.templateId,
     workflowPack: template.workflowPack,
     styleProfile,
+    figureIntent,
     status,
     templateQa: {
       qaStatus: templateQa.qaStatus,
@@ -72,6 +79,14 @@ const demoReports = examples.map((example) => {
       qaChecks: visualQa.qaChecks,
       snapshotKey: visualQa.snapshotKey
     },
+    journalQa: journalQa ? {
+      status: journalQa.status,
+      score: journalQa.score,
+      visualIssueCount: journalQa.visualIssues.length,
+      plotIssueCount: journalQa.plotIssues.length,
+      exportWarningCount: journalQa.exportWarnings.length,
+      nextAction: journalQa.nextAction
+    } : undefined,
     exportQa: {
       pptxStatus: templateQa.exportReadiness.pptx.status,
       premiumAssetFallbackCount: templateQa.exportReadiness.pptx.premiumAssetFallbackCount,

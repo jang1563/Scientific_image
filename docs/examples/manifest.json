@@ -6,19 +6,43 @@
       "filename": "perturb-seq-workflow.svg",
       "title": "Perturb-seq CRISPR Workflow",
       "templateId": "perturb-seq-workflow",
-      "styleProfile": "consulting-2p5d"
+      "styleProfile": "consulting-2p5d",
+      "figureIntent": "talk-slide"
+    },
+    {
+      "filename": "perturb-seq-workflow-journal.svg",
+      "title": "Perturb-seq Journal Workflow Figure",
+      "templateId": "perturb-seq-workflow-journal",
+      "styleProfile": "publication-line",
+      "figureIntent": "journal-figure"
     },
     {
       "filename": "spatial-results-panel.svg",
       "title": "Spatial Transcriptomics Results Panel",
       "templateId": "spatial-results-panel",
-      "styleProfile": "consulting-2p5d"
+      "styleProfile": "consulting-2p5d",
+      "figureIntent": "talk-slide"
+    },
+    {
+      "filename": "spatial-results-panel-journal.svg",
+      "title": "Spatial Transcriptomics Journal Results Panel",
+      "templateId": "spatial-results-panel-journal",
+      "styleProfile": "publication-line",
+      "figureIntent": "journal-figure"
     },
     {
       "filename": "ai-biosecurity-pipeline.svg",
       "title": "AI Biosecurity Evaluation Pipeline",
       "templateId": "ai-biosecurity-pipeline",
-      "styleProfile": "risk-warning"
+      "styleProfile": "risk-warning",
+      "figureIntent": "talk-slide"
+    },
+    {
+      "filename": "ai-biosecurity-pipeline-journal.svg",
+      "title": "AI Biosecurity Journal Evaluation Schematic",
+      "templateId": "ai-biosecurity-pipeline-journal",
+      "styleProfile": "publication-line",
+      "figureIntent": "journal-figure"
     }
   ]
 }

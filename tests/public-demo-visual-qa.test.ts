@@ -8,14 +8,20 @@ test("public demo visual QA links README examples to pack, template, and export 
 
   const report = JSON.parse(result.stdout);
   assert.equal(report.ok, true);
-  assert.equal(report.exampleCount, 3);
+  assert.equal(report.exampleCount, 6);
   assert.equal(report.blockedCount, 0);
   assert.ok(report.needsReviewCount >= 1);
   assert.deepEqual(report.demos.map((demo: { templateId: string }) => demo.templateId), [
     "perturb-seq-workflow",
+    "perturb-seq-workflow-journal",
     "spatial-results-panel",
-    "ai-biosecurity-pipeline"
+    "spatial-results-panel-journal",
+    "ai-biosecurity-pipeline",
+    "ai-biosecurity-pipeline-journal"
   ]);
+  const journalDemos = report.demos.filter((demo: { figureIntent: string }) => demo.figureIntent === "journal-figure");
+  assert.equal(journalDemos.length, 3);
+  assert.ok(journalDemos.every((demo: { styleProfile: string; journalQa?: { status: string } }) => demo.styleProfile === "publication-line" && demo.journalQa?.status === "journal-ready"));
 
   for (const demo of report.demos) {
     assert.ok(demo.workflowPack);

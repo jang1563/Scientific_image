@@ -373,7 +373,7 @@ for (const token of [
   "Copy-paste MCP/API path in `docs/AGENT_QUICKSTART.md`",
   "Product prototype that joins a human web workspace with agent-addressable API/MCP workflows over one structured scene JSON artifact.",
   "Copy-pasteable agent quickstart that demonstrates compact indexing",
-  "`3` generated SVG examples under `docs/examples/`",
+  "`6` generated SVG examples under `docs/examples/`",
   "Metrics freshness",
   "Recompute with `node scripts/portfolio-metrics.ts`; enforced by `node scripts/public-readiness-audit.ts`",
   "`scripts/portfolio-metrics.ts` returns the same computed metrics used in README and this scorecard.",

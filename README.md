@@ -12,7 +12,7 @@ The repo is intentionally usable with only Node 24 in this environment. The curr
 | --- | --- |
 | Product wedge | Local-first, agent-addressable scientific figure/deck workspace for biology and AI, built around editable scene JSON rather than screenshots. |
 | Differentiator | Structured SVG workflow packs combine premium assets, templates, provenance, review/export QA, and MCP/API operations for Codex/Claude-style agents. |
-| Proof path | Run the copy-paste reviewer commands, then open the three public demos; the examples are generated from code and checked in CI. |
+| Proof path | Run the copy-paste reviewer commands, then open the six public demos; the examples are generated from code and checked in CI. |
 | Current scale | See the Portfolio Snapshot below; counts are recomputed from code with `node scripts/portfolio-metrics.ts` and guarded by the public-readiness audit. |
 
 ## Project Brief
@@ -58,8 +58,11 @@ node scripts/serve-static.ts apps/web 4173
 Open one of the editable public demos:
 
 - `http://127.0.0.1:4173/?demo=perturb-seq-workflow`
+- `http://127.0.0.1:4173/?demo=perturb-seq-workflow-journal`
 - `http://127.0.0.1:4173/?demo=spatial-results-panel`
+- `http://127.0.0.1:4173/?demo=spatial-results-panel-journal`
 - `http://127.0.0.1:4173/?demo=ai-biosecurity-pipeline`
+- `http://127.0.0.1:4173/?demo=ai-biosecurity-pipeline-journal`
 
 ## Why This Is Technically Interesting
 
@@ -88,9 +91,13 @@ For the MCP/agent proof path, see [docs/AGENT_DEMO_EVIDENCE.md](docs/AGENT_DEMO_
 
 These are synthetic public examples generated from structured scene nodes, not screenshots or private source material. Regenerate them with `node scripts/generate-public-examples.ts`.
 
-| Perturb-seq workflow | Spatial transcriptomics panel | AI biosecurity pipeline |
+| Deck-premium Perturb-seq workflow | Deck-premium spatial panel | Deck-premium AI biosecurity pipeline |
 | --- | --- | --- |
 | <img src="docs/examples/perturb-seq-workflow.svg" alt="Perturb-seq CRISPR workflow example" width="320"> | <img src="docs/examples/spatial-results-panel.svg" alt="Spatial transcriptomics results panel example" width="320"> | <img src="docs/examples/ai-biosecurity-pipeline.svg" alt="AI biosecurity evaluation pipeline example" width="320"> |
+
+| Journal-safe Perturb-seq figure | Journal-safe spatial panel | Journal-safe AI biosecurity schematic |
+| --- | --- | --- |
+| <img src="docs/examples/perturb-seq-workflow-journal.svg" alt="Perturb-seq journal workflow figure example" width="320"> | <img src="docs/examples/spatial-results-panel-journal.svg" alt="Spatial transcriptomics journal results panel example" width="320"> | <img src="docs/examples/ai-biosecurity-pipeline-journal.svg" alt="AI biosecurity journal evaluation schematic example" width="320"> |
 
 See [docs/PUBLIC_EXAMPLE_GALLERY.md](docs/PUBLIC_EXAMPLE_GALLERY.md) for what each example demonstrates, which template generated it, and which local URL opens the editable scene.
 
@@ -180,12 +187,15 @@ Then restart the client and start with these MCP resources:
 
 Full setup instructions are in [docs/MCP_CLIENT_SETUP.md](docs/MCP_CLIENT_SETUP.md). Package release checks are in [docs/NPM_PACKAGE_RELEASE.md](docs/NPM_PACKAGE_RELEASE.md). The copy-paste agent workflow is in [docs/AGENT_QUICKSTART.md](docs/AGENT_QUICKSTART.md).
 
-The right-side Insert panel includes a `Public demos` launcher for the same Perturb-seq, spatial transcriptomics, and AI biosecurity examples shown above.
+The right-side Insert panel includes a `Public demos` launcher for the same deck-premium and journal-safe Perturb-seq, spatial transcriptomics, and AI biosecurity examples shown above.
 Direct local demo links also work after the static server is running:
 
 - `http://127.0.0.1:4173/?demo=perturb-seq-workflow`
+- `http://127.0.0.1:4173/?demo=perturb-seq-workflow-journal`
 - `http://127.0.0.1:4173/?demo=spatial-results-panel`
+- `http://127.0.0.1:4173/?demo=spatial-results-panel-journal`
 - `http://127.0.0.1:4173/?demo=ai-biosecurity-pipeline`
+- `http://127.0.0.1:4173/?demo=ai-biosecurity-pipeline-journal`
 
 ## Premium Deck Flow
 

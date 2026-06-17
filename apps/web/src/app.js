@@ -133,6 +133,14 @@ const publicDemos = [
     styleProfile: "consulting-2p5d"
   },
   {
+    id: "perturb-seq-workflow-journal",
+    title: "Perturb-seq paper",
+    subtitle: "Publication-line manuscript schematic",
+    workflowPack: "perturb-seq-crispr",
+    templateId: "perturb-seq-workflow-journal",
+    styleProfile: "publication-line"
+  },
+  {
     id: "spatial-results-panel",
     title: "Spatial",
     subtitle: "Tissue, spots, segmentation, evidence",
@@ -141,12 +149,28 @@ const publicDemos = [
     styleProfile: "consulting-2p5d"
   },
   {
+    id: "spatial-results-panel-journal",
+    title: "Spatial paper",
+    subtitle: "Journal-safe results panel",
+    workflowPack: "spatial-transcriptomics",
+    templateId: "spatial-results-panel-journal",
+    styleProfile: "publication-line"
+  },
+  {
     id: "ai-biosecurity-pipeline",
     title: "AI biosecurity",
     subtitle: "Risk gate, review, audit pipeline",
     workflowPack: "ai-biosecurity-eval",
     templateId: "ai-biosecurity-pipeline",
     styleProfile: "risk-warning"
+  },
+  {
+    id: "ai-biosecurity-pipeline-journal",
+    title: "AI safety paper",
+    subtitle: "Publication-line methods schematic",
+    workflowPack: "ai-biosecurity-eval",
+    templateId: "ai-biosecurity-pipeline-journal",
+    styleProfile: "publication-line"
   }
 ];
 let pendingPublicDemoId = initialPublicDemoId();
