@@ -1361,7 +1361,7 @@ test("workflow pack galleries expose assets templates flagship demos and QA stat
 test("workflow pack export snapshots summarize fallbacks and next actions", () => {
   const aiSnapshot = getWorkflowPackExportSnapshot("ai-biosecurity-eval", { styleProfile: "risk-warning" });
   assert.equal(aiSnapshot.packId, "ai-biosecurity-eval");
-  assert.equal(aiSnapshot.templateCount, 4);
+  assert.equal(aiSnapshot.templateCount, 5);
   assert.equal(aiSnapshot.blockedTemplateCount, 0);
   assert.equal(aiSnapshot.exportFormats.svg.status, "full-vector");
   assert.equal(aiSnapshot.exportFormats.pdf.status, "full-vector");
@@ -1370,6 +1370,7 @@ test("workflow pack export snapshots summarize fallbacks and next actions", () =
   assert.ok(aiSnapshot.totalPremiumAssetFallbackCount >= aiSnapshot.uniqueFallbackAssetIds.length);
   assert.ok(aiSnapshot.uniqueFallbackAssetIds.includes("risk-gate"));
   assert.ok(aiSnapshot.uniqueFallbackAssetIds.includes("human-review"));
+  assert.ok(aiSnapshot.templates.some((template) => template.templateId === "ai-biosecurity-pipeline-journal" && template.fallbackAssetIds.includes("risk-gate")));
   assert.ok(aiSnapshot.templates.some((template) => template.templateId === "benchmark-dashboard" && template.fallbackAssetIds.includes("bio-classifier")));
   assert.ok(aiSnapshot.warnings.some((warning) => warning.includes("PPTX")));
   assert.ok(aiSnapshot.nextAction.includes("visual QA"));
@@ -1381,7 +1382,7 @@ test("premium coverage roadmap exposes 12 month targets and ontology contracts",
   assert.equal(coverage.baseline.totalAssets, 466);
   assert.equal(coverage.baseline.signatureHeroAssets, 401);
   assert.equal(coverage.baseline.workflowPacks, 18);
-  assert.equal(coverage.baseline.templates, 79);
+  assert.equal(coverage.baseline.templates, 80);
   assert.equal(coverage.productWedge, "asset-breadth-library");
   assert.equal(coverage.firstWave, "broad-biology-market");
   assert.equal(coverage.qualityGate, "pack-complete-premium");
@@ -2071,6 +2072,37 @@ test("spatial transcriptomics journal template passes manuscript-safe QA gate", 
   assert.equal(qa.needsCitationCount, 0);
 
   const journal = getJournalFigureQa("spatial-results-panel-journal", { styleProfile: "publication-line" });
+  assert.equal(journal.status, "journal-ready");
+  assert.equal(journal.counts.decorativeDepthNodeCount, 0);
+  assert.equal(journal.counts.uiCardShapeCount, 0);
+  assert.equal(journal.counts.plotMetadataReviewCount, 0);
+  assert.deepEqual(journal.visualIssues, []);
+  assert.deepEqual(journal.plotIssues, []);
+});
+
+test("AI biosecurity journal template passes manuscript-safe QA gate", () => {
+  const template = getWorkflowTemplate("ai-biosecurity-pipeline-journal");
+  const pack = listWorkflowPacks().find((candidate) => candidate.id === "ai-biosecurity-eval");
+  assert.equal(template.recommendedStyleProfile, "publication-line");
+  assert.ok(pack?.templates.includes("ai-biosecurity-pipeline-journal"));
+
+  const nodes = createWorkflowFigureNodes({ templateId: "ai-biosecurity-pipeline-journal", styleProfile: "publication-line" });
+  assert.ok(nodes.length >= 44);
+  assert.ok(nodes.some((node) => node.kind === "plot" && node.payload.spec.plotType === "bar"));
+  assert.ok(nodes.some((node) => node.kind === "symbol" && node.payload.assetId === "benchmark"));
+  assert.ok(nodes.some((node) => node.kind === "symbol" && node.payload.assetId === "bio-classifier"));
+  assert.ok(nodes.some((node) => node.kind === "symbol" && node.payload.assetId === "risk-gate"));
+  assert.ok(nodes.some((node) => node.kind === "symbol" && node.payload.assetId === "audit-log"));
+  assert.equal(nodes.filter((node) => ["raised", "floating", "hero"].includes(String(node.style.depth))).length, 0);
+  assert.equal(nodes.filter((node) => node.kind === "shape" && node.payload.shape === "round-rect").length, 0);
+
+  const qa = getWorkflowTemplateQa("ai-biosecurity-pipeline-journal", { styleProfile: "publication-line" });
+  assert.equal(qa.qaStatus, "premium");
+  assert.equal(qa.outOfBoundsCount, 0);
+  assert.equal(qa.textOverflowCount, 0);
+  assert.equal(qa.needsCitationCount, 0);
+
+  const journal = getJournalFigureQa("ai-biosecurity-pipeline-journal", { styleProfile: "publication-line" });
   assert.equal(journal.status, "journal-ready");
   assert.equal(journal.counts.decorativeDepthNodeCount, 0);
   assert.equal(journal.counts.uiCardShapeCount, 0);

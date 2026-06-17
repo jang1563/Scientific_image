@@ -362,6 +362,18 @@ let workflowTemplates = [
     qaChecklist: ["Check risk states, review path, and audit visibility."]
   },
   {
+    id: "ai-biosecurity-pipeline-journal",
+    workflowPack: "ai-biosecurity-eval",
+    name: "AI biosecurity journal evaluation schematic",
+    description: "Manuscript-safe AI biosecurity evaluation schematic with publication-line assets, metric metadata, and review/audit source placeholders.",
+    layout: "multi-panel",
+    recommendedStyleProfile: "publication-line",
+    previewAssetIds: ["dataset", "benchmark", "bio-classifier", "risk-gate", "human-review", "audit-log"],
+    nodeKinds: ["shape", "text", "symbol", "plot", "connector"],
+    agentUseHints: ["Use for paper, manuscript, and journal-safe AI biosecurity methods schematics."],
+    qaChecklist: ["Use publication-line styling, explicit threshold metadata, and visible audit/source placeholders."]
+  },
+  {
     id: "agent-loop-architecture",
     workflowPack: "agentic-ai-mcp-rag",
     name: "Agent MCP/RAG architecture",

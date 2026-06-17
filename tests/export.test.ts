@@ -182,6 +182,26 @@ test("spatial transcriptomics journal template exports manuscript-safe line figu
   assert.ok(pptx.warnings.some((warning) => warning.includes("visium-spot-array")));
 });
 
+test("AI biosecurity journal template exports manuscript-safe line figure", () => {
+  let project = createProject("AI biosecurity journal fixture", "figure");
+  for (const node of createWorkflowFigureNodes({ templateId: "ai-biosecurity-pipeline-journal", styleProfile: "publication-line" })) {
+    project = addNode(project, node);
+  }
+
+  const svg = String(exportProject(project, { format: "svg" }).data);
+  assert.match(svg, /AI biosecurity evaluation schematic/);
+  assert.match(svg, /data-style-profile="publication-line"/);
+  assert.match(svg, /plot-bar-layer/);
+  assert.match(svg, /Review and reproducibility checklist/);
+  assert.match(svg, /source-ai-biosecurity-eval-metrics.tsv/);
+  assert.doesNotMatch(svg, /data-depth="(?:raised|floating|hero)"/);
+  assert.doesNotMatch(svg, /stroke="#(?:bfdbfe|e9d5ff|fecaca|fed7aa)"/);
+
+  const pptx = exportProject(project, { format: "pptx" });
+  assert.ok(pptx.warnings.some((warning) => warning.includes("ai-biosecurity-pipeline-journal")));
+  assert.ok(pptx.warnings.some((warning) => warning.includes("risk-gate")));
+});
+
 test("priority flagship templates honor publication-line and dark-talk style themes", () => {
   const templateIds = ["perturb-seq-workflow", "spatial-results-panel", "ai-biosecurity-pipeline", "drug-discovery-funnel", "protein-engineering-platform", "synthetic-biology-platform", "microbiome-infectious-disease-platform", "cell-therapy-manufacturing-platform", "microscopy-image-analysis-pipeline", "lab-automation-platform", "anatomy-organ-system-overview"];
 

@@ -175,6 +175,12 @@ test("local API exposes premium asset search, render, and recommendations", asyn
     assert.equal(spatialJournalReadyQa.qa.counts.uiCardShapeCount, 0);
     assert.equal(spatialJournalReadyQa.qa.counts.plotMetadataReviewCount, 0);
 
+    const aiJournalReadyQa = await fetch(`${base}/assets/workflow-templates/ai-biosecurity-pipeline-journal/journal-qa?styleProfile=publication-line`).then((response) => response.json());
+    assert.equal(aiJournalReadyQa.qa.templateId, "ai-biosecurity-pipeline-journal");
+    assert.equal(aiJournalReadyQa.qa.status, "journal-ready");
+    assert.equal(aiJournalReadyQa.qa.counts.decorativeDepthNodeCount, 0);
+    assert.equal(aiJournalReadyQa.qa.counts.plotMetadataReviewCount, 0);
+
     const report = await fetch(`${base}/assets/quality-report`).then((response) => response.json());
     assert.equal(report.report.summary.totalAssets, 466);
     assert.ok(report.report.benchmarks.some((benchmark: { id: string }) => benchmark.id === "biorender"));
@@ -938,6 +944,17 @@ test("MCP tools expose premium asset search, preview, recommendation, and insert
   assert.equal(spatialJournalReadyPayload.qa.counts.decorativeDepthNodeCount, 0);
   assert.equal(spatialJournalReadyPayload.qa.counts.plotMetadataReviewCount, 0);
 
+  const aiJournalReadyQa = await handleJsonRpc({
+    jsonrpc: "2.0",
+    id: 2853,
+    method: "tools/call",
+    params: { name: "get_journal_figure_qa", arguments: { templateId: "ai-biosecurity-pipeline-journal", style: "publication-line" } }
+  });
+  const aiJournalReadyPayload = JSON.parse((aiJournalReadyQa.result as { content: { text: string }[] }).content[0].text);
+  assert.equal(aiJournalReadyPayload.qa.status, "journal-ready");
+  assert.equal(aiJournalReadyPayload.qa.counts.uiCardShapeCount, 0);
+  assert.equal(aiJournalReadyPayload.qa.counts.plotMetadataReviewCount, 0);
+
   const packRecommendation = await handleJsonRpc({
     jsonrpc: "2.0",
     id: 2901,
@@ -1026,6 +1043,25 @@ test("MCP tools expose premium asset search, preview, recommendation, and insert
   const spatialJournalSetPayload = JSON.parse((spatialJournalSet.result as { content: { text: string }[] }).content[0].text);
   assert.equal(spatialJournalSetPayload.recommendation.templateId, "spatial-results-panel-journal");
   assert.equal(spatialJournalSetPayload.recommendation.styleProfile, "publication-line");
+
+  const aiJournalSet = await handleJsonRpc({
+    jsonrpc: "2.0",
+    id: 29024,
+    method: "tools/call",
+    params: {
+      name: "recommend_asset_set",
+      arguments: {
+        title: "Paper methods figure for AI biosecurity evaluation",
+        sourceText: "manuscript schematic with benchmark set, classifier calibration, risk gate, permission tier, human review, audit log, threshold plot, and source metrics",
+        workflowPack: "ai-biosecurity-eval",
+        responseShape: "compact",
+        limit: 8
+      }
+    }
+  });
+  const aiJournalSetPayload = JSON.parse((aiJournalSet.result as { content: { text: string }[] }).content[0].text);
+  assert.equal(aiJournalSetPayload.recommendation.templateId, "ai-biosecurity-pipeline-journal");
+  assert.equal(aiJournalSetPayload.recommendation.styleProfile, "publication-line");
 
   const brief = await handleJsonRpc({
     jsonrpc: "2.0",
