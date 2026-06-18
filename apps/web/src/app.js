@@ -1143,6 +1143,7 @@ function smoothClosedPath(points) {
 function renderVolcanoPlot(points, x, y, width, height, theme) {
   if (!points.length) return "";
   const compact = height < 90 || width < 380;
+  const isPublication = theme.mode === "publication";
   const fcThreshold = 1;
   const pThreshold = 4;
   const maxAbsX = Math.max(fcThreshold * 1.55, ...points.map((point) => Math.abs(point.x))) * 1.08;
@@ -1163,13 +1164,21 @@ function renderVolcanoPlot(points, x, y, width, height, theme) {
     .filter((point) => point.label && Math.abs(point.x) >= fcThreshold && point.y >= pThreshold)
     .sort((a, b) => b.y - a.y)
     .slice(0, compact ? 3 : 4);
+  const significanceZones = isPublication ? [] : [
+    `<rect class="plot-volcano-significance-zone" x="${fmt(x)}" y="${fmt(y)}" width="${fmt(Math.max(0, leftThresholdX - x))}" height="${fmt(Math.max(0, thresholdY - y))}" fill="#ede9fe" opacity="0.18"/>`,
+    `<rect class="plot-volcano-significance-zone" x="${fmt(rightThresholdX)}" y="${fmt(y)}" width="${fmt(Math.max(0, x + width - rightThresholdX))}" height="${fmt(Math.max(0, thresholdY - y))}" fill="#ccfbf1" opacity="0.18"/>`
+  ];
+  const journalReferenceBand = isPublication
+    ? `<g class="plot-journal-volcano-reference-band" aria-label="publication volcano threshold guide"><path class="plot-journal-volcano-reference-bracket" d="M${fmt(leftThresholdX)},${fmt(thresholdY - 5)} V${fmt(thresholdY + 5)} M${fmt(rightThresholdX)},${fmt(thresholdY - 5)} V${fmt(thresholdY + 5)} M${fmt(leftThresholdX)},${fmt(thresholdY)} H${fmt(rightThresholdX)}" fill="none" stroke="#111827" stroke-width="0.85" opacity="0.62"/><path class="plot-journal-volcano-reference-cap" d="M${fmt(x)},${fmt(thresholdY)} H${fmt(x + width)}" fill="none" stroke="#111827" stroke-width="0.45" opacity="0.28"/></g>`
+    : "";
   const guides = [
-    `<rect class="plot-volcano-significance-zone" x="${x}" y="${y}" width="${Math.max(0, leftThresholdX - x)}" height="${Math.max(0, thresholdY - y)}" fill="${theme.mode === "publication" ? "#111827" : "#ede9fe"}" opacity="${theme.mode === "publication" ? "0.04" : "0.18"}"/>`,
-    `<rect class="plot-volcano-significance-zone" x="${rightThresholdX}" y="${y}" width="${Math.max(0, x + width - rightThresholdX)}" height="${Math.max(0, thresholdY - y)}" fill="${theme.mode === "publication" ? "#111827" : "#ccfbf1"}" opacity="${theme.mode === "publication" ? "0.04" : "0.18"}"/>`,
+    ...significanceZones,
+    journalReferenceBand,
     `<path class="plot-volcano-threshold-line" d="M${leftThresholdX},${y} V${y + height} M${rightThresholdX},${y} V${y + height}" stroke="${theme.muted}" stroke-width="0.8" stroke-dasharray="4 5" opacity="0.62"/>`,
-    `<path class="plot-volcano-threshold-line" d="M${x},${thresholdY} H${x + width}" stroke="${theme.mode === "publication" ? "#111827" : "#f59e0b"}" stroke-width="0.9" stroke-dasharray="4 5" opacity="0.78"/>`,
+    `<path class="plot-volcano-threshold-line" d="M${x},${thresholdY} H${x + width}" stroke="${isPublication ? "#111827" : "#f59e0b"}" stroke-width="0.9" stroke-dasharray="4 5" opacity="0.78"/>`,
     `<path class="plot-volcano-zero-line" d="M${sx(0)},${y} V${y + height}" stroke="${theme.grid}" stroke-width="0.8" opacity="0.72"/>`,
-    `<text class="plot-volcano-threshold-label" x="${x + 5}" y="${Math.max(y + 10, thresholdY - 4)}" font-size="7.6" font-weight="700" fill="${theme.label}">p=1e-4</text>`,
+    `<text class="plot-volcano-threshold-label${isPublication ? " plot-journal-threshold-label" : ""}" x="${x + 5}" y="${Math.max(y + 10, thresholdY - 4)}" font-size="7.6" font-weight="${isPublication ? "650" : "700"}" fill="${theme.label}">adj. P &lt; 1e-4</text>`,
+    `<text class="plot-volcano-effect-threshold-label${isPublication ? " plot-journal-threshold-label" : ""}" x="${sx(0)}" y="${y + 10}" text-anchor="middle" font-size="7.2" font-weight="${isPublication ? "650" : "700"}" fill="${theme.muted}">|log2FC| = 1</text>`,
     compact ? "" : `<text class="plot-volcano-direction-label" x="${x + 7}" y="${y + height - 6}" font-size="7.6" font-weight="800" fill="${theme.color("down")}">depleted</text><text class="plot-volcano-direction-label" x="${x + width - 7}" y="${y + height - 6}" text-anchor="end" font-size="7.6" font-weight="800" fill="${theme.color("up")}">enriched</text>`
   ].join("");
   const marks = points
@@ -1180,7 +1189,7 @@ function renderVolcanoPlot(points, x, y, width, height, theme) {
       const fill = significant ? (direction === "down" ? theme.color("down") : theme.color("up")) : theme.muted;
       const opacity = significant ? "0.9" : "0.5";
       const radius = significant ? Math.min(5.6, Math.max(4.3, 3.4 + point.y * 0.18)) : 3.4;
-      const halo = significant ? `<circle class="plot-volcano-hit-halo" cx="${sx(point.x)}" cy="${sy(point.y)}" r="${radius + 3.6}" fill="${fill}" opacity="0.13"/>` : "";
+      const halo = significant && !isPublication ? `<circle class="plot-volcano-hit-halo" cx="${sx(point.x)}" cy="${sy(point.y)}" r="${radius + 3.6}" fill="${fill}" opacity="0.13"/>` : "";
       return `${halo}<circle class="plot-volcano-point ${significant ? `significant ${direction}` : "background"}" data-group="${escapeAttr(point.group)}" cx="${sx(point.x)}" cy="${sy(point.y)}" r="${radius}" fill="${fill}" opacity="${opacity}" stroke="${theme.pointStroke}" stroke-width="${significant ? "1" : "0.45"}"/>`;
     })
     .join("");
@@ -1194,12 +1203,16 @@ function renderVolcanoPlot(points, x, y, width, height, theme) {
       const stackIndex = placeLeft ? upLabelIndex++ : downLabelIndex++;
       const labelX = compact ? (placeLeft ? x + width - 12 : x + 12) : Math.max(x + 18, Math.min(x + width - 18, pointX + (placeLeft ? -24 : 24)));
       const labelY = compact ? Math.min(y + height - 8, y + 13 + stackIndex * 10) : Math.max(y + 12, Math.min(y + height - 8, pointY + (index % 2 ? 12 : -8)));
-      return `<path class="plot-volcano-label-leader" d="M${pointX},${pointY} L${labelX + (placeLeft ? 4 : -4)},${labelY - 3}" stroke="${theme.muted}" stroke-width="0.65" opacity="0.62"/><text class="plot-volcano-label" x="${labelX}" y="${labelY}" text-anchor="${placeLeft ? "end" : "start"}" font-size="8.4" font-weight="760" fill="${theme.label}">${escapeXml(shortPlotLabel(point.label, 8))}</text>`;
+      const leader = isPublication ? "" : `<path class="plot-volcano-label-leader" d="M${pointX},${pointY} L${labelX + (placeLeft ? 4 : -4)},${labelY - 3}" stroke="${theme.muted}" stroke-width="0.65" opacity="0.62"/>`;
+      return `${leader}<text class="plot-volcano-label${isPublication ? " plot-journal-volcano-label" : ""}" x="${labelX}" y="${labelY}" text-anchor="${placeLeft ? "end" : "start"}" font-size="8.4" font-weight="${isPublication ? "690" : "760"}" fill="${theme.label}">${escapeXml(shortPlotLabel(point.label, 8))}</text>`;
     })
     .join("");
   const legendX = x + width - 92;
   const legendY = compact ? y - 8 : y + 9;
-  const legend = `<g class="plot-volcano-legend" transform="translate(${legendX} ${legendY})"><circle cx="0" cy="0" r="3.4" fill="${theme.color("up")}"/><text x="8" y="3" font-size="7.8" font-weight="700" fill="${theme.muted}">up hit</text><circle cx="45" cy="0" r="3.4" fill="${theme.color("down")}"/><text x="53" y="3" font-size="7.8" font-weight="700" fill="${theme.muted}">down</text></g>`;
+  const legendClass = `plot-volcano-legend${isPublication ? " plot-journal-volcano-legend" : ""}`;
+  const upMarker = isPublication ? `<circle cx="0" cy="0" r="3.2" fill="none" stroke="${theme.color("up")}" stroke-width="0.9"/>` : `<circle cx="0" cy="0" r="3.4" fill="${theme.color("up")}"/>`;
+  const downMarker = isPublication ? `<circle cx="45" cy="0" r="3.2" fill="none" stroke="${theme.color("down")}" stroke-width="0.9"/>` : `<circle cx="45" cy="0" r="3.4" fill="${theme.color("down")}"/>`;
+  const legend = `<g class="${legendClass}" transform="translate(${legendX} ${legendY})">${upMarker}<text x="8" y="3" font-size="7.8" font-weight="${isPublication ? "650" : "700"}" fill="${theme.muted}">up hit</text>${downMarker}<text x="53" y="3" font-size="7.8" font-weight="${isPublication ? "650" : "700"}" fill="${theme.muted}">down</text></g>`;
   return `<g class="plot-volcano-layer">${grid}${guides}${marks}${labels}${legend}</g>`;
 }
 
@@ -1221,6 +1234,7 @@ function renderGroupedPlot(spec, x, y, width, height, theme = plotTheme(spec)) {
     values: spec.table.rows.filter((row) => String(row[xColumn] ?? "") === group).map((row) => Number(row[yColumn])).filter(Number.isFinite)
   }));
   const allValues = valuesByGroup.flatMap((entry) => entry.values);
+  const isPublication = theme.mode === "publication";
   const sy = scale(allValues, y + height, y);
   const band = width / Math.max(groups.length, 1);
   const compact = height < 48 || band < 118;
@@ -1232,6 +1246,13 @@ function renderGroupedPlot(spec, x, y, width, height, theme = plotTheme(spec)) {
   const baseline = sy(0);
   const tickValues = uniqueNumbers([minValue, 0, maxValue / 2, maxValue]).filter((value) => value >= minValue && value <= maxValue);
   const guides = tickValues.map((value) => `<g class="plot-bar-axis-tick"><path class="plot-bar-grid" d="M${x},${sy(value)} H${x + width}" stroke="${theme.grid}" stroke-width="${value === 0 ? "1" : "0.75"}" opacity="${value === 0 ? "0.9" : "0.62"}"/><text x="${x - 7}" y="${sy(value) + 3}" text-anchor="end" font-size="7.6" font-weight="700" fill="${theme.muted}">${escapeXml(fmtCompactNumber(value))}</text></g>`).join("");
+  const threshold = spec.plotType === "bar" ? plotThresholdValue(spec) : undefined;
+  const thresholdBand = isPublication && threshold !== undefined && threshold >= minValue && threshold <= maxValue
+    ? `<rect class="plot-journal-bar-threshold-band" x="${x}" y="${Math.max(y, sy(threshold) - 3.5)}" width="${width}" height="${Math.min(height, 7)}" fill="#111827" opacity="0.035"/>`
+    : "";
+  const thresholdGuide = threshold !== undefined && threshold >= minValue && threshold <= maxValue
+    ? `<g class="plot-bar-threshold" data-threshold="${escapeAttr(fmtCompactNumber(threshold))}"><path class="plot-bar-threshold-line" d="M${x},${sy(threshold)} H${x + width}" stroke="${isPublication ? "#111827" : "#f59e0b"}" stroke-width="0.9" stroke-dasharray="4 4" opacity="0.78"/><text class="plot-bar-threshold-label${isPublication ? " plot-journal-bar-threshold-label" : ""}" x="${x + width - 4}" y="${Math.max(y + 9, sy(threshold) - 4)}" text-anchor="end" font-size="${compact ? "7.2" : "8.2"}" font-weight="760" fill="${theme.label}">threshold = ${escapeXml(fmtCompactNumber(threshold))}</text></g>`
+    : "";
   const bars = valuesByGroup.map((entry, index) => {
     const cx = x + band * index + band / 2;
     const mean = entry.values.reduce((sum, value) => sum + value, 0) / Math.max(entry.values.length, 1);
@@ -1239,18 +1260,30 @@ function renderGroupedPlot(spec, x, y, width, height, theme = plotTheme(spec)) {
     const barY = Math.min(top, baseline);
     const barHeight = Math.max(1, Math.abs(baseline - top));
     const fill = theme.color(entry.group);
-    const valueLabel = compact && barHeight < 18 ? "" : `<text class="plot-bar-value-label" x="${cx}" y="${Math.max(y + 8, barY - 5)}" text-anchor="middle" font-size="${compact ? 7.4 : 8.8}" font-weight="800" fill="${theme.label}">${escapeXml(fmtCompactNumber(mean))}</text>`;
+    const valueLabel = compact && barHeight < 18 ? "" : `<text class="plot-bar-value-label${isPublication ? " plot-journal-bar-value-label" : ""}" x="${cx}" y="${Math.max(y + 8, barY - 5)}" text-anchor="middle" font-size="${compact ? 7.4 : 8.8}" font-weight="800" fill="${theme.label}">${escapeXml(fmtCompactNumber(mean))}</text>`;
     const categoryLabel = renderBarCategoryLabel(entry.group, cx, labelY, labelFont, labelMaxChars, compact ? 2 : 3, theme);
-    return `<rect class="plot-bar-track" x="${cx - band * 0.31}" y="${y}" width="${band * 0.62}" height="${height}" rx="${Math.min(5, band * 0.08)}" fill="${theme.fieldFill}" opacity="0.72"/><rect class="plot-bar-mark" data-group="${escapeAttr(entry.group)}" data-value="${escapeAttr(fmtCompactNumber(mean))}" x="${cx - band * 0.26}" y="${barY}" width="${band * 0.52}" height="${barHeight}" rx="${Math.min(4, band * 0.08)}" fill="${fill}" opacity="0.88"/><path class="plot-bar-highlight" d="M${cx - band * 0.22},${barY + 3} H${cx + band * 0.22}" stroke="${theme.pointStroke}" stroke-width="1.1" opacity="0.54"/>${valueLabel}${categoryLabel}`;
+    const track = isPublication ? "" : `<rect class="plot-bar-track" x="${cx - band * 0.31}" y="${y}" width="${band * 0.62}" height="${height}" rx="${Math.min(5, band * 0.08)}" fill="${theme.fieldFill}" opacity="0.72"/>`;
+    const barRadius = isPublication ? 0 : Math.min(4, band * 0.08);
+    const highlight = isPublication ? "" : `<path class="plot-bar-highlight" d="M${cx - band * 0.22},${barY + 3} H${cx + band * 0.22}" stroke="${theme.pointStroke}" stroke-width="1.1" opacity="0.54"/>`;
+    const cap = isPublication ? `<path class="plot-journal-bar-cap" d="M${cx - band * 0.25},${barY} H${cx + band * 0.25}" stroke="#111827" stroke-width="0.85" opacity="0.82"/>` : "";
+    return `${track}<rect class="plot-bar-mark${isPublication ? " plot-journal-bar-mark" : ""}" data-group="${escapeAttr(entry.group)}" data-value="${escapeAttr(fmtCompactNumber(mean))}" x="${cx - band * 0.26}" y="${barY}" width="${band * 0.52}" height="${barHeight}" rx="${barRadius}" fill="${fill}" opacity="${isPublication ? "1" : "0.88"}"/>${cap}${highlight}${valueLabel}${categoryLabel}`;
   }).join("");
-  return `<g class="plot-bar-layer">${guides}${bars}</g>`;
+  return `<g class="plot-bar-layer">${guides}${thresholdBand}${thresholdGuide}${bars}</g>`;
+}
+
+function plotThresholdValue(spec) {
+  const metadata = spec && typeof spec.journalPlot === "object" && spec.journalPlot !== null ? spec.journalPlot : {};
+  if (typeof metadata.threshold === "number" && Number.isFinite(metadata.threshold)) return metadata.threshold;
+  if (typeof metadata.threshold === "string" && Number.isFinite(Number(metadata.threshold))) return Number(metadata.threshold);
+  const rowThresholds = uniqueNumbers((spec.table?.rows ?? []).map((row) => Number(row.threshold)).filter(Number.isFinite));
+  return rowThresholds.length === 1 ? rowThresholds[0] : undefined;
 }
 
 function renderBarCategoryLabel(label, x, y, fontSize, maxChars, maxLines, theme = plotTheme({ style: {} })) {
   const normalized = String(label).replace(/[/_]+/g, " ").replace(/\s*-\s*/g, " ").replace(/\s+/g, " ").trim();
   const lines = wrapWords(normalized || String(label), maxChars, maxLines);
   const tspans = lines.map((line, index) => `<tspan class="plot-bar-category-line" x="${x}" dy="${index === 0 ? 0 : fontSize + 2}">${escapeXml(line)}</tspan>`).join("");
-  return `<text class="plot-bar-category-label" data-lines="${lines.length}" x="${x}" y="${y}" text-anchor="middle" font-size="${fontSize}" font-weight="760" fill="${theme.label}">${tspans}</text>`;
+  return `<text class="plot-bar-category-label${theme.mode === "publication" ? " plot-journal-bar-category-label" : ""}" data-lines="${lines.length}" x="${x}" y="${y}" text-anchor="middle" font-size="${fontSize}" font-weight="760" fill="${theme.label}">${tspans}</text>`;
 }
 
 function plotPoints(spec) {

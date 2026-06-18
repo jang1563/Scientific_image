@@ -187,6 +187,7 @@ test("perturb-seq journal template exports manuscript-safe line figure", () => {
   assert.match(svg, /-log10 adjusted P value/);
   assert.match(svg, /plot-volcano-effect-threshold-label/);
   assert.match(svg, /plot-journal-threshold-label/);
+  assert.match(svg, /plot-journal-volcano-reference-band/);
   assert.match(svg, /plot-journal-volcano-label/);
   assert.match(svg, /plot-journal-volcano-legend/);
   assert.match(svg, /adj\. P &lt; 1e-4/);
@@ -294,6 +295,10 @@ test("AI biosecurity journal template exports manuscript-safe line figure", () =
   assert.match(svg, /Classifier score/);
   assert.match(svg, /plot-bar-threshold-line/);
   assert.match(svg, /plot-bar-threshold-label/);
+  assert.match(svg, /plot-journal-bar-threshold-band/);
+  assert.match(svg, /plot-journal-bar-threshold-label/);
+  assert.match(svg, /plot-journal-bar-mark/);
+  assert.match(svg, /plot-journal-bar-cap/);
   assert.match(svg, /data-threshold="0.5"/);
   assert.match(svg, /threshold = 0.5/);
   assert.match(svg, /plot-journal-legend/);
@@ -314,7 +319,7 @@ test("AI biosecurity journal template exports manuscript-safe line figure", () =
   assert.match(svg, /class="journal-divider-rule"/);
   assert.doesNotMatch(svg, /plot-bar-track/);
   assert.doesNotMatch(svg, /plot-bar-highlight/);
-  assert.match(svg, /plot-bar-mark"[^>]*rx="0"/);
+  assert.match(svg, /class="[^"]*plot-bar-mark[^"]*"[^>]*rx="0"/);
   assert.doesNotMatch(svg, /data-depth="(?:raised|floating|hero)"/);
   assert.doesNotMatch(svg, /stroke="#(?:bfdbfe|e9d5ff|fecaca|fed7aa)"/);
   assertJournalSafeSvgDefs(svg);
