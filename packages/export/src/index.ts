@@ -24,6 +24,10 @@ export interface ExportResult {
   warnings: string[];
 }
 
+interface RenderContext {
+  lineSafe: boolean;
+}
+
 export function exportProject(project: Project, input: { pageId?: string; format: ExportResult["format"]; dpi?: number }): ExportResult {
   if (input.format === "svg") return exportSvg(project, input.pageId);
   if (input.format === "pdf") return exportPdf(project, input.pageId);
@@ -77,19 +81,26 @@ export function renderDeckToSvg(project: Project): string {
 export function renderPageToSvg(project: Project, pageId?: string): string {
   const page = getPage(project, pageId);
   const nodes = [...page.nodes].filter((node) => !node.hidden).sort((a, b) => a.transform.z - b.transform.z);
+  const context: RenderContext = { lineSafe: isPublicationLineScene(nodes) };
+  const renderedNodes = nodes.map((node) => renderNodeSvg(node, context));
   return [
     `<?xml version="1.0" encoding="UTF-8"?>`,
     `<svg xmlns="http://www.w3.org/2000/svg" width="${page.width}" height="${page.height}" viewBox="0 0 ${page.width} ${page.height}" role="img" aria-label="${escapeXml(project.title)}">`,
-    `<defs>${renderDepthDefs()}</defs>`,
+    `<defs>${renderDepthDefs({ lineSafe: context.lineSafe, body: renderedNodes.join("") })}</defs>`,
     `<rect width="100%" height="100%" fill="${escapeXml(page.background)}"/>`,
-    ...nodes.map((node) => renderNodeSvg(node)),
+    ...renderedNodes,
     `</svg>`
   ].join("");
 }
 
-export function renderDepthDefs(): string {
+export function renderDepthDefs(input: { lineSafe?: boolean; body?: string } = {}): string {
+  const marker = `<marker id="arrow-end" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L8,4 L0,8 z" fill="#334155"/></marker>`;
+  if (input.lineSafe) {
+    const assetDefs = input.body && /url\(#(?:asset|realistic)-/.test(input.body) ? renderPremiumAssetDefs() : "";
+    return [marker, assetDefs].filter(Boolean).join("");
+  }
   return [
-    `<marker id="arrow-end" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L8,4 L0,8 z" fill="#334155"/></marker>`,
+    marker,
     `<filter id="contact-shadow" x="-35%" y="-35%" width="170%" height="170%" color-interpolation-filters="sRGB"><feGaussianBlur in="SourceAlpha" stdDeviation="2.2" result="blur"/><feOffset in="blur" dx="0" dy="3" result="offset"/><feColorMatrix in="offset" type="matrix" values="0 0 0 0 0.05 0 0 0 0 0.09 0 0 0 0 0.16 0 0 0 0.18 0"/><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>`,
     `<filter id="raised-panel-shadow" x="-18%" y="-22%" width="136%" height="150%" color-interpolation-filters="sRGB"><feGaussianBlur in="SourceAlpha" stdDeviation="1.4" result="ambient-blur"/><feOffset in="ambient-blur" dx="0" dy="1.2" result="ambient-offset"/><feColorMatrix in="ambient-offset" type="matrix" values="0 0 0 0 0.05 0 0 0 0 0.09 0 0 0 0 0.16 0 0 0 0.12 0" result="ambient-shadow"/><feGaussianBlur in="SourceAlpha" stdDeviation="9" result="drop-blur"/><feOffset in="drop-blur" dx="0" dy="9" result="drop-offset"/><feColorMatrix in="drop-offset" type="matrix" values="0 0 0 0 0.05 0 0 0 0 0.09 0 0 0 0 0.16 0 0 0 0.12 0" result="drop-shadow"/><feMerge><feMergeNode in="drop-shadow"/><feMergeNode in="ambient-shadow"/><feMergeNode in="SourceGraphic"/></feMerge></filter>`,
     `<filter id="soft-object-shadow" x="-28%" y="-32%" width="156%" height="168%" color-interpolation-filters="sRGB"><feGaussianBlur in="SourceAlpha" stdDeviation="3.2" result="ambient-blur"/><feOffset in="ambient-blur" dx="0" dy="3" result="ambient-offset"/><feColorMatrix in="ambient-offset" type="matrix" values="0 0 0 0 0.05 0 0 0 0 0.09 0 0 0 0 0.16 0 0 0 0.14 0" result="ambient-shadow"/><feGaussianBlur in="SourceAlpha" stdDeviation="12" result="drop-blur"/><feOffset in="drop-blur" dx="0" dy="14" result="drop-offset"/><feColorMatrix in="drop-offset" type="matrix" values="0 0 0 0 0.05 0 0 0 0 0.09 0 0 0 0 0.16 0 0 0 0.11 0" result="drop-shadow"/><feMerge><feMergeNode in="drop-shadow"/><feMergeNode in="ambient-shadow"/><feMergeNode in="SourceGraphic"/></feMerge></filter>`,
@@ -102,11 +113,28 @@ export function renderDepthDefs(): string {
   ].join("");
 }
 
-function renderNodeSvg(node: SceneNode): string {
+function isPublicationLineScene(nodes: SceneNode[]): boolean {
+  const profiles = nodes.map((node) => nodeStyleProfile(node)).filter(Boolean);
+  return profiles.length > 0 && profiles.every((profile) => profile === "publication-line");
+}
+
+function nodeStyleProfile(node: SceneNode): string | undefined {
+  if (node.kind === "symbol") {
+    const payload = node.payload as SymbolPayload;
+    return payload.styleProfile ?? payload.appearance?.styleProfile;
+  }
+  if (node.kind === "image") {
+    const payload = node.payload as ImagePayload;
+    return payload.styleProfile;
+  }
+  return undefined;
+}
+
+function renderNodeSvg(node: SceneNode, context: RenderContext = { lineSafe: false }): string {
   const transform = `translate(${fmt(node.transform.x)} ${fmt(node.transform.y)}) rotate(${fmt(node.transform.rotation)} ${fmt(node.transform.width / 2)} ${fmt(node.transform.height / 2)}) scale(${fmt(node.transform.scaleX)} ${fmt(node.transform.scaleY)})`;
   const depth = depthForNode(node);
-  const filter = filterForDepth(depth, node);
-  return `<g id="${escapeXml(node.id)}" data-kind="${node.kind}" data-depth="${depth}" data-claim-status="${node.claimStatus}" transform="${transform}"><g class="node-body" data-depth="${depth}"${filter}>${renderNodeBody(node)}</g></g>`;
+  const filter = filterForDepth(depth, node, context);
+  return `<g id="${escapeXml(node.id)}" data-kind="${node.kind}" data-depth="${depth}" data-claim-status="${node.claimStatus}" transform="${transform}"><g class="node-body" data-depth="${depth}"${filter}>${renderNodeBody(node, context)}</g></g>`;
 }
 
 function depthForNode(node: SceneNode): DepthLevel {
@@ -118,7 +146,8 @@ function depthForNode(node: SceneNode): DepthLevel {
   return "surface";
 }
 
-function filterForDepth(depth: DepthLevel, node: SceneNode): string {
+function filterForDepth(depth: DepthLevel, node: SceneNode, context: RenderContext): string {
+  if (context.lineSafe) return "";
   if (node.claimStatus === "unsupported-claim") return ` filter="url(#danger-object-shadow)"`;
   if (isRiskVisualNode(node)) return ` filter="url(#warning-object-shadow)"`;
   if (depth === "hero") return ` filter="url(#hero-shadow)"`;
@@ -134,18 +163,18 @@ function isRiskVisualNode(node: SceneNode): boolean {
   return Boolean(payload.assetId && /risk|review|permission|audit|policy|safety|biosecurity|durc|biosafety|containment|refusal/.test(payload.assetId));
 }
 
-function renderNodeBody(node: SceneNode): string {
+function renderNodeBody(node: SceneNode, context: RenderContext): string {
   if (node.kind === "text") return renderText(node.payload as TextPayload, node);
-  if (node.kind === "shape") return renderShape(node.payload as ShapePayload, node);
+  if (node.kind === "shape") return renderShape(node.payload as ShapePayload, node, context);
   if (node.kind === "symbol") return renderSymbol(node.payload as SymbolPayload, node);
   if (node.kind === "connector") return renderConnector(node.payload as ConnectorPayload, node);
   if (node.kind === "plot") return renderPlotSvg((node.payload as { spec: PlotSpec }).spec, node.transform.width, node.transform.height);
   if (node.kind === "image") return renderImage(node.payload as ImagePayload, node);
   if (node.kind === "annotation") {
     const text = (node.payload as { text: string }).text;
-    return renderShape({ shape: "round-rect", label: text }, node);
+    return renderShape({ shape: "round-rect", label: text }, node, context);
   }
-  return renderShape({ shape: "round-rect", label: node.name }, node);
+  return renderShape({ shape: "round-rect", label: node.name }, node, context);
 }
 
 function renderText(payload: TextPayload, node: SceneNode): string {
@@ -162,7 +191,7 @@ function renderText(payload: TextPayload, node: SceneNode): string {
   return `<text x="${fmt(x)}" y="${fmt(y)}" text-anchor="${align}" dominant-baseline="middle" fill="${escapeXml(style.color ?? "#0f172a")}" font-family="${escapeXml(style.fontFamily ?? "Arial, sans-serif")}" font-size="${fmt(fontSize)}" font-weight="${escapeXml(String(style.fontWeight ?? 500))}">${tspans}</text>`;
 }
 
-function renderShape(payload: ShapePayload, node: SceneNode): string {
+function renderShape(payload: ShapePayload, node: SceneNode, context: RenderContext = { lineSafe: false }): string {
   const style = node.style;
   const fill = escapeXml(style.fill ?? "#ffffff");
   const stroke = escapeXml(style.stroke ?? "#334155");
@@ -172,16 +201,19 @@ function renderShape(payload: ShapePayload, node: SceneNode): string {
   const height = node.transform.height;
   const label = payload.label ? `<text x="${fmt(width / 2)}" y="${fmt(height / 2)}" text-anchor="middle" dominant-baseline="middle" fill="${escapeXml(style.color ?? "#0f172a")}" font-family="${escapeXml(style.fontFamily ?? "Arial, sans-serif")}" font-size="${fmt(style.fontSize ?? 16)}" font-weight="${escapeXml(String(style.fontWeight ?? 600))}">${escapeXml(payload.label)}</text>` : "";
   if (payload.shape === "ellipse") {
+    if (context.lineSafe) return `<ellipse cx="${fmt(width / 2)}" cy="${fmt(height / 2)}" rx="${fmt(width / 2)}" ry="${fmt(height / 2)}" fill="${fill}" stroke="${stroke}" stroke-width="${strokeWidth}" opacity="${opacity}"/>${label}`;
     const rim = `<ellipse cx="${fmt(width / 2)}" cy="${fmt(height / 2)}" rx="${fmt(Math.max(0, width / 2 - 1.5))}" ry="${fmt(Math.max(0, height / 2 - 1.5))}" fill="none" stroke="#ffffff" stroke-width="1.3" opacity="0.5"/>`;
     const shine = `<ellipse cx="${fmt(width * 0.34)}" cy="${fmt(height * 0.28)}" rx="${fmt(width * 0.16)}" ry="${fmt(height * 0.07)}" fill="#ffffff" opacity="0.35"/>`;
     return `<ellipse cx="${fmt(width / 2)}" cy="${fmt(height / 2)}" rx="${fmt(width / 2)}" ry="${fmt(height / 2)}" fill="${fill}" stroke="${stroke}" stroke-width="${strokeWidth}" opacity="${opacity}"/>${rim}${shine}${label}`;
   }
   if (payload.shape === "diamond") {
     const points = `${fmt(width / 2)},0 ${fmt(width)},${fmt(height / 2)} ${fmt(width / 2)},${fmt(height)} 0,${fmt(height / 2)}`;
+    if (context.lineSafe) return `<polygon points="${points}" fill="${fill}" stroke="${stroke}" stroke-width="${strokeWidth}" opacity="${opacity}"/>${label}`;
     const inset = `${fmt(width / 2)},${fmt(2)} ${fmt(width - 2)},${fmt(height / 2)} ${fmt(width / 2)},${fmt(height - 2)} 2,${fmt(height / 2)}`;
     return `<polygon points="${points}" fill="${fill}" stroke="${stroke}" stroke-width="${strokeWidth}" opacity="${opacity}"/><polygon points="${inset}" fill="none" stroke="#ffffff" stroke-width="1.2" opacity="0.42"/>${label}`;
   }
   const radius = payload.shape === "round-rect" ? Math.min(18, width / 5, height / 5) : 0;
+  if (context.lineSafe) return `<rect x="0" y="0" width="${fmt(width)}" height="${fmt(height)}" rx="${fmt(radius)}" fill="${fill}" stroke="${stroke}" stroke-width="${strokeWidth}" opacity="${opacity}"/>${label}`;
   const highlightHeight = Math.min(30, Math.max(8, height * 0.42));
   const darkSurface = isDarkColor(fill);
   const highlight = `<rect x="1" y="1" width="${fmt(Math.max(0, width - 2))}" height="${fmt(highlightHeight)}" rx="${fmt(Math.max(0, radius - 1))}" fill="#ffffff" opacity="${darkSurface ? "0.08" : "0.26"}" pointer-events="none"/>`;

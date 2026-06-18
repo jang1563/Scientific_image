@@ -10,6 +10,12 @@ TP53,1.8,0.00008,DNA damage
 MYC,-1.2,0.00004,Oncogene
 CDKN1A,2.4,0.00002,Cell cycle`;
 
+function assertJournalSafeSvgDefs(svg: string): void {
+  assert.match(svg, /id="arrow-end"/);
+  assert.doesNotMatch(svg, /id="(?:contact-shadow|raised-panel-shadow|soft-object-shadow|hero-shadow|warning-object-shadow|danger-object-shadow|focus-glow|soft-shadow|asset-contact-shadow|asset-soft-shadow|asset-warning-glow|asset-body-depth|asset-glass-highlight|realistic-editorial-shadow|realistic-frame-highlight)"/);
+  assert.doesNotMatch(svg, /filter="url\(#(?:soft-object-shadow|raised-panel-shadow|hero-shadow|warning-object-shadow|danger-object-shadow|asset-soft-shadow|asset-contact-shadow)\)"/);
+}
+
 test("exports SVG, PDF, PPTX, and DOCX from the same scene graph", () => {
   let project = createProject("Export fixture");
   project = addNode(project, createCuratedSymbolNode({ assetId: "model-block", x: 80, y: 80, label: "AI model", styleProfile: "consulting-2p5d" }));
@@ -129,6 +135,7 @@ test("publication results template exports line and dark style plot themes", () 
   assert.match(lineSvg, /plot-heatmap-colorbar/);
   assert.match(lineSvg, /data-style-profile="publication-line"/);
   assert.doesNotMatch(lineSvg, /fill="#fff7ed"/);
+  assertJournalSafeSvgDefs(lineSvg);
 
   let darkProject = createProject("Dark talk fixture");
   for (const node of createWorkflowFigureNodes({ templateId: "manuscript-results-figure", styleProfile: "dark-talk" })) {
@@ -168,6 +175,7 @@ test("perturb-seq journal template exports manuscript-safe line figure", () => {
   assert.match(svg, /Source data/);
   assert.doesNotMatch(svg, /data-depth="(?:raised|floating|hero)"/);
   assert.doesNotMatch(svg, /stroke="#(?:bfdbfe|e9d5ff|fecaca)"/);
+  assertJournalSafeSvgDefs(svg);
 
   const pptx = exportProject(project, { format: "pptx" });
   assert.ok(pptx.warnings.some((warning) => warning.includes("perturb-seq-workflow-journal")));
@@ -197,6 +205,7 @@ test("spatial transcriptomics journal template exports manuscript-safe line figu
   assert.match(svg, /source-spatial-expression-table.tsv/);
   assert.doesNotMatch(svg, /data-depth="(?:raised|floating|hero)"/);
   assert.doesNotMatch(svg, /stroke="#(?:bfdbfe|e9d5ff|fecaca|d8b4fe)"/);
+  assertJournalSafeSvgDefs(svg);
 
   const pptx = exportProject(project, { format: "pptx" });
   assert.ok(pptx.warnings.some((warning) => warning.includes("spatial-results-panel-journal")));
@@ -231,6 +240,7 @@ test("AI biosecurity journal template exports manuscript-safe line figure", () =
   assert.match(svg, /source-ai-biosecurity-eval-metrics.tsv/);
   assert.doesNotMatch(svg, /data-depth="(?:raised|floating|hero)"/);
   assert.doesNotMatch(svg, /stroke="#(?:bfdbfe|e9d5ff|fecaca|fed7aa)"/);
+  assertJournalSafeSvgDefs(svg);
 
   const pptx = exportProject(project, { format: "pptx" });
   assert.ok(pptx.warnings.some((warning) => warning.includes("ai-biosecurity-pipeline-journal")));
