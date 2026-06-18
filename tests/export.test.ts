@@ -134,7 +134,11 @@ test("publication results template exports line and dark style plot themes", () 
   assert.match(lineSvg, /plot-embedding-layer/);
   assert.match(lineSvg, /plot-heatmap-colorbar/);
   assert.match(lineSvg, /data-style-profile="publication-line"/);
+  assert.match(lineSvg, /plot-journal-frame/);
   assert.doesNotMatch(lineSvg, /fill="#fff7ed"/);
+  assert.doesNotMatch(lineSvg, /plot-embedding-cluster-rim/);
+  assert.doesNotMatch(lineSvg, /plot-volcano-hit-halo/);
+  assert.match(lineSvg, /plot-heatmap-cell"[^>]*rx="0"/);
   assertJournalSafeSvgDefs(lineSvg);
 
   let darkProject = createProject("Dark talk fixture");
@@ -173,6 +177,8 @@ test("perturb-seq journal template exports manuscript-safe line figure", () => {
   assert.match(svg, /plot-compact-footer/);
   assert.match(svg, /source-perturb-seq-results.tsv/);
   assert.match(svg, /Source data/);
+  assert.match(svg, /plot-journal-frame/);
+  assert.doesNotMatch(svg, /plot-volcano-hit-halo/);
   assert.doesNotMatch(svg, /data-depth="(?:raised|floating|hero)"/);
   assert.doesNotMatch(svg, /stroke="#(?:bfdbfe|e9d5ff|fecaca)"/);
   assertJournalSafeSvgDefs(svg);
@@ -203,6 +209,9 @@ test("spatial transcriptomics journal template exports manuscript-safe line figu
   assert.match(svg, /source-spatial-expression-table.tsv/);
   assert.match(svg, /Source and integrity checklist/);
   assert.match(svg, /source-spatial-expression-table.tsv/);
+  assert.match(svg, /plot-journal-frame/);
+  assert.match(svg, /plot-heatmap-cell"[^>]*rx="0"/);
+  assert.match(svg, /plot-heatmap-matrix-frame"[^>]*rx="0"/);
   assert.doesNotMatch(svg, /data-depth="(?:raised|floating|hero)"/);
   assert.doesNotMatch(svg, /stroke="#(?:bfdbfe|e9d5ff|fecaca|d8b4fe)"/);
   assertJournalSafeSvgDefs(svg);
@@ -238,6 +247,10 @@ test("AI biosecurity journal template exports manuscript-safe line figure", () =
   assert.match(svg, /source-ai-biosecurity-eval-metrics.tsv/);
   assert.match(svg, /Review and reproducibility checklist/);
   assert.match(svg, /source-ai-biosecurity-eval-metrics.tsv/);
+  assert.match(svg, /plot-journal-frame/);
+  assert.doesNotMatch(svg, /plot-bar-track/);
+  assert.doesNotMatch(svg, /plot-bar-highlight/);
+  assert.match(svg, /plot-bar-mark"[^>]*rx="0"/);
   assert.doesNotMatch(svg, /data-depth="(?:raised|floating|hero)"/);
   assert.doesNotMatch(svg, /stroke="#(?:bfdbfe|e9d5ff|fecaca|fed7aa)"/);
   assertJournalSafeSvgDefs(svg);
