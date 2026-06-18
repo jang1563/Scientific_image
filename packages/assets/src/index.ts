@@ -8420,7 +8420,7 @@ function createPerturbSeqJournalTemplateNodes(template: WorkflowTemplate, input:
     label("Cas9", panelA.x + 195, panelA.y + 124, 74),
     createConnectorNode([{ x: panelA.x + 100, y: panelA.y + 87 }, { x: panelA.x + 112, y: panelA.y + 87 }], "", { stroke: "#111827", strokeWidth: 1.25 }),
     createConnectorNode([{ x: panelA.x + 190, y: panelA.y + 87 }, { x: panelA.x + 198, y: panelA.y + 87 }], "", { stroke: "#111827", strokeWidth: 1.25 }),
-    figureText("Library identity and guide assignment are stored as editable scene metadata.", createTransform(panelA.x + 18, panelA.y + 146, panelA.w - 36, 18), {
+    figureText("Library identity and guide assignment are stored as editable scene metadata.", createTransform(panelA.x + 18, panelA.y + 146, panelA.w - 36, 28), {
       fontSize: 8.8,
       color: "#374151"
     }),
@@ -8433,7 +8433,7 @@ function createPerturbSeqJournalTemplateNodes(template: WorkflowTemplate, input:
     label("UMI/cell tag", panelB.x + 238, panelB.y + 124, 76),
     createConnectorNode([{ x: panelB.x + 116, y: panelB.y + 86 }, { x: panelB.x + 146, y: panelB.y + 86 }], "", { stroke: "#111827", strokeWidth: 1.25 }),
     createConnectorNode([{ x: panelB.x + 232, y: panelB.y + 86 }, { x: panelB.x + 246, y: panelB.y + 86 }], "", { stroke: "#111827", strokeWidth: 1.25 }),
-    figureText("Keep MOI, cell-type gating, and guide-capture assumptions in the caption.", createTransform(panelB.x + 18, panelB.y + 146, panelB.w - 36, 18), {
+    figureText("Keep MOI, cell-type gating, and guide-capture assumptions in the caption.", createTransform(panelB.x + 18, panelB.y + 146, panelB.w - 36, 28), {
       fontSize: 8.8,
       color: "#374151"
     }),
@@ -8446,7 +8446,7 @@ function createPerturbSeqJournalTemplateNodes(template: WorkflowTemplate, input:
     label("ranked hit genes", panelC.x + 270, panelC.y + 124, 112),
     createConnectorNode([{ x: panelC.x + 118, y: panelC.y + 86 }, { x: panelC.x + 150, y: panelC.y + 86 }], "", { stroke: "#111827", strokeWidth: 1.25 }),
     createConnectorNode([{ x: panelC.x + 244, y: panelC.y + 86 }, { x: panelC.x + 286, y: panelC.y + 86 }], "", { stroke: "#111827", strokeWidth: 1.25 }),
-    figureText("Readout table links perturbation, cell state, effect size, and uncertainty.", createTransform(panelC.x + 18, panelC.y + 146, panelC.w - 36, 18), {
+    figureText("Readout table links perturbation, cell state, effect size, and uncertainty.", createTransform(panelC.x + 18, panelC.y + 146, panelC.w - 36, 28), {
       fontSize: 8.8,
       color: "#374151"
     })
@@ -13278,7 +13278,7 @@ function createSpatialResultsJournalTemplateNodes(template: WorkflowTemplate, in
     symbol("visium-spot-array", "Spot capture array", panelA.x + 154, panelA.y + 50, 112, 78, "spatial-assay", `${template.id}:panel-a-spot-array`),
     label("spot capture", panelA.x + 150, panelA.y + 130, 116),
     createConnectorNode([{ x: panelA.x + 118, y: panelA.y + 88 }, { x: panelA.x + 154, y: panelA.y + 88 }], "", { stroke: "#111827", strokeWidth: 1.25 }),
-    figureText("Record slide source, staining, platform, and spot diameter in caption/source table.", createTransform(panelA.x + 18, panelA.y + 150, panelA.w - 36, 18), {
+    figureText("Record slide source, staining, platform, and spot diameter in caption/source table.", createTransform(panelA.x + 18, panelA.y + 150, panelA.w - 36, 28), {
       fontSize: 8.6,
       color: "#374151"
     }),
@@ -13288,7 +13288,7 @@ function createSpatialResultsJournalTemplateNodes(template: WorkflowTemplate, in
     symbol("cell-boundary", "Cell boundaries", panelB.x + 174, panelB.y + 54, 90, 72, "image-analysis", `${template.id}:panel-b-boundaries`),
     label("cell boundaries", panelB.x + 158, panelB.y + 130, 120),
     createConnectorNode([{ x: panelB.x + 138, y: panelB.y + 88 }, { x: panelB.x + 174, y: panelB.y + 88 }], "", { stroke: "#111827", strokeWidth: 1.25 }),
-    figureText("Segmentation method, QC filters, and excluded regions remain editable review metadata.", createTransform(panelB.x + 18, panelB.y + 150, panelB.w - 36, 18), {
+    figureText("Segmentation method, QC filters, and excluded regions remain editable review metadata.", createTransform(panelB.x + 18, panelB.y + 150, panelB.w - 36, 28), {
       fontSize: 8.6,
       color: "#374151"
     }),
@@ -13298,7 +13298,7 @@ function createSpatialResultsJournalTemplateNodes(template: WorkflowTemplate, in
     symbol("tissue-region", "Region annotation", panelC.x + 194, panelC.y + 52, 96, 78, "annotation", `${template.id}:panel-c-region`),
     label("region labels", panelC.x + 184, panelC.y + 134, 118),
     createConnectorNode([{ x: panelC.x + 154, y: panelC.y + 91 }, { x: panelC.x + 194, y: panelC.y + 91 }], "", { stroke: "#111827", strokeWidth: 1.25 }),
-    figureText("Neighborhood definitions should include distance radius, graph rule, and cell-type mapping.", createTransform(panelC.x + 18, panelC.y + 150, panelC.w - 36, 18), {
+    figureText("Neighborhood definitions should include distance radius, graph rule, and cell-type mapping.", createTransform(panelC.x + 18, panelC.y + 150, panelC.w - 36, 28), {
       fontSize: 8.6,
       color: "#374151"
     })
@@ -14454,7 +14454,7 @@ function createAiBiosecurityJournalTemplateNodes(template: WorkflowTemplate, inp
     symbol("benchmark", "Benchmark suite", panelA.x + 152, panelA.y + 52, 94, 72, "evaluation-evidence", `${template.id}:panel-a-benchmark`),
     label("benchmark suite", panelA.x + 136, panelA.y + 128, 126),
     createConnectorNode([{ x: panelA.x + 112, y: panelA.y + 88 }, { x: panelA.x + 152, y: panelA.y + 88 }], "", { stroke: "#111827", strokeWidth: 1.25 }),
-    figureText("Benchmark composition, source snippets, and labels remain auditable metadata.", createTransform(panelA.x + 18, panelA.y + 150, panelA.w - 36, 18), {
+    figureText("Benchmark composition, source snippets, and labels remain auditable metadata.", createTransform(panelA.x + 18, panelA.y + 150, panelA.w - 36, 28), {
       fontSize: 8.6,
       color: "#374151"
     }),
@@ -14467,7 +14467,7 @@ function createAiBiosecurityJournalTemplateNodes(template: WorkflowTemplate, inp
     label("metrics", panelB.x + 238, panelB.y + 128, 96),
     createConnectorNode([{ x: panelB.x + 130, y: panelB.y + 88 }, { x: panelB.x + 150, y: panelB.y + 88 }], "", { stroke: "#111827", strokeWidth: 1.25 }),
     createConnectorNode([{ x: panelB.x + 236, y: panelB.y + 88 }, { x: panelB.x + 254, y: panelB.y + 88 }], "", { stroke: "#111827", strokeWidth: 1.25 }),
-    figureText("Report model checkpoint, calibration split, and uncertainty before decision claims.", createTransform(panelB.x + 18, panelB.y + 150, panelB.w - 36, 18), {
+    figureText("Report model checkpoint, calibration split, and uncertainty before decision claims.", createTransform(panelB.x + 18, panelB.y + 150, panelB.w - 36, 28), {
       fontSize: 8.6,
       color: "#374151"
     }),
@@ -14480,7 +14480,7 @@ function createAiBiosecurityJournalTemplateNodes(template: WorkflowTemplate, inp
     label("review", panelC.x + 232, panelC.y + 128, 110),
     createConnectorNode([{ x: panelC.x + 108, y: panelC.y + 88 }, { x: panelC.x + 132, y: panelC.y + 88 }], "", { stroke: "#111827", strokeWidth: 1.25 }),
     createConnectorNode([{ x: panelC.x + 222, y: panelC.y + 88 }, { x: panelC.x + 246, y: panelC.y + 88 }], "", { stroke: "#111827", strokeWidth: 1.25 }),
-    figureText("Decision thresholds and review triggers must be defined in methods or supplement.", createTransform(panelC.x + 18, panelC.y + 150, panelC.w - 36, 18), {
+    figureText("Decision thresholds and review triggers must be defined in methods or supplement.", createTransform(panelC.x + 18, panelC.y + 150, panelC.w - 36, 28), {
       fontSize: 8.6,
       color: "#374151"
     })

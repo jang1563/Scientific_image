@@ -19,6 +19,10 @@ function assertJournalSafeSvgDefs(svg: string): void {
   assert.doesNotMatch(svg, /class="journal-panel-frame"[^>]*fill="#(?:f8fafc|fff7ed|eff6ff|fef2f2|ecfeff)"/);
 }
 
+function visibleSvgText(svg: string): string {
+  return svg.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+}
+
 test("exports SVG, PDF, PPTX, and DOCX from the same scene graph", () => {
   let project = createProject("Export fixture");
   project = addNode(project, createCuratedSymbolNode({ assetId: "model-block", x: 80, y: 80, label: "AI model", styleProfile: "consulting-2p5d" }));
@@ -172,6 +176,7 @@ test("perturb-seq journal template exports manuscript-safe line figure", () => {
   }
 
   const svg = String(exportProject(project, { format: "svg" }).data);
+  const text = visibleSvgText(svg);
   assert.match(svg, /Perturb-seq CRISPR screen schematic/);
   assert.match(svg, /data-style-profile="publication-line"/);
   assert.match(svg, /plot-volcano-layer/);
@@ -193,6 +198,12 @@ test("perturb-seq journal template exports manuscript-safe line figure", () => {
   assert.match(svg, /plot-journal-metadata-footer/);
   assert.match(svg, /source-perturb-seq-results.tsv/);
   assert.match(svg, /Source data/);
+  assert.match(text, /Library identity and guide assignment are stored as editable scene metadata\./);
+  assert.match(text, /Keep MOI, cell-type gating, and guide-capture assumptions in the caption\./);
+  assert.match(text, /Readout table links perturbation, cell state, effect size, and uncertainty\./);
+  assert.doesNotMatch(text, /Library identity.{0,90}\.\.\./);
+  assert.doesNotMatch(text, /Keep MOI.{0,90}\.\.\./);
+  assert.doesNotMatch(text, /Readout table.{0,90}\.\.\./);
   assert.match(svg, /plot-journal-frame/);
   assert.match(svg, /class="journal-panel-frame"[^>]*rx="0"/);
   assert.match(svg, /class="journal-divider-rule"/);
@@ -215,6 +226,7 @@ test("spatial transcriptomics journal template exports manuscript-safe line figu
   }
 
   const svg = String(exportProject(project, { format: "svg" }).data);
+  const text = visibleSvgText(svg);
   assert.match(svg, /Spatial transcriptomics results schematic/);
   assert.match(svg, /data-style-profile="publication-line"/);
   assert.match(svg, /plot-heatmap-layer/);
@@ -231,6 +243,12 @@ test("spatial transcriptomics journal template exports manuscript-safe line figu
   assert.match(svg, /source-spatial-expression-table.tsv/);
   assert.match(svg, /Source and integrity checklist/);
   assert.match(svg, /source-spatial-expression-table.tsv/);
+  assert.match(text, /Record slide source, staining, platform, and spot diameter in caption\/source table\./);
+  assert.match(text, /Segmentation method, QC filters, and excluded regions remain editable review metadata\./);
+  assert.match(text, /Neighborhood definitions should include distance radius, graph rule, and cell-type mapping\./);
+  assert.doesNotMatch(text, /Record slide source.{0,90}\.\.\./);
+  assert.doesNotMatch(text, /Segmentation method.{0,90}\.\.\./);
+  assert.doesNotMatch(text, /Neighborhood definitions.{0,90}\.\.\./);
   assert.match(svg, /plot-journal-title/);
   assert.match(svg, /plot-journal-frame"[^>]*stroke="#6b7280"/);
   assert.match(svg, /plot-journal-heatmap-column-label/);
@@ -259,6 +277,7 @@ test("AI biosecurity journal template exports manuscript-safe line figure", () =
   }
 
   const svg = String(exportProject(project, { format: "svg" }).data);
+  const text = visibleSvgText(svg);
   assert.match(svg, /AI biosecurity evaluation schematic/);
   assert.match(svg, /data-style-profile="publication-line"/);
   assert.match(svg, /plot-bar-layer/);
@@ -278,6 +297,12 @@ test("AI biosecurity journal template exports manuscript-safe line figure", () =
   assert.match(svg, /source-ai-biosecurity-eval-metrics.tsv/);
   assert.match(svg, /Review and reproducibility checklist/);
   assert.match(svg, /source-ai-biosecurity-eval-metrics.tsv/);
+  assert.match(text, /Benchmark composition, source snippets, and labels remain auditable metadata\./);
+  assert.match(text, /Report model checkpoint, calibration split, and uncertainty before decision claims\./);
+  assert.match(text, /Decision thresholds and review triggers must be defined in methods or supplement\./);
+  assert.doesNotMatch(text, /Benchmark composition.{0,90}\.\.\./);
+  assert.doesNotMatch(text, /Report model checkpoint.{0,90}\.\.\./);
+  assert.doesNotMatch(text, /Decision thresholds.{0,90}\.\.\./);
   assert.match(svg, /plot-journal-frame/);
   assert.match(svg, /class="journal-panel-frame"[^>]*rx="0"/);
   assert.match(svg, /class="journal-divider-rule"/);
