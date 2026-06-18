@@ -1282,6 +1282,7 @@ function renderHeatmapPlot(spec, w, h, margin, theme = plotTheme(spec)) {
   const cellW = plotW / Math.max(1, xs.length);
   const cellH = plotH / Math.max(1, ys.length);
   const labelFont = Math.max(7.4, Math.min(8.6, cellH - 3));
+  const isPublication = theme.mode === "publication";
   const separator = theme.mode === "publication" ? "#e5e7eb" : theme.mode === "dark" ? "#0f172a" : "#ffffff";
   const rowLines = ys.slice(1).map((_, index) => {
     const lineY = margin.top + (index + 1) * cellH;
@@ -1291,25 +1292,58 @@ function renderHeatmapPlot(spec, w, h, margin, theme = plotTheme(spec)) {
     const lineX = margin.left + (index + 1) * cellW;
     return `<path class="plot-heatmap-column-guide" d="M${lineX},${margin.top} V${margin.top + plotH}" stroke="${separator}" stroke-width="1.2" opacity="0.95"/>`;
   }).join("");
-  const cells = spec.table.rows.map((row) => {
-    const xi = xs.indexOf(String(row[xColumn] ?? ""));
-    const yi = ys.indexOf(String(row[yColumn] ?? ""));
-    const value = Number(row[valueColumn]);
-    if (xi < 0 || yi < 0 || !Number.isFinite(value)) return "";
-    return `<rect class="plot-heatmap-cell" data-x="${escapeAttr(String(row[xColumn] ?? ""))}" data-y="${escapeAttr(String(row[yColumn] ?? ""))}" x="${margin.left + xi * cellW}" y="${margin.top + yi * cellH}" width="${Math.max(1, cellW)}" height="${Math.max(1, cellH)}" rx="1.8" fill="${theme.heat(value, min, max)}"/>`;
+  const rowByKey = new Map(spec.table.rows.map((row) => [`${String(row[xColumn] ?? "")}\u0000${String(row[yColumn] ?? "")}`, row]));
+  const entries = isPublication
+    ? xs.flatMap((xValue) => ys.map((yValue) => ({ xValue, yValue, row: rowByKey.get(`${xValue}\u0000${yValue}`) })))
+    : spec.table.rows.map((row) => ({ xValue: String(row[xColumn] ?? ""), yValue: String(row[yColumn] ?? ""), row }));
+  const cells = entries.map(({ xValue, yValue, row }) => {
+    const xi = xs.indexOf(xValue);
+    const yi = ys.indexOf(yValue);
+    const value = Number(row?.[valueColumn]);
+    const hasValue = Number.isFinite(value);
+    if (xi < 0 || yi < 0) return "";
+    const t = hasValue ? (value - min) / Math.max(max - min, 1e-9) : 0;
+    const bin = Math.max(0, Math.min(4, Math.round(t * 4)));
+    const rectX = margin.left + xi * cellW;
+    const rectY = margin.top + yi * cellH;
+    const className = `plot-heatmap-cell${isPublication ? " plot-journal-heatmap-cell" : ""}${hasValue ? "" : " plot-journal-heatmap-missing-cell"}`;
+    const stroke = isPublication ? ` stroke="${theme.grid}" stroke-width="0.45"` : "";
+    const missingMark = isPublication && !hasValue
+      ? `<path class="plot-journal-heatmap-missing-mark" d="M${rectX + cellW * 0.28},${rectY + cellH * 0.72} L${rectX + cellW * 0.72},${rectY + cellH * 0.28}" stroke="${theme.grid}" stroke-width="0.55" opacity="0.72"/>`
+      : "";
+    return `<rect class="${className}" data-x="${escapeAttr(xValue)}" data-y="${escapeAttr(yValue)}"${isPublication ? ` data-bin="${bin}"` : ""} x="${rectX}" y="${rectY}" width="${Math.max(1, cellW)}" height="${Math.max(1, cellH)}" rx="${isPublication ? 0 : 1.8}" fill="${hasValue ? theme.heat(value, min, max) : theme.fieldFill}"${stroke}/>${missingMark}`;
   }).join("");
+  const axisTicks = isPublication
+    ? `<g class="plot-journal-heatmap-axis-ticks">${xs.map((_, index) => {
+      const tickX = margin.left + index * cellW + cellW / 2;
+      return `<path class="plot-journal-heatmap-axis-tick" d="M${tickX},${margin.top + plotH} v3.8" stroke="${theme.axis}" stroke-width="0.55" opacity="0.75"/>`;
+    }).join("")}${ys.map((_, index) => {
+      const tickY = margin.top + index * cellH + cellH / 2;
+      return `<path class="plot-journal-heatmap-axis-tick" d="M${margin.left},${tickY} h-3.8" stroke="${theme.axis}" stroke-width="0.55" opacity="0.75"/>`;
+    }).join("")}</g>`
+    : "";
   const xLabels = xs.map((label, index) => `<text class="plot-heatmap-column-label" x="${margin.left + index * cellW + cellW / 2}" y="${h - 12}" text-anchor="middle" font-size="${labelFont}" font-weight="700" fill="${theme.muted}">${escapeXml(label.slice(0, 9))}</text>`).join("");
   const yLabels = ys.map((label, index) => `<text class="plot-heatmap-row-label" x="${margin.left - 9}" y="${margin.top + index * cellH + cellH / 2 + labelFont / 3}" text-anchor="end" font-size="${labelFont}" font-weight="700" fill="${theme.muted}">${escapeXml(label.slice(0, 9))}</text>`).join("");
   const colorbarX = margin.left + plotW + 13;
   const colorbarH = Math.max(42, Math.min(plotH, 78));
   const colorbarY = margin.top + Math.max(0, (plotH - colorbarH) / 2);
-  const colorbarStops = Array.from({ length: 18 }, (_, index) => {
-    const t = index / 17;
-    const barY = colorbarY + (1 - t) * colorbarH;
-    return `<rect class="plot-heatmap-colorbar-stop" x="${colorbarX}" y="${barY}" width="8" height="${Math.ceil(colorbarH / 17) + 0.6}" fill="${theme.heat(min + t * (max - min), min, max)}"/>`;
-  }).join("");
-  const colorbar = `<g class="plot-heatmap-colorbar"><rect x="${colorbarX - 1}" y="${colorbarY - 1}" width="10" height="${colorbarH + 2}" rx="3" fill="${theme.frameFill}" stroke="${theme.frameStroke}"/>${colorbarStops}<text x="${colorbarX + 15}" y="${colorbarY + 3}" font-size="7.4" font-weight="700" fill="${theme.muted}">${escapeXml(fmtCompactNumber(max))}</text><text x="${colorbarX + 15}" y="${colorbarY + colorbarH}" font-size="7.4" font-weight="700" fill="${theme.muted}">${escapeXml(fmtCompactNumber(min))}</text></g>`;
-  return `<g class="plot-heatmap-layer"><rect class="plot-heatmap-matrix-frame" x="${margin.left}" y="${margin.top}" width="${plotW}" height="${plotH}" rx="5" fill="${theme.fieldFill}" stroke="${theme.grid}"/>${cells}${rowLines}${columnLines}${xLabels}${yLabels}${colorbar}</g>`;
+  const colorbarStops = isPublication
+    ? Array.from({ length: 5 }, (_, index) => {
+      const t = index / 4;
+      const swatchH = colorbarH / 5;
+      const barY = colorbarY + (4 - index) * swatchH;
+      return `<rect class="plot-heatmap-colorbar-stop plot-journal-heatmap-swatch" data-bin="${index}" x="${colorbarX}" y="${barY}" width="8" height="${swatchH + 0.2}" fill="${theme.heat(min + t * (max - min), min, max)}" stroke="${theme.grid}" stroke-width="0.35"/>`;
+    }).join("")
+    : Array.from({ length: 18 }, (_, index) => {
+      const t = index / 17;
+      const barY = colorbarY + (1 - t) * colorbarH;
+      return `<rect class="plot-heatmap-colorbar-stop" x="${colorbarX}" y="${barY}" width="8" height="${Math.ceil(colorbarH / 17) + 0.6}" fill="${theme.heat(min + t * (max - min), min, max)}"/>`;
+    }).join("");
+  const colorbarTicks = isPublication
+    ? `<path class="plot-heatmap-colorbar-tick plot-journal-colorbar-tick" d="M${colorbarX + 9},${colorbarY} h5 M${colorbarX + 9},${colorbarY + colorbarH / 2} h4 M${colorbarX + 9},${colorbarY + colorbarH} h5" fill="none" stroke="${theme.muted}" stroke-width="0.55" opacity="0.8"/>`
+    : "";
+  const colorbar = `<g class="plot-heatmap-colorbar"><rect x="${colorbarX - 1}" y="${colorbarY - 1}" width="10" height="${colorbarH + 2}" rx="${isPublication ? 0 : 3}" fill="${theme.frameFill}" stroke="${theme.frameStroke}"/>${colorbarStops}${colorbarTicks}<text x="${colorbarX + 15}" y="${colorbarY + 3}" font-size="7.4" font-weight="700" fill="${theme.muted}">${escapeXml(fmtCompactNumber(max))}</text><text x="${colorbarX + 15}" y="${colorbarY + colorbarH}" font-size="7.4" font-weight="700" fill="${theme.muted}">${escapeXml(fmtCompactNumber(min))}</text></g>`;
+  return `<g class="plot-heatmap-layer"><rect class="plot-heatmap-matrix-frame" x="${margin.left}" y="${margin.top}" width="${plotW}" height="${plotH}" rx="${isPublication ? 0 : 5}" fill="${theme.fieldFill}" stroke="${theme.grid}"/>${cells}${rowLines}${columnLines}${axisTicks}${xLabels}${yLabels}${colorbar}</g>`;
 }
 
 function renderLegend(points, x, y) {
@@ -4829,12 +4863,29 @@ function demoSpatialHeatmapTable() {
     name: "Demo spatial expression table",
     columns: ["gene", "region", "expression"],
     rows: [
-      { gene: "CXCL10", region: "immune", expression: 2.6 },
-      { gene: "CXCL10", region: "tumor", expression: 0.8 },
+      { gene: "CXCL10", region: "immune edge", expression: 2.6 },
+      { gene: "CXCL10", region: "tumor core", expression: 0.8 },
+      { gene: "CXCL10", region: "stroma", expression: 0.5 },
+      { gene: "CXCL10", region: "vessel", expression: 0.7 },
+      { gene: "COL1A1", region: "immune edge", expression: 0.6 },
+      { gene: "COL1A1", region: "tumor core", expression: 0.9 },
       { gene: "COL1A1", region: "stroma", expression: 2.1 },
-      { gene: "EPCAM", region: "tumor", expression: 2.4 },
-      { gene: "PTPRC", region: "immune", expression: 2.2 },
-      { gene: "MKI67", region: "tumor", expression: 1.8 },
+      { gene: "COL1A1", region: "vessel", expression: 0.8 },
+      { gene: "EPCAM", region: "immune edge", expression: 0.4 },
+      { gene: "EPCAM", region: "tumor core", expression: 2.4 },
+      { gene: "EPCAM", region: "stroma", expression: 0.7 },
+      { gene: "EPCAM", region: "vessel", expression: 0.6 },
+      { gene: "PTPRC", region: "immune edge", expression: 2.2 },
+      { gene: "PTPRC", region: "tumor core", expression: 0.5 },
+      { gene: "PTPRC", region: "stroma", expression: 0.8 },
+      { gene: "PTPRC", region: "vessel", expression: 0.4 },
+      { gene: "MKI67", region: "immune edge", expression: 0.9 },
+      { gene: "MKI67", region: "tumor core", expression: 1.8 },
+      { gene: "MKI67", region: "stroma", expression: 1.1 },
+      { gene: "MKI67", region: "vessel", expression: 0.6 },
+      { gene: "PECAM1", region: "immune edge", expression: 0.5 },
+      { gene: "PECAM1", region: "tumor core", expression: 0.6 },
+      { gene: "PECAM1", region: "stroma", expression: 0.9 },
       { gene: "PECAM1", region: "vessel", expression: 1.7 }
     ],
     source: manualProvenance("Synthetic spatial transcriptomics demo data")

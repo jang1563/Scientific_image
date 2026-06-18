@@ -2207,7 +2207,11 @@ test("spatial transcriptomics journal template passes manuscript-safe QA gate", 
 
   const nodes = createWorkflowFigureNodes({ templateId: "spatial-results-panel-journal", styleProfile: "publication-line" });
   assert.ok(nodes.length >= 40);
-  assert.ok(nodes.some((node) => node.kind === "plot" && node.payload.spec.plotType === "heatmap"));
+  const heatmap = nodes.find((node) => node.kind === "plot" && node.payload.spec.plotType === "heatmap");
+  assert.ok(heatmap);
+  assert.equal(heatmap.payload.spec.table.rows.length, 24);
+  assert.equal(new Set(heatmap.payload.spec.table.rows.map((row: { gene: string }) => row.gene)).size, 6);
+  assert.equal(new Set(heatmap.payload.spec.table.rows.map((row: { region: string }) => row.region)).size, 4);
   assert.ok(nodes.some((node) => node.kind === "symbol" && node.payload.assetId === "histology-section"));
   assert.ok(nodes.some((node) => node.kind === "symbol" && node.payload.assetId === "visium-spot-array"));
   assert.ok(nodes.some((node) => node.kind === "symbol" && node.payload.assetId === "segmentation-mask"));

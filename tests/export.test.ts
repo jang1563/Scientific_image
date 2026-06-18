@@ -153,7 +153,7 @@ test("publication results template exports line and dark style plot themes", () 
   assert.doesNotMatch(lineSvg, /plot-embedding-label-bg/);
   assert.doesNotMatch(lineSvg, /plot-volcano-hit-halo/);
   assert.doesNotMatch(lineSvg, /plot-volcano-significance-zone/);
-  assert.match(lineSvg, /plot-heatmap-cell"[^>]*rx="0"/);
+  assert.match(lineSvg, /class="[^"]*plot-heatmap-cell[^"]*"[^>]*rx="0"/);
   assertJournalSafeSvgDefs(lineSvg);
 
   let darkProject = createProject("Dark talk fixture");
@@ -255,10 +255,16 @@ test("spatial transcriptomics journal template exports manuscript-safe line figu
   assert.match(svg, /plot-journal-heatmap-row-label/);
   assert.match(svg, /plot-journal-colorbar-tick/);
   assert.match(svg, /plot-journal-colorbar-label/);
+  assert.match(svg, /plot-journal-heatmap-cell/);
+  assert.match(svg, /plot-journal-heatmap-axis-tick/);
+  assert.match(svg, /plot-journal-heatmap-swatch/);
+  assert.match(svg, /data-bin="4"/);
+  assert.match(svg, /data-x="immune edge"/);
+  assert.match(svg, /data-y="PECAM1"/);
   assert.match(svg, /scaled expression \(a\.u\.\)/);
   assert.match(svg, /class="journal-panel-frame"[^>]*rx="0"/);
   assert.match(svg, /class="journal-divider-rule"/);
-  assert.match(svg, /plot-heatmap-cell"[^>]*rx="0"/);
+  assert.match(svg, /class="[^"]*plot-heatmap-cell[^"]*"[^>]*rx="0"/);
   assert.match(svg, /plot-heatmap-matrix-frame"[^>]*rx="0"/);
   assert.match(svg, /plot-journal-colorbar-frame"[^>]*rx="0"/);
   assert.doesNotMatch(svg, /data-depth="(?:raised|floating|hero)"/);

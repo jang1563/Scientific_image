@@ -877,6 +877,7 @@ function renderHeatmap(rows: Record<string, string | number | null>[], xColumn: 
   const cellWidth = width / Math.max(xs.length, 1);
   const cellHeight = height / Math.max(ys.length, 1);
   const labelFont = Math.max(7.6, Math.min(9.2, cellHeight - 3));
+  const isPublication = theme.mode === "publication";
   const separator = theme.mode === "publication" ? "#e5e7eb" : theme.mode === "dark" ? "#0f172a" : "#ffffff";
   const rowLines = ys.slice(1).map((_, index) => {
     const lineY = y + (index + 1) * cellHeight;
@@ -886,18 +887,39 @@ function renderHeatmap(rows: Record<string, string | number | null>[], xColumn: 
     const lineX = x + (index + 1) * cellWidth;
     return `<path class="plot-heatmap-column-guide" d="M${fmt(lineX)},${fmt(y)} V${fmt(y + height)}" stroke="${separator}" stroke-width="1.2" opacity="0.95"/>`;
   }).join("");
-  const cellRadius = theme.mode === "publication" ? 0 : 1.8;
-  const matrixRadius = theme.mode === "publication" ? 0 : 5;
-  const colorbarRadius = theme.mode === "publication" ? 0 : 3;
-  const cells = rows
-    .map((row) => {
-      const xi = xs.indexOf(String(row[xColumn] ?? ""));
-      const yi = ys.indexOf(String(row[yColumn] ?? ""));
-      const value = Number(row[valueColumn]);
-      const t = Number.isFinite(value) ? (value - min) / Math.max(max - min, 1e-9) : 0;
-      return `<rect class="plot-heatmap-cell" data-x="${escapeXml(String(row[xColumn] ?? ""))}" data-y="${escapeXml(String(row[yColumn] ?? ""))}" x="${fmt(x + xi * cellWidth)}" y="${fmt(y + yi * cellHeight)}" width="${fmt(Math.max(1, cellWidth))}" height="${fmt(Math.max(1, cellHeight))}" rx="${fmt(cellRadius)}" fill="${theme.heat(t)}"/>`;
+  const cellRadius = isPublication ? 0 : 1.8;
+  const matrixRadius = isPublication ? 0 : 5;
+  const colorbarRadius = isPublication ? 0 : 3;
+  const rowByKey = new Map(rows.map((row) => [`${String(row[xColumn] ?? "")}\u0000${String(row[yColumn] ?? "")}`, row]));
+  const heatmapEntries = isPublication
+    ? xs.flatMap((xValue) => ys.map((yValue) => ({ xValue, yValue, row: rowByKey.get(`${xValue}\u0000${yValue}`) })))
+    : rows.map((row) => ({ xValue: String(row[xColumn] ?? ""), yValue: String(row[yColumn] ?? ""), row }));
+  const cells = heatmapEntries
+    .map(({ xValue, yValue, row }) => {
+      const xi = xs.indexOf(xValue);
+      const yi = ys.indexOf(yValue);
+      const value = Number(row?.[valueColumn]);
+      const hasValue = Number.isFinite(value);
+      const t = hasValue ? (value - min) / Math.max(max - min, 1e-9) : 0;
+      const bin = Math.max(0, Math.min(4, Math.round(t * 4)));
+      const className = `plot-heatmap-cell${isPublication ? " plot-journal-heatmap-cell" : ""}${hasValue ? "" : " plot-journal-heatmap-missing-cell"}`;
+      const fill = hasValue ? theme.heat(t) : theme.fieldFill;
+      const stroke = isPublication ? ` stroke="${theme.grid}" stroke-width="0.45"` : "";
+      const missingMark = isPublication && !hasValue
+        ? `<path class="plot-journal-heatmap-missing-mark" d="M${fmt(x + xi * cellWidth + cellWidth * 0.28)},${fmt(y + yi * cellHeight + cellHeight * 0.72)} L${fmt(x + xi * cellWidth + cellWidth * 0.72)},${fmt(y + yi * cellHeight + cellHeight * 0.28)}" stroke="${theme.grid}" stroke-width="0.55" opacity="0.72"/>`
+        : "";
+      return `<rect class="${className}" data-x="${escapeXml(xValue)}" data-y="${escapeXml(yValue)}"${isPublication ? ` data-bin="${bin}"` : ""} x="${fmt(x + xi * cellWidth)}" y="${fmt(y + yi * cellHeight)}" width="${fmt(Math.max(1, cellWidth))}" height="${fmt(Math.max(1, cellHeight))}" rx="${fmt(cellRadius)}" fill="${fill}"${stroke}/>${missingMark}`;
     })
     .join("");
+  const axisTicks = isPublication
+    ? `<g class="plot-journal-heatmap-axis-ticks">${xs.map((_, index) => {
+      const tickX = x + index * cellWidth + cellWidth / 2;
+      return `<path class="plot-journal-heatmap-axis-tick" d="M${fmt(tickX)},${fmt(y + height)} v${fmt(3.8)}" stroke="${theme.axis}" stroke-width="0.55" opacity="0.75"/>`;
+    }).join("")}${ys.map((_, index) => {
+      const tickY = y + index * cellHeight + cellHeight / 2;
+      return `<path class="plot-journal-heatmap-axis-tick" d="M${fmt(x)},${fmt(tickY)} h${fmt(-3.8)}" stroke="${theme.axis}" stroke-width="0.55" opacity="0.75"/>`;
+    }).join("")}</g>`
+    : "";
   const xLabels = xs.map((label, index) => {
     const labelX = x + index * cellWidth + cellWidth / 2;
     const labelY = y + height + (theme.mode === "publication" ? 13 : 15);
@@ -912,22 +934,29 @@ function renderHeatmap(rows: Record<string, string | number | null>[], xColumn: 
   const colorbarX = x + width + 13;
   const colorbarH = Math.max(42, Math.min(height, 78));
   const colorbarY = y + Math.max(0, (height - colorbarH) / 2);
-  const colorbarStops = Array.from({ length: 18 }, (_, index) => {
-    const t = index / 17;
-    const barY = colorbarY + (1 - t) * colorbarH;
-    return `<rect class="plot-heatmap-colorbar-stop" x="${fmt(colorbarX)}" y="${fmt(barY)}" width="8" height="${fmt(Math.ceil(colorbarH / 17) + 0.6)}" fill="${theme.heat(t)}"/>`;
-  }).join("");
+  const colorbarStops = isPublication
+    ? Array.from({ length: 5 }, (_, index) => {
+      const t = index / 4;
+      const swatchH = colorbarH / 5;
+      const barY = colorbarY + (4 - index) * swatchH;
+      return `<rect class="plot-heatmap-colorbar-stop plot-journal-heatmap-swatch" data-bin="${index}" x="${fmt(colorbarX)}" y="${fmt(barY)}" width="8" height="${fmt(swatchH + 0.2)}" fill="${theme.heat(t)}" stroke="${theme.grid}" stroke-width="0.35"/>`;
+    }).join("")
+    : Array.from({ length: 18 }, (_, index) => {
+      const t = index / 17;
+      const barY = colorbarY + (1 - t) * colorbarH;
+      return `<rect class="plot-heatmap-colorbar-stop" x="${fmt(colorbarX)}" y="${fmt(barY)}" width="8" height="${fmt(Math.ceil(colorbarH / 17) + 0.6)}" fill="${theme.heat(t)}"/>`;
+    }).join("");
   const colorbarClass = `plot-heatmap-colorbar-frame${theme.mode === "publication" ? " plot-journal-colorbar-frame" : ""}`;
   const colorbarStroke = theme.mode === "publication" ? theme.grid : theme.frameStroke;
-  const colorbarTicks = theme.mode === "publication"
-    ? `<path class="plot-heatmap-colorbar-tick plot-journal-colorbar-tick" d="M${fmt(colorbarX + 9)},${fmt(colorbarY)} h5 M${fmt(colorbarX + 9)},${fmt(colorbarY + colorbarH)} h5" fill="none" stroke="${theme.muted}" stroke-width="0.55" opacity="0.8"/>`
+  const colorbarTicks = isPublication
+    ? `<path class="plot-heatmap-colorbar-tick plot-journal-colorbar-tick" d="M${fmt(colorbarX + 9)},${fmt(colorbarY)} h5 M${fmt(colorbarX + 9)},${fmt(colorbarY + colorbarH / 2)} h4 M${fmt(colorbarX + 9)},${fmt(colorbarY + colorbarH)} h5" fill="none" stroke="${theme.muted}" stroke-width="0.55" opacity="0.8"/>`
     : "";
   const colorbarDataLabel = valueScaleLabel ? ` data-scale-label="${escapeXml(valueScaleLabel)}"` : "";
-  const colorbarLabel = theme.mode === "publication" && valueScaleLabel
+  const colorbarLabel = isPublication && valueScaleLabel
     ? `<text class="plot-heatmap-colorbar-label plot-journal-colorbar-label" x="${fmt(colorbarX + 4)}" y="${fmt(colorbarY - 4)}" text-anchor="middle" font-size="6.7" font-family="Arial" font-weight="650" fill="${theme.muted}">${escapeXml(shortPlotLabel(valueScaleLabel.replace(/\s*\([^)]*\)/g, ""), 12))}</text>`
     : "";
   const colorbar = `<g class="plot-heatmap-colorbar"${colorbarDataLabel}><rect class="${colorbarClass}" x="${fmt(colorbarX - 1)}" y="${fmt(colorbarY - 1)}" width="10" height="${fmt(colorbarH + 2)}" rx="${fmt(colorbarRadius)}" fill="${theme.frameFill}" stroke="${colorbarStroke}"/>${colorbarStops}${colorbarTicks}<text x="${fmt(colorbarX + 15)}" y="${fmt(colorbarY + 3)}" font-size="7.4" font-family="Arial" font-weight="650" fill="${theme.muted}">${escapeXml(fmt(max))}</text><text x="${fmt(colorbarX + 15)}" y="${fmt(colorbarY + colorbarH)}" font-size="7.4" font-family="Arial" font-weight="650" fill="${theme.muted}">${escapeXml(fmt(min))}</text>${colorbarLabel}</g>`;
-  return `<g class="plot-heatmap-layer"><rect class="plot-heatmap-matrix-frame" x="${fmt(x)}" y="${fmt(y)}" width="${fmt(width)}" height="${fmt(height)}" rx="${fmt(matrixRadius)}" fill="${theme.fieldFill}" stroke="${theme.grid}"/>${cells}${rowLines}${columnLines}${xLabels}${yLabels}${colorbar}</g>`;
+  return `<g class="plot-heatmap-layer"><rect class="plot-heatmap-matrix-frame" x="${fmt(x)}" y="${fmt(y)}" width="${fmt(width)}" height="${fmt(height)}" rx="${fmt(matrixRadius)}" fill="${theme.fieldFill}" stroke="${theme.grid}"/>${cells}${rowLines}${columnLines}${axisTicks}${xLabels}${yLabels}${colorbar}</g>`;
 }
 
 export function exportPdf(project: Project, pageId?: string): ExportResult {
