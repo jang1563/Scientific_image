@@ -1276,10 +1276,18 @@ test("spatial transcriptomics assets expose premium map and image-analysis marke
 });
 
 test("spatial transcriptomics publication-line assets remain export-clean", () => {
-  for (const assetId of ["visium-spot-array", "segmentation-mask", "cell-boundary", "neighborhood-graph"]) {
+  const expectedLineMarkers: Record<string, RegExp[]> = {
+    "visium-spot-array": [/asset-visium-manuscript-grid-axis/, /asset-visium-spot-ring/],
+    "segmentation-mask": [/asset-segmentation-review-vector/, /asset-segmentation-line-scale-bar/],
+    "cell-boundary": [/asset-cell-boundary-junction-point/, /asset-cell-boundary-line-key/],
+    "neighborhood-graph": [/asset-neighborhood-distance-ring/, /asset-neighborhood-line-key/]
+  };
+
+  for (const [assetId, markers] of Object.entries(expectedLineMarkers)) {
     const lineSvg = renderPremiumAssetSvg(assetId, { styleProfile: "publication-line", width: 180, height: 140 });
     assert.match(lineSvg, /data-style-profile="publication-line"/);
     assert.match(lineSvg, /data-accent="#111827"/);
+    for (const marker of markers) assert.match(lineSvg, marker);
     assert.doesNotMatch(lineSvg, /filter="url\(#asset-/);
     assert.doesNotMatch(lineSvg, /class="asset-(?:contact-shadow|soft-body-gradient|body-depth-overlay|inner-highlight|warning-glow|rim-highlight)"/);
     assert.doesNotMatch(lineSvg, /fill="url\(#asset-glass-highlight\)"/);

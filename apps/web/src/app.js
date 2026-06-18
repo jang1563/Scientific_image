@@ -4380,14 +4380,14 @@ function createSpatialJournalWebNodes(template) {
     ["E", "Image/source processing notes", x + 724, y + 270, 424, 200]
   ].forEach((panel) => nodes.push(...tk.panel(...panel)));
   nodes.push(
-    tk.lineSymbol("histology-section", "Histology section", x + 32, y + 92, 116, 92, `${template.id}:panel-A-histology`),
-    tk.lineSymbol("visium-spot-array", "Spot array", x + 176, y + 92, 116, 92, `${template.id}:panel-A-spots`),
+    tk.lineSymbol("histology-section", "Histology section", x + 24, y + 88, 132, 104, `${template.id}:panel-A-histology`),
+    tk.lineSymbol("visium-spot-array", "Spot array", x + 174, y + 86, 136, 104, `${template.id}:panel-A-spots`),
     tk.lineText("Replace fixture with source image and processing notes.", x + 42, y + 194, 250, 18, { fontSize: 9.2, color: "#374151" }),
-    tk.lineSymbol("segmentation-mask", "Segmentation", x + 420, y + 88, 120, 98, `${template.id}:panel-B-mask`),
-    tk.lineSymbol("cell-boundary", "Cell boundary", x + 570, y + 94, 104, 86, `${template.id}:panel-B-boundary`),
+    tk.lineSymbol("segmentation-mask", "Segmentation", x + 410, y + 86, 134, 104, `${template.id}:panel-B-mask`),
+    tk.lineSymbol("cell-boundary", "Cell boundary", x + 562, y + 90, 118, 96, `${template.id}:panel-B-boundary`),
     tk.lineText("Mask version, model, and threshold must be cited.", x + 420, y + 194, 252, 18, { fontSize: 9.2, color: "#374151" }),
-    tk.lineSymbol("neighborhood-graph", "Neighborhood graph", x + 802, y + 86, 138, 104, `${template.id}:panel-C-neighborhood`),
-    tk.lineSymbol("tissue-region", "Region annotation", x + 976, y + 94, 104, 86, `${template.id}:panel-C-region`),
+    tk.lineSymbol("neighborhood-graph", "Neighborhood graph", x + 792, y + 84, 152, 114, `${template.id}:panel-C-neighborhood`),
+    tk.lineSymbol("tissue-region", "Region annotation", x + 966, y + 88, 120, 98, `${template.id}:panel-C-region`),
     tk.linePlot("heatmap", "Marker expression by region", demoSpatialHeatmapTable(), { x: "region", y: "gene", value: "expression" }, x + 26, y + 316, 430, 128, { axisLabels: "region by marker gene", legend: "scaled expression" }),
     tk.lineSymbol("gene-locus", "Marker gene", x + 484, y + 330, 86, 72, `${template.id}:panel-D-gene`),
     tk.lineText("Report region annotation, normalization, and source-data table with the figure.", x + 584, y + 326, 96, 76, { fontSize: 9.5, fontWeight: 700, color: "#374151" }),

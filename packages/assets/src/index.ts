@@ -13257,7 +13257,7 @@ function createSpatialResultsJournalTemplateNodes(template: WorkflowTemplate, in
   ];
 
   const topY = y + 22;
-  const panelH = 178;
+  const panelH = 188;
   const gap = 18;
   const panelA = { x, y: topY, w: 310, h: panelH };
   const panelB = { x: x + panelA.w + gap, y: topY, w: 310, h: panelH };
@@ -13273,32 +13273,32 @@ function createSpatialResultsJournalTemplateNodes(template: WorkflowTemplate, in
     nodes.push(divider(p.x + 12, p.y + 36, p.w - 24));
   }
   nodes.push(
-    symbol("histology-section", "Histology section", panelA.x + 24, panelA.y + 54, 92, 72, "microscopy-evidence", `${template.id}:panel-a-histology`),
-    label("source tissue", panelA.x + 18, panelA.y + 130, 104),
-    symbol("visium-spot-array", "Spot capture array", panelA.x + 154, panelA.y + 50, 112, 78, "spatial-assay", `${template.id}:panel-a-spot-array`),
-    label("spot capture", panelA.x + 150, panelA.y + 130, 116),
-    createConnectorNode([{ x: panelA.x + 118, y: panelA.y + 88 }, { x: panelA.x + 154, y: panelA.y + 88 }], "", { stroke: "#111827", strokeWidth: 1.25 }),
-    figureText("Record slide source, staining, platform, and spot diameter in caption/source table.", createTransform(panelA.x + 18, panelA.y + 150, panelA.w - 36, 28), {
+    symbol("histology-section", "Histology section", panelA.x + 20, panelA.y + 50, 112, 88, "microscopy-evidence", `${template.id}:panel-a-histology`),
+    label("source tissue", panelA.x + 16, panelA.y + 140, 120),
+    symbol("visium-spot-array", "Spot capture array", panelA.x + 158, panelA.y + 48, 128, 90, "spatial-assay", `${template.id}:panel-a-spot-array`),
+    label("spot capture", panelA.x + 154, panelA.y + 140, 136),
+    createConnectorNode([{ x: panelA.x + 136, y: panelA.y + 94 }, { x: panelA.x + 158, y: panelA.y + 94 }], "", { stroke: "#111827", strokeWidth: 1.25 }),
+    figureText("Record slide source, staining, platform, and spot diameter in caption/source table.", createTransform(panelA.x + 18, panelA.y + 160, panelA.w - 36, 24), {
       fontSize: 8.6,
       color: "#374151"
     }),
 
-    symbol("segmentation-mask", "Segmentation mask", panelB.x + 32, panelB.y + 52, 104, 76, "image-analysis", `${template.id}:panel-b-segmentation`),
-    label("segmentation", panelB.x + 24, panelB.y + 130, 116),
-    symbol("cell-boundary", "Cell boundaries", panelB.x + 174, panelB.y + 54, 90, 72, "image-analysis", `${template.id}:panel-b-boundaries`),
-    label("cell boundaries", panelB.x + 158, panelB.y + 130, 120),
-    createConnectorNode([{ x: panelB.x + 138, y: panelB.y + 88 }, { x: panelB.x + 174, y: panelB.y + 88 }], "", { stroke: "#111827", strokeWidth: 1.25 }),
-    figureText("Segmentation method, QC filters, and excluded regions remain editable review metadata.", createTransform(panelB.x + 18, panelB.y + 150, panelB.w - 36, 28), {
+    symbol("segmentation-mask", "Segmentation mask", panelB.x + 24, panelB.y + 50, 118, 86, "image-analysis", `${template.id}:panel-b-segmentation`),
+    label("segmentation", panelB.x + 18, panelB.y + 140, 130),
+    symbol("cell-boundary", "Cell boundaries", panelB.x + 172, panelB.y + 52, 108, 84, "image-analysis", `${template.id}:panel-b-boundaries`),
+    label("cell boundaries", panelB.x + 158, panelB.y + 140, 132),
+    createConnectorNode([{ x: panelB.x + 146, y: panelB.y + 94 }, { x: panelB.x + 172, y: panelB.y + 94 }], "", { stroke: "#111827", strokeWidth: 1.25 }),
+    figureText("Segmentation method, QC filters, and excluded regions remain editable review metadata.", createTransform(panelB.x + 18, panelB.y + 160, panelB.w - 36, 24), {
       fontSize: 8.6,
       color: "#374151"
     }),
 
-    symbol("neighborhood-graph", "Neighborhood graph", panelC.x + 34, panelC.y + 48, 118, 86, "spatial-context", `${template.id}:panel-c-neighborhood`),
-    label("neighborhood graph", panelC.x + 20, panelC.y + 134, 148),
-    symbol("tissue-region", "Region annotation", panelC.x + 194, panelC.y + 52, 96, 78, "annotation", `${template.id}:panel-c-region`),
-    label("region labels", panelC.x + 184, panelC.y + 134, 118),
-    createConnectorNode([{ x: panelC.x + 154, y: panelC.y + 91 }, { x: panelC.x + 194, y: panelC.y + 91 }], "", { stroke: "#111827", strokeWidth: 1.25 }),
-    figureText("Neighborhood definitions should include distance radius, graph rule, and cell-type mapping.", createTransform(panelC.x + 18, panelC.y + 150, panelC.w - 36, 28), {
+    symbol("neighborhood-graph", "Neighborhood graph", panelC.x + 26, panelC.y + 46, 134, 100, "spatial-context", `${template.id}:panel-c-neighborhood`),
+    label("neighborhood graph", panelC.x + 18, panelC.y + 146, 154),
+    symbol("tissue-region", "Region annotation", panelC.x + 194, panelC.y + 50, 112, 90, "annotation", `${template.id}:panel-c-region`),
+    label("region labels", panelC.x + 184, panelC.y + 146, 136),
+    createConnectorNode([{ x: panelC.x + 164, y: panelC.y + 96 }, { x: panelC.x + 194, y: panelC.y + 96 }], "", { stroke: "#111827", strokeWidth: 1.25 }),
+    figureText("Neighborhood definitions should include distance radius, graph rule, and cell-type mapping.", createTransform(panelC.x + 18, panelC.y + 160, panelC.w - 36, 24), {
       fontSize: 8.6,
       color: "#374151"
     })
