@@ -1006,6 +1006,29 @@ test("anatomy organ systems broad pack assets expose dedicated premium recipe ma
   }
 });
 
+test("anatomy organ systems publication-line assets avoid UI-card framing", () => {
+  const manuscriptPanelAssets = [
+    "anatomy-overview",
+    "organ-axis-brain-lung-gut",
+    "skin",
+    "bone-marrow",
+    "vasculature",
+    "renal-nephron",
+    "hepatic-lobule",
+    "organ-system-network"
+  ];
+
+  for (const assetId of manuscriptPanelAssets) {
+    const lineSvg = renderPremiumAssetSvg(assetId, { styleProfile: "publication-line", width: 180, height: 140 });
+    assert.match(lineSvg, /data-style-profile="publication-line"/);
+    assert.match(lineSvg, /asset-anatomy-manuscript-panel/);
+    assert.match(lineSvg, /asset-anatomy-panel-rule/);
+    assert.doesNotMatch(lineSvg, /\basset-anatomy-organ-card\b/);
+    assert.doesNotMatch(lineSvg, /\basset-anatomy-rim-highlight\b/);
+    assert.doesNotMatch(lineSvg, /filter="url\(#asset-/);
+  }
+});
+
 test("methods and protocols broad pack assets expose dedicated premium recipe markers", () => {
   const expectedMarkers: Record<string, RegExp[]> = {
     "protocol-overview": [/asset-methods-protocol-overview/, /asset-methods-step-node/, /asset-methods-review-gate/],
