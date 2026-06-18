@@ -2037,9 +2037,13 @@ test("journal figure QA flags dense compact plot labels before manuscript use", 
   assert.equal(journal.templateId, "manuscript-results-figure");
   assert.equal(journal.status, "journal-draft");
   assert.ok(journal.counts.plotTypographyReviewCount >= 2);
+  assert.ok(journal.counts.sourceIntegrityReviewCount >= 2);
   assert.ok(journal.plotIssues.some((issue) => issue.kind === "plot" && issue.message.includes("label-density")));
+  assert.ok(journal.provenanceIssues.some((issue) => issue.kind === "provenance" && issue.message.includes("source-data reference")));
   assert.ok(journal.exportWarnings.some((warning) => warning.includes("manuscript label-density review")));
+  assert.ok(journal.exportWarnings.some((warning) => warning.includes("source-data or image-integrity review")));
   assert.ok(journal.actionItems.some((item) => item.title === "Review compact plot labels"));
+  assert.ok(journal.actionItems.some((item) => item.title === "Verify source-data integrity"));
 });
 
 test("perturb-seq journal template passes manuscript-safe QA gate", () => {
@@ -2068,7 +2072,9 @@ test("perturb-seq journal template passes manuscript-safe QA gate", () => {
   assert.equal(journal.counts.uiCardShapeCount, 0);
   assert.equal(journal.counts.plotMetadataReviewCount, 0);
   assert.equal(journal.counts.plotTypographyReviewCount, 0);
+  assert.equal(journal.counts.sourceIntegrityReviewCount, 0);
   assert.deepEqual(journal.visualIssues, []);
+  assert.deepEqual(journal.provenanceIssues, []);
   assert.deepEqual(journal.plotIssues, []);
 });
 
@@ -2100,7 +2106,9 @@ test("spatial transcriptomics journal template passes manuscript-safe QA gate", 
   assert.equal(journal.counts.uiCardShapeCount, 0);
   assert.equal(journal.counts.plotMetadataReviewCount, 0);
   assert.equal(journal.counts.plotTypographyReviewCount, 0);
+  assert.equal(journal.counts.sourceIntegrityReviewCount, 0);
   assert.deepEqual(journal.visualIssues, []);
+  assert.deepEqual(journal.provenanceIssues, []);
   assert.deepEqual(journal.plotIssues, []);
 });
 
@@ -2132,7 +2140,9 @@ test("AI biosecurity journal template passes manuscript-safe QA gate", () => {
   assert.equal(journal.counts.uiCardShapeCount, 0);
   assert.equal(journal.counts.plotMetadataReviewCount, 0);
   assert.equal(journal.counts.plotTypographyReviewCount, 0);
+  assert.equal(journal.counts.sourceIntegrityReviewCount, 0);
   assert.deepEqual(journal.visualIssues, []);
+  assert.deepEqual(journal.provenanceIssues, []);
   assert.deepEqual(journal.plotIssues, []);
 });
 

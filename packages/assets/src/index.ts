@@ -986,6 +986,7 @@ export interface JournalFigureQaReport {
     uiCardShapeCount: number;
     plotMetadataReviewCount: number;
     plotTypographyReviewCount: number;
+    sourceIntegrityReviewCount: number;
     missingProvenanceCount: number;
     needsCitationCount: number;
     unsupportedClaimCount: number;
@@ -6545,6 +6546,7 @@ export function getJournalFigureQa(templateId: string, input: {
   const uiCardShapes = nodes.filter(journalUiCardShapeNode);
   const plotMetadataReviewNodes = nodes.filter(journalPlotNeedsMetadataReview);
   const plotTypographyReviewNodes = nodes.filter(journalPlotNeedsTypographyReview);
+  const sourceIntegrityReviewNodes = nodes.filter(journalSourceIntegrityNeedsReview);
   const blockingIssues: JournalFigureQaIssue[] = [];
   const visualIssues: JournalFigureQaIssue[] = [];
   const provenanceIssues: JournalFigureQaIssue[] = [];
@@ -6644,6 +6646,21 @@ export function getJournalFigureQa(templateId: string, input: {
       nodeIds: baseIssueNodeIds(baseTemplateQa, "provenance")
     });
   }
+  if (sourceIntegrityReviewNodes.length) {
+    provenanceIssues.push({
+      severity: "warning",
+      kind: "provenance",
+      message: `${sourceIntegrityReviewNodes.length} plot/image evidence node(s) need source-data reference, processing/integrity note, or realistic image rights review.`,
+      nodeIds: sourceIntegrityReviewNodes.map((node) => node.id)
+    });
+    actionItems.push({
+      severity: "warning",
+      kind: "coverage",
+      title: "Verify source-data integrity",
+      action: "Attach source table/image IDs, processing notes, analysis version or threshold notes, and image rights/provenance before manuscript delivery.",
+      nodeIds: sourceIntegrityReviewNodes.map((node) => node.id)
+    });
+  }
   if (plotMetadataReviewNodes.length) {
     plotIssues.push({
       severity: "warning",
@@ -6685,6 +6702,9 @@ export function getJournalFigureQa(templateId: string, input: {
   if (plotTypographyReviewNodes.length) {
     exportWarnings.push(`${plotTypographyReviewNodes.length} compact plot node(s) need manuscript label-density review.`);
   }
+  if (sourceIntegrityReviewNodes.length) {
+    exportWarnings.push(`${sourceIntegrityReviewNodes.length} evidence node(s) need source-data or image-integrity review before manuscript delivery.`);
+  }
   if (baseTemplateQa.premiumFallbackAssetIds.length) {
     exportWarnings.push(`Journal PPTX/DOCX fallback review must name assets: ${describeTemplateQaList(baseTemplateQa.premiumFallbackAssetIds, 8)}.`);
   }
@@ -6696,6 +6716,7 @@ export function getJournalFigureQa(templateId: string, input: {
     - Math.min(18, Math.max(0, uiCardShapes.length - 4) * 2)
     - Math.min(12, plotMetadataReviewNodes.length * 6)
     - Math.min(10, plotTypographyReviewNodes.length * 4)
+    - Math.min(12, sourceIntegrityReviewNodes.length * 4)
     - Math.min(12, baseTemplateQa.needsCitationCount * 2)
     - (baseTemplateQa.premiumFallbackAssetIds.length ? 4 : 0)
   )));
@@ -6728,6 +6749,7 @@ export function getJournalFigureQa(templateId: string, input: {
       uiCardShapeCount: uiCardShapes.length,
       plotMetadataReviewCount: plotMetadataReviewNodes.length,
       plotTypographyReviewCount: plotTypographyReviewNodes.length,
+      sourceIntegrityReviewCount: sourceIntegrityReviewNodes.length,
       missingProvenanceCount: baseTemplateQa.missingProvenanceCount,
       needsCitationCount: baseTemplateQa.needsCitationCount,
       unsupportedClaimCount: baseTemplateQa.unsupportedClaimCount,
@@ -6835,6 +6857,80 @@ function journalPlotNeedsTypographyReview(node: SceneNode): boolean {
     return rows.length > Math.max(5, Math.floor(width / 24)) && (width < 160 || height < 90);
   }
   return false;
+}
+
+function journalSourceIntegrityNeedsReview(node: SceneNode): boolean {
+  if (node.kind === "plot") return journalPlotSourceIntegrityNeedsReview(node);
+  if (node.kind === "image") return journalImageSourceIntegrityNeedsReview(node);
+  return false;
+}
+
+function journalPlotSourceIntegrityNeedsReview(node: SceneNode): boolean {
+  const payload = nodePayloadObject(node);
+  const spec = typeof payload.spec === "object" && payload.spec !== null ? payload.spec as Record<string, unknown> : {};
+  const table = typeof spec.table === "object" && spec.table !== null ? spec.table as Record<string, unknown> : {};
+  const journalPlot = typeof spec.journalPlot === "object" && spec.journalPlot !== null ? spec.journalPlot as Record<string, unknown> : {};
+  const tableSource = typeof table.source === "object" && table.source !== null ? table.source as Record<string, unknown> : {};
+  const hasSourceReference = Boolean(firstNonEmptyString(
+    journalPlot.sourceData,
+    spec.sourceData,
+    tableSource.source,
+    tableSource.citation,
+    tableSource.url
+  ));
+  const integrityNote = firstNonEmptyString(
+    journalPlot.processingNote,
+    spec.processingNote,
+    journalPlot.integrityNote,
+    spec.integrityNote,
+    journalPlot.sourceDataNote,
+    spec.sourceDataNote
+  );
+  return !(hasSourceReference && sourceIntegrityNoteLooksUseful(integrityNote));
+}
+
+function journalImageSourceIntegrityNeedsReview(node: SceneNode): boolean {
+  const payload = nodePayloadObject(node);
+  const assetId = firstNonEmptyString(payload.assetId, payload.imageAssetId);
+  const src = firstNonEmptyString(payload.src, payload.href, payload.dataUri);
+  if (!assetId && !src) return true;
+  if (!assetId) return true;
+
+  let asset: LibraryAsset;
+  try {
+    asset = getAnyAsset(assetId);
+  } catch {
+    return true;
+  }
+
+  if (!isRealisticAsset(asset)) return false;
+  const hasRights = asset.rightsStatus === "curated-fixture";
+  const hasProvenance = Boolean(asset.provenance.source && asset.provenance.license);
+  const hasImageMetadata = Boolean(
+    asset.mediaType &&
+    asset.sourceAssetType &&
+    asset.resolution.width >= 512 &&
+    asset.resolution.height >= 384
+  );
+  const hasCaptionOrAnchor = Boolean(firstNonEmptyString(
+    payload.alt,
+    payload.caption,
+    payload.captionAnchor,
+    asset.name
+  ));
+  return !(hasRights && hasProvenance && hasImageMetadata && hasCaptionOrAnchor);
+}
+
+function firstNonEmptyString(...values: unknown[]): string {
+  for (const value of values) {
+    if (typeof value === "string" && value.trim()) return value.trim();
+  }
+  return "";
+}
+
+function sourceIntegrityNoteLooksUseful(value: string): boolean {
+  if (value.trim().length < 12) return false;
+  return /\b(source|replace|analysis|version|threshold|processing|raw|table|citation|qc|filter|normalization|pipeline|fixture|image|crop|stain|platform)\b/i.test(value);
 }
 
 function nodePayloadObject(node: SceneNode): Record<string, unknown> {
