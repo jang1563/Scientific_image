@@ -3789,8 +3789,9 @@ function finishRenderedAssetMarkup(markup, palette) {
   if (palette.styleProfile === "publication-line") {
     next = next
       .replace(/\sfilter="url\(#asset-(?:soft-shadow|contact-shadow|warning-glow)\)"/g, "")
-      .replace(/<[^>]*class="asset-(?:contact-shadow|soft-body-gradient|body-depth-overlay|inner-highlight|warning-glow|rim-highlight)"[^>]*>/g, "")
-      .replace(/<(?:path|ellipse|circle|rect)[^>]*fill="url\(#asset-glass-highlight\)"[^>]*>/g, "");
+      .replace(/<(?:path|ellipse|circle|rect)[^>]*class="[^"]*(?:asset-(?:contact-shadow|soft-body-gradient|body-depth-overlay|inner-highlight|warning-glow|rim-highlight)|asset-(?:tcell|bcell|immune-cell|macrophage|tumor-cell|protein|receptor-membrane|scrna-oil|cell-barcode|metabolite|enzyme|tissue)[\w-]*-rim\b)[^"]*"[^>]*>/g, "")
+      .replace(/<(?:path|ellipse|circle|rect)[^>]*fill="url\(#asset-(?:glass-highlight|body-depth)\)"[^>]*>/g, "")
+      .replace(/stroke="#ffffff"/g, `stroke="${palette.stroke}"`);
   }
   if (palette.styleProfile === "minimal-flat" || palette.detailLevel === "low") {
     next = next

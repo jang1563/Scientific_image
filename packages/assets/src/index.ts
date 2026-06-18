@@ -5749,7 +5749,11 @@ export function renderPremiumAssetSvg(assetId: string, options: {
   const height = options.height ?? 120;
   const asset = getAnyAsset(assetId);
   if (isRealisticAsset(asset)) return renderRealisticAssetSvg(asset.id, options);
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" role="img" aria-label="${escapeXml(options.label ?? asset.name)}"><defs>${renderPremiumAssetDefs()}</defs>${renderPremiumAssetGlyph(asset, width, height, options)}</svg>`;
+  const glyph = renderPremiumAssetGlyph(asset, width, height, options);
+  const styleProfile = normalizeAssetStyleProfile(options.styleProfile ?? options.appearance?.styleProfile ?? options.variant);
+  const needsDefs = styleProfile !== "publication-line" || /url\(#(?:asset|realistic)-/.test(glyph);
+  const defs = needsDefs ? `<defs>${renderPremiumAssetDefs()}</defs>` : "";
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" role="img" aria-label="${escapeXml(options.label ?? asset.name)}">${defs}${glyph}</svg>`;
 }
 
 export function renderPremiumAssetGlyph(

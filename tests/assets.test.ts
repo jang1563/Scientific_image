@@ -469,7 +469,11 @@ test("premium assets render non-empty SVG variants", () => {
       assert.match(svg, /<svg/);
       assert.match(svg, /premium-asset/);
       assert.match(svg, /commercial-premium-asset/);
-      assert.match(svg, /asset-contact-shadow/);
+      if (variant === "outline") {
+        assert.doesNotMatch(svg, /asset-(?:contact-shadow|soft-shadow|glass-highlight|body-depth)/);
+      } else {
+        assert.match(svg, /asset-contact-shadow/);
+      }
       assert.ok(svg.length > 400, `${asset.id} ${variant} render is too small`);
       if (asset.qualityTier === "signature" || asset.qualityTier === "hero") {
         assert.match(svg, new RegExp(`data-quality-tier="${asset.qualityTier}"`));
@@ -557,6 +561,34 @@ test("cell and tissue publication-line style stays clean after morphology upgrad
     assert.doesNotMatch(lineSvg, /filter="url\(#asset-/);
     assert.doesNotMatch(lineSvg, /class="asset-(?:contact-shadow|soft-body-gradient|body-depth-overlay|inner-highlight|warning-glow|rim-highlight)"/);
     assert.doesNotMatch(lineSvg, /fill="url\(#asset-glass-highlight\)"/);
+  }
+});
+
+test("core cell and molecule publication-line assets strip glossy rim residues", () => {
+  const coreLineAssets = [
+    "cell-t",
+    "cell-b",
+    "cell-immune",
+    "cell-macrophage",
+    "cell-tumor",
+    "protein",
+    "antibody",
+    "receptor",
+    "cytokine",
+    "enzyme",
+    "scrna-droplet",
+    "cell-barcode"
+  ];
+
+  for (const assetId of coreLineAssets) {
+    const lineSvg = renderPremiumAssetSvg(assetId, { styleProfile: "publication-line", width: 180, height: 140 });
+    assert.match(lineSvg, /data-style-profile="publication-line"/);
+    assert.match(lineSvg, /data-accent="#111827"/);
+    assert.doesNotMatch(lineSvg, /filter="url\(#asset-/);
+    assert.doesNotMatch(lineSvg, /fill="url\(#asset-glass-highlight\)"/);
+    assert.doesNotMatch(lineSvg, /\basset-[^"]*(?:glass|rim-highlight|inner-highlight)\b/);
+    assert.doesNotMatch(lineSvg, /\basset-(?:immune-cell|macrophage|tumor-cell|protein|receptor-membrane|scrna-oil|cell-barcode|metabolite|enzyme|tissue)[^"]*-rim\b/);
+    assert.doesNotMatch(lineSvg, /stroke="#ffffff"/);
   }
 });
 
