@@ -200,6 +200,11 @@ function renderShape(payload: ShapePayload, node: SceneNode, context: RenderCont
   const width = node.transform.width;
   const height = node.transform.height;
   const label = payload.label ? `<text x="${fmt(width / 2)}" y="${fmt(height / 2)}" text-anchor="middle" dominant-baseline="middle" fill="${escapeXml(style.color ?? "#0f172a")}" font-family="${escapeXml(style.fontFamily ?? "Arial, sans-serif")}" font-size="${fmt(style.fontSize ?? 16)}" font-weight="${escapeXml(String(style.fontWeight ?? 600))}">${escapeXml(payload.label)}</text>` : "";
+  if (payload.shape === "line") {
+    const y = height > 1 ? height / 2 : 0.5;
+    const className = context.lineSafe ? "journal-divider-rule" : "shape-line";
+    return `<path class="${className}" d="M0,${fmt(y)} H${fmt(width)}" fill="none" stroke="${stroke}" stroke-width="${strokeWidth}" opacity="${opacity}"/>${label}`;
+  }
   if (payload.shape === "ellipse") {
     if (context.lineSafe) return `<ellipse cx="${fmt(width / 2)}" cy="${fmt(height / 2)}" rx="${fmt(width / 2)}" ry="${fmt(height / 2)}" fill="${fill}" stroke="${stroke}" stroke-width="${strokeWidth}" opacity="${opacity}"/>${label}`;
     const rim = `<ellipse cx="${fmt(width / 2)}" cy="${fmt(height / 2)}" rx="${fmt(Math.max(0, width / 2 - 1.5))}" ry="${fmt(Math.max(0, height / 2 - 1.5))}" fill="none" stroke="#ffffff" stroke-width="1.3" opacity="0.5"/>`;
@@ -213,12 +218,18 @@ function renderShape(payload: ShapePayload, node: SceneNode, context: RenderCont
     return `<polygon points="${points}" fill="${fill}" stroke="${stroke}" stroke-width="${strokeWidth}" opacity="${opacity}"/><polygon points="${inset}" fill="none" stroke="#ffffff" stroke-width="1.2" opacity="0.42"/>${label}`;
   }
   const radius = payload.shape === "round-rect" ? Math.min(18, width / 5, height / 5) : 0;
-  if (context.lineSafe) return `<rect x="0" y="0" width="${fmt(width)}" height="${fmt(height)}" rx="${fmt(radius)}" fill="${fill}" stroke="${stroke}" stroke-width="${strokeWidth}" opacity="${opacity}"/>${label}`;
+  if (context.lineSafe) return renderJournalPanelShape(width, height, style, opacity, label);
   const highlightHeight = Math.min(30, Math.max(8, height * 0.42));
   const darkSurface = isDarkColor(fill);
   const highlight = `<rect x="1" y="1" width="${fmt(Math.max(0, width - 2))}" height="${fmt(highlightHeight)}" rx="${fmt(Math.max(0, radius - 1))}" fill="#ffffff" opacity="${darkSurface ? "0.08" : "0.26"}" pointer-events="none"/>`;
   const rim = `<rect x="1" y="1" width="${fmt(Math.max(0, width - 2))}" height="${fmt(Math.max(0, height - 2))}" rx="${fmt(Math.max(0, radius - 1))}" fill="none" stroke="#ffffff" stroke-width="1.2" opacity="${darkSurface ? "0.18" : "0.48"}" pointer-events="none"/>`;
   return `<rect x="0" y="0" width="${fmt(width)}" height="${fmt(height)}" rx="${fmt(radius)}" fill="${fill}" stroke="${stroke}" stroke-width="${strokeWidth}" opacity="${opacity}"/>${highlight}${rim}${label}`;
+}
+
+function renderJournalPanelShape(width: number, height: number, style: Style, opacity: string, label: string): string {
+  const rawStrokeWidth = Number(style.strokeWidth ?? 1.1);
+  const strokeWidth = fmt(Math.min(1.35, Math.max(0.75, Number.isFinite(rawStrokeWidth) ? rawStrokeWidth : 1.1)));
+  return `<rect class="journal-panel-frame" x="0" y="0" width="${fmt(width)}" height="${fmt(height)}" rx="0" fill="#ffffff" stroke="#111827" stroke-width="${strokeWidth}" opacity="${opacity}"/>${label}`;
 }
 
 function renderSymbol(payload: SymbolPayload, node: SceneNode): string {
