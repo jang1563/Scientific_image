@@ -182,7 +182,7 @@ test("perturb-seq journal template exports manuscript-safe line figure", () => {
   assert.match(svg, /plot-volcano-layer/);
   assert.match(svg, /plot-axis-label-x/);
   assert.match(svg, /plot-axis-label-y/);
-  assert.match(svg, /M48,104 H406 M48,104 V28/);
+  assert.match(svg, /M48,104 H434 M48,104 V28/);
   assert.match(svg, /log2 fold-change vs non-targeting control/);
   assert.match(svg, /-log10 adjusted P value/);
   assert.match(svg, /plot-volcano-effect-threshold-label/);
@@ -202,6 +202,7 @@ test("perturb-seq journal template exports manuscript-safe line figure", () => {
   assert.match(text, /Library identity and guide assignment are stored as editable scene metadata\./);
   assert.match(text, /Keep MOI, cell-type gating, and guide-capture assumptions in the caption\./);
   assert.match(text, /Readout table links perturbation, cell state, effect size, and uncertainty\./);
+  assert.match(text, /Thresholds shown are placeholders; replace with study-specific FDR and effect-size rules\./);
   assert.doesNotMatch(text, /Library identity.{0,90}\.\.\./);
   assert.doesNotMatch(text, /Keep MOI.{0,90}\.\.\./);
   assert.doesNotMatch(text, /Readout table.{0,90}\.\.\./);
@@ -311,9 +312,12 @@ test("AI biosecurity journal template exports manuscript-safe line figure", () =
   assert.match(text, /Benchmark composition, source snippets, and labels remain auditable metadata\./);
   assert.match(text, /Report model checkpoint, calibration split, and uncertainty before decision claims\./);
   assert.match(text, /Decision thresholds and review triggers must be defined in methods or supplement\./);
+  assert.match(text, /Attach metrics TSV and calibration split\./);
+  assert.match(text, /Store reviewer rationale and export warnings\./);
   assert.doesNotMatch(text, /Benchmark composition.{0,90}\.\.\./);
   assert.doesNotMatch(text, /Report model checkpoint.{0,90}\.\.\./);
   assert.doesNotMatch(text, /Decision thresholds.{0,90}\.\.\./);
+  assert.doesNotMatch(text, /source-ai-biosecurity-eval-metrics\.tsv and\.\.\./);
   assert.match(svg, /plot-journal-frame/);
   assert.match(svg, /class="journal-panel-frame"[^>]*rx="0"/);
   assert.match(svg, /class="journal-divider-rule"/);

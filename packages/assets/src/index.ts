@@ -8495,12 +8495,12 @@ function createPerturbSeqJournalTemplateNodes(template: WorkflowTemplate, input:
       sourceData: "source-perturb-seq-results.tsv",
       sourceDataNote: "Synthetic fixture for layout QA; replace with source data."
     }
-  } as never, createTransform(resultPanel.x + 24, resultPanel.y + 52, 424, 146)));
+  } as never, createTransform(resultPanel.x + 24, resultPanel.y + 52, 452, 146)));
   nodes.push(
-    symbol("metric-card", "Effect-size table", resultPanel.x + 486, resultPanel.y + 64, 82, 64, "evaluation-evidence", `${template.id}:panel-d-effect-size`),
-    label("effect-size table", resultPanel.x + 462, resultPanel.y + 132, 132),
-    figureText("Thresholds: |log2FC| >= 1, adjusted P < 1e-4. Replace with study-specific thresholds.", createTransform(resultPanel.x + 466, resultPanel.y + 154, 198, 34), {
-      fontSize: 8.8,
+    symbol("metric-card", "Effect-size table", resultPanel.x + 518, resultPanel.y + 64, 68, 58, "evaluation-evidence", `${template.id}:panel-d-effect-size`),
+    label("effect-size table", resultPanel.x + 490, resultPanel.y + 130, 124),
+    figureText("Thresholds shown are placeholders; replace with study-specific FDR and effect-size rules.", createTransform(resultPanel.x + 494, resultPanel.y + 154, 170, 38), {
+      fontSize: 8.4,
       color: "#374151"
     })
   );
@@ -14561,9 +14561,9 @@ function createAiBiosecurityJournalTemplateNodes(template: WorkflowTemplate, inp
   nodes.push(divider(reviewPanel.x + 12, reviewPanel.y + 36, reviewPanel.w - 24));
   const checks = [
     ["Benchmark", "Attach source prompts, labels, and benchmark version."],
-    ["Threshold", "Attach source-ai-biosecurity-eval-metrics.tsv and calibration split."],
-    ["Policy", "Record permission tier, refusal boundary, and review trigger."],
-    ["Audit", "Store reviewer rationale, timestamp, and export fallback warnings."]
+    ["Threshold", "Attach metrics TSV and calibration split."],
+    ["Policy", "Record permission tier and review trigger."],
+    ["Audit", "Store reviewer rationale and export warnings."]
   ];
   checks.forEach(([title, detail], index) => {
     const rowY = reviewPanel.y + 54 + index * 38;
