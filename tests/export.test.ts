@@ -189,6 +189,9 @@ test("perturb-seq journal template exports manuscript-safe line figure", () => {
   assert.match(svg, /plot-journal-threshold-label/);
   assert.match(svg, /plot-journal-volcano-reference-band/);
   assert.match(svg, /plot-journal-volcano-label/);
+  assert.equal([...svg.matchAll(/plot-journal-volcano-label"/g)].length, 2);
+  assert.match(svg, /data-journal-label-side="up"/);
+  assert.match(svg, /data-journal-label-side="down"/);
   assert.match(svg, /plot-journal-volcano-legend/);
   assert.match(svg, /adj\. P &lt; 1e-4/);
   assert.match(svg, /plot-journal-legend/);

@@ -709,10 +709,12 @@ function renderVolcanoPlot(points: { rawX: number; rawY: number; group: string; 
     ...xTicks.map((value) => `<g class="plot-volcano-axis-tick"><path class="plot-volcano-grid" d="M${fmt(sx(value))},${fmt(y)} V${fmt(y + height)}" stroke="${theme.grid}" stroke-width="0.65" opacity="${value === 0 ? "0.82" : "0.55"}"/><text x="${fmt(sx(value))}" y="${fmt(y + height + 11)}" text-anchor="middle" font-family="Arial, sans-serif" font-size="7.2" font-weight="700" fill="${theme.muted}">${escapeXml(fmt(value))}</text></g>`),
     ...yTicks.map((value) => `<g class="plot-volcano-axis-tick"><path class="plot-volcano-grid" d="M${fmt(x)},${fmt(sy(value))} H${fmt(x + width)}" stroke="${theme.grid}" stroke-width="0.65" opacity="${value === pThreshold ? "0.2" : "0.58"}"/><text x="${fmt(x - 6)}" y="${fmt(sy(value) + 2.8)}" text-anchor="end" font-family="Arial, sans-serif" font-size="7.2" font-weight="700" fill="${theme.muted}">${escapeXml(fmt(value))}</text></g>`)
   ].join("");
-  const hitPoints = points
+  const significantHits = points
     .filter((point) => point.label && Math.abs(point.rawX) >= fcThreshold && point.rawY >= pThreshold)
-    .sort((a, b) => b.rawY - a.rawY)
-    .slice(0, compact ? 3 : 4);
+    .sort((a, b) => b.rawY - a.rawY);
+  const hitPoints = isPublication
+    ? pickJournalVolcanoLabels(significantHits, 2)
+    : significantHits.slice(0, compact ? 3 : 4);
   const significanceZones = isPublication ? [] : [
     `<rect class="plot-volcano-significance-zone" x="${fmt(x)}" y="${fmt(y)}" width="${fmt(Math.max(0, leftThresholdX - x))}" height="${fmt(Math.max(0, thresholdY - y))}" fill="#ede9fe" opacity="0.18"/>`,
     `<rect class="plot-volcano-significance-zone" x="${fmt(rightThresholdX)}" y="${fmt(y)}" width="${fmt(Math.max(0, x + width - rightThresholdX))}" height="${fmt(Math.max(0, thresholdY - y))}" fill="#ccfbf1" opacity="0.18"/>`
@@ -750,14 +752,21 @@ function renderVolcanoPlot(points: { rawX: number; rawY: number; group: string; 
       const pointY = sy(point.rawY);
       const placeLeft = point.rawX > 0;
       const stackIndex = placeLeft ? upLabelIndex++ : downLabelIndex++;
-      const labelX = compact
+      const labelX = isPublication
+        ? (placeLeft
+          ? Math.max(x + 38, Math.min(x + width - 12, pointX - 30))
+          : Math.min(x + width - 38, Math.max(x + 12, pointX + 30)))
+        : compact
         ? (placeLeft ? x + width - 12 : x + 12)
         : Math.max(x + 18, Math.min(x + width - 18, pointX + (placeLeft ? -24 : 24)));
-      const labelY = compact
+      const labelY = isPublication
+        ? Math.max(y + 22, Math.min(y + height - 9, pointY + (placeLeft ? 18 : 14) + stackIndex * 11))
+        : compact
         ? Math.min(y + height - 8, y + 13 + stackIndex * 10)
         : Math.max(y + 12, Math.min(y + height - 8, pointY + (index % 2 ? 12 : -8)));
       const leader = isPublication ? "" : `<path class="plot-volcano-label-leader" d="M${fmt(pointX)},${fmt(pointY)} L${fmt(labelX + (placeLeft ? 4 : -4))},${fmt(labelY - 3)}" stroke="${theme.muted}" stroke-width="0.65" opacity="0.62"/>`;
-      return `${leader}<text class="plot-volcano-label${isPublication ? " plot-journal-volcano-label" : ""}" x="${fmt(labelX)}" y="${fmt(labelY)}" text-anchor="${placeLeft ? "end" : "start"}" font-family="Arial, sans-serif" font-size="8.4" font-weight="${isPublication ? "690" : "760"}" fill="${theme.label}">${escapeXml(shortPlotLabel(point.label, 8))}</text>`;
+      const journalAttrs = isPublication ? ` data-journal-label-side="${point.rawX > 0 ? "up" : "down"}"` : "";
+      return `${leader}<text class="plot-volcano-label${isPublication ? " plot-journal-volcano-label" : ""}"${journalAttrs} x="${fmt(labelX)}" y="${fmt(labelY)}" text-anchor="${placeLeft ? "end" : "start"}" font-family="Arial, sans-serif" font-size="8.4" font-weight="${isPublication ? "690" : "760"}" fill="${theme.label}">${escapeXml(shortPlotLabel(point.label, 8))}</text>`;
     })
     .join("");
   const legendX = x + width - 92;
@@ -771,6 +780,19 @@ function renderVolcanoPlot(points: { rawX: number; rawY: number; group: string; 
     : `<circle cx="45" cy="0" r="3.4" fill="${theme.color("down")}"/>`;
   const legend = `<g class="${legendClass}" transform="translate(${fmt(legendX)} ${fmt(legendY)})">${upMarker}<text x="8" y="3" font-family="Arial, sans-serif" font-size="7.8" font-weight="${isPublication ? "650" : "700"}" fill="${theme.muted}">up hit</text>${downMarker}<text x="53" y="3" font-family="Arial, sans-serif" font-size="7.8" font-weight="${isPublication ? "650" : "700"}" fill="${theme.muted}">down</text></g>`;
   return `<g class="plot-volcano-layer">${grid}${guides}${marks}${labels}${legend}</g>`;
+}
+
+function pickJournalVolcanoLabels<T extends { rawX: number; rawY: number }>(points: T[], limit: number): T[] {
+  const selected: T[] = [];
+  for (const side of ["up", "down"] as const) {
+    const point = points.find((candidate) => side === "up" ? candidate.rawX > 0 : candidate.rawX < 0);
+    if (point && !selected.includes(point) && selected.length < limit) selected.push(point);
+  }
+  for (const point of points) {
+    if (selected.length >= limit) break;
+    if (!selected.includes(point)) selected.push(point);
+  }
+  return selected.sort((a, b) => b.rawY - a.rawY);
 }
 
 function renderLinePlot(spec: PlotSpec, x: number, y: number, width: number, height: number, theme: PlotTheme): string {
