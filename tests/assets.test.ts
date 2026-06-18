@@ -620,6 +620,36 @@ test("core cell and molecule publication-line assets strip glossy rim residues",
   }
 });
 
+test("molecule publication-line schematics avoid deck-style chrome", () => {
+  const lineAssets = ["gene-locus", "chromatin", "metabolite", "signaling-cascade"];
+
+  for (const assetId of lineAssets) {
+    const lineSvg = renderPremiumAssetSvg(assetId, { styleProfile: "publication-line", width: 180, height: 140 });
+    const roundedRects = [...lineSvg.matchAll(/<rect[^>]*rx="([^"]+)"/g)].filter((match) => Number(match[1]) > 0);
+    assert.match(lineSvg, /data-style-profile="publication-line"/);
+    assert.equal(roundedRects.length, 0, `${assetId} should not retain rounded manuscript-mode rects`);
+    assert.doesNotMatch(lineSvg, /asset-gene-locus-frame/);
+    assert.doesNotMatch(lineSvg, /asset-gene-track-ruler/);
+    assert.doesNotMatch(lineSvg, /asset-metabolite-badge/);
+    assert.doesNotMatch(lineSvg, /asset-cascade-label/);
+    assert.doesNotMatch(lineSvg, /asset-label-pill/);
+  }
+
+  const geneSvg = renderPremiumAssetSvg("gene-locus", { styleProfile: "publication-line", width: 180, height: 140 });
+  assert.match(geneSvg, /asset-gene-track-axis/);
+  assert.match(geneSvg, /asset-gene-exon/);
+  assert.match(geneSvg, /asset-regulatory-loop/);
+
+  const chromatinSvg = renderPremiumAssetSvg("chromatin", { styleProfile: "publication-line", width: 180, height: 140 });
+  assert.match(chromatinSvg, /asset-chromatin-methyl-mark[^"]*asset-chromatin-epigenetic-mark[^"]*"[^>]*rx="0"/);
+
+  const metaboliteSvg = renderPremiumAssetSvg("metabolite", { styleProfile: "publication-line", width: 180, height: 140 });
+  assert.match(metaboliteSvg, /asset-metabolite-spectrum-label/);
+
+  const cascadeSvg = renderPremiumAssetSvg("signaling-cascade", { styleProfile: "publication-line", width: 180, height: 140 });
+  assert.match(cascadeSvg, /asset-cascade-output-label/);
+});
+
 test("pathogen and biosafety assets have distinct premium vector markers", () => {
   const expectedMarkers: Record<string, RegExp[]> = {
     "virus-particle": [/asset-virus-capsid/, /asset-virus-spike/, /asset-virus-genome/, /asset-virus-risk-halo/],

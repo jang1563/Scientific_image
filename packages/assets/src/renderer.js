@@ -1403,7 +1403,10 @@ function geneTrack(cx, cy, s, palette) {
   const geneLine = `<path class="asset-gene-track-axis" d="M${fmt(cx - 38 * s)},${fmt(cy + 5 * s)} H${fmt(cx + 42 * s)}" stroke="${palette.stroke}" stroke-width="${fmt(2.3 * s)}" stroke-linecap="round"/>`;
   const exons = [[-31, 17, palette.accent], [-7, 13, palette.secondary], [13, 25, palette.accent], [43, 9, palette.secondary]].map(([x, w, fill], index) => `<rect class="asset-gene-exon" x="${fmt(cx + x * s)}" y="${fmt(cy - (index === 2 ? 8 : 6) * s)}" width="${fmt(w * s)}" height="${fmt((index === 2 ? 16 : 12) * s)}" rx="${fmt(4 * s)}" fill="${fill}" stroke="${palette.accent}" stroke-width="${fmt(1.25 * s)}" opacity="${index % 2 ? 0.92 : 1}"/>`).join("");
   const arrows = [-17, 4, 31].map((x) => `<path class="asset-gene-direction-arrow" d="M${fmt(cx + x * s)},${fmt(cy + 5 * s)} l${fmt(6 * s)},${fmt(-4 * s)} l0,${fmt(8 * s)} Z" fill="${palette.stroke}" opacity="0.55"/>`).join("");
-  const regulatory = `<path class="asset-regulatory-loop" d="M${fmt(cx - 35 * s)},${fmt(cy + 19 * s)} C${fmt(cx - 20 * s)},${fmt(cy + 35 * s)} ${fmt(cx + 18 * s)},${fmt(cy + 35 * s)} ${fmt(cx + 33 * s)},${fmt(cy + 17 * s)}" fill="none" stroke="${palette.accent}" stroke-width="${fmt(1.9 * s)}" stroke-linecap="round" opacity="0.72"/><circle cx="${fmt(cx - 36 * s)}" cy="${fmt(cy + 19 * s)}" r="${fmt(5.2 * s)}" fill="#ffffff" stroke="${palette.accent}" stroke-width="${fmt(1.3 * s)}"/><circle cx="${fmt(cx + 34 * s)}" cy="${fmt(cy + 17 * s)}" r="${fmt(5.2 * s)}" fill="#ffffff" stroke="${palette.accent}" stroke-width="${fmt(1.3 * s)}"/><rect x="${fmt(cx - 44 * s)}" y="${fmt(cy - 31 * s)}" width="${fmt(26 * s)}" height="${fmt(13 * s)}" rx="${fmt(6.5 * s)}" fill="${palette.secondary}" stroke="${palette.accent}" stroke-width="${fmt(1.15 * s)}"/><text x="${fmt(cx - 31 * s)}" y="${fmt(cy - 21.7 * s)}" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="${fmt(6.7 * s)}" font-weight="900" fill="${palette.accent}">GENE</text>`;
+  const geneLabel = palette.styleProfile === "publication-line"
+    ? `<text class="asset-gene-locus-label" x="${fmt(cx - 31 * s)}" y="${fmt(cy - 21.7 * s)}" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="${fmt(6.7 * s)}" font-weight="900" fill="${palette.accent}">GENE</text>`
+    : `<rect class="asset-gene-locus-label-box" x="${fmt(cx - 44 * s)}" y="${fmt(cy - 31 * s)}" width="${fmt(26 * s)}" height="${fmt(13 * s)}" rx="${fmt(6.5 * s)}" fill="${palette.secondary}" stroke="${palette.accent}" stroke-width="${fmt(1.15 * s)}"/><text class="asset-gene-locus-label" x="${fmt(cx - 31 * s)}" y="${fmt(cy - 21.7 * s)}" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="${fmt(6.7 * s)}" font-weight="900" fill="${palette.accent}">GENE</text>`;
+  const regulatory = `<path class="asset-regulatory-loop" d="M${fmt(cx - 35 * s)},${fmt(cy + 19 * s)} C${fmt(cx - 20 * s)},${fmt(cy + 35 * s)} ${fmt(cx + 18 * s)},${fmt(cy + 35 * s)} ${fmt(cx + 33 * s)},${fmt(cy + 17 * s)}" fill="none" stroke="${palette.accent}" stroke-width="${fmt(1.9 * s)}" stroke-linecap="round" opacity="0.72"/><circle cx="${fmt(cx - 36 * s)}" cy="${fmt(cy + 19 * s)}" r="${fmt(5.2 * s)}" fill="#ffffff" stroke="${palette.accent}" stroke-width="${fmt(1.3 * s)}"/><circle cx="${fmt(cx + 34 * s)}" cy="${fmt(cy + 17 * s)}" r="${fmt(5.2 * s)}" fill="#ffffff" stroke="${palette.accent}" stroke-width="${fmt(1.3 * s)}"/>${geneLabel}`;
   const signal = `<path class="asset-gene-locus-signal" d="M${fmt(cx - 36 * s)},${fmt(cy + 27 * s)} h${fmt(15 * s)} M${fmt(cx - 13 * s)},${fmt(cy + 27 * s)} h${fmt(22 * s)} M${fmt(cx + 17 * s)},${fmt(cy + 27 * s)} h${fmt(20 * s)}" stroke="${palette.accent}" stroke-width="${fmt(1.8 * s)}" stroke-linecap="round" opacity="0.5"/>`;
   return `${baseLayer(cx, cy, s, palette, "panel")}<g class="asset-gene-locus" filter="url(#asset-soft-shadow)">${panel}${ticks}${geneLine}${exons}${arrows}${regulatory}${signal}<path class="asset-gene-locus-rim-highlight" d="M${fmt(cx - 38 * s)},${fmt(cy - 29 * s)} C${fmt(cx - 11 * s)},${fmt(cy - 39 * s)} ${fmt(cx + 24 * s)},${fmt(cy - 37 * s)} ${fmt(cx + 43 * s)},${fmt(cy - 25 * s)}" fill="none" stroke="#ffffff" stroke-width="${fmt(1.8 * s)}" opacity="0.54" stroke-linecap="round"/></g>`;
 }
@@ -3803,6 +3806,7 @@ function finishRenderedAssetMarkup(markup, palette) {
       .replace(/<(?:path|ellipse|circle|rect)[^>]*fill="url\(#asset-(?:glass-highlight|body-depth)\)"[^>]*>/g, "")
       .replace(/stroke="#ffffff"/g, `stroke="${palette.stroke}"`);
     next = squarePublicationLineUiRects(next);
+    next = stripPublicationLineBiologyChrome(next);
   }
   if (palette.styleProfile === "minimal-flat" || palette.detailLevel === "low") {
     next = next
@@ -3817,9 +3821,21 @@ function finishRenderedAssetMarkup(markup, palette) {
 }
 
 function squarePublicationLineUiRects(markup) {
-  const uiClassPattern = "asset-(?:dataset|benchmark|metric|calibration|permission|human-review|audit-log|bio-classifier|model-block|foundation-model|classifier|context-window|memory|planner|executor|function-schema|tool-call|mcp-server|agent-loop|expression-matrix|gene-track|gene-exon|policy-stack|review|blocked-output|approval-stamp|bio-protocol|protocol-risk|safety-classifier|gene-synthesis|dual-use|escalation)[\\w-]*";
+  const uiClassPattern = "asset-(?:dataset|benchmark|metric|calibration|permission|human-review|audit-log|bio-classifier|model-block|foundation-model|classifier|context-window|memory|planner|executor|function-schema|tool-call|mcp-server|agent-loop|expression-matrix|gene-track|gene-exon|chromatin-methyl|chromatin-epigenetic|policy-stack|review|blocked-output|approval-stamp|bio-protocol|protocol-risk|safety-classifier|gene-synthesis|dual-use|escalation)[\\w-]*";
   const uiRect = new RegExp(`(<rect\\b[^>]*\\bclass="[^"]*(?:${uiClassPattern})[^"]*"[^>]*?)\\s+rx="[^"]+"`, "g");
   return markup.replace(uiRect, "$1 rx=\"0\"");
+}
+
+function stripPublicationLineBiologyChrome(markup) {
+  const chromeClasses = [
+    "asset-gene-locus-frame",
+    "asset-gene-track-ruler",
+    "asset-metabolite-badge",
+    "asset-cascade-label"
+  ];
+  const chromePattern = chromeClasses.join("|");
+  const chromeRect = new RegExp(`<rect\\b[^>]*\\bclass="[^"]*(?:${chromePattern})[^"]*"[^>]*>`, "g");
+  return markup.replace(chromeRect, "");
 }
 
 function inferFamily(assetId = "") {
