@@ -359,15 +359,22 @@ function renderPlotSvg(spec: PlotSpec, width: number, height: number): string {
   const groupColumn = spec.encodings.group ?? spec.encodings.color;
   const xAxisLabel = journalAxisLabel(spec, "x", xColumn ?? "");
   const yAxisLabel = journalAxisLabel(spec, "y", spec.plotType === "volcano" ? `-log10(${yColumn ?? "p"})` : yColumn ?? valueColumn ?? "");
-  const title = `<text x="${fmt(width / 2)}" y="${compact ? 18 : 24}" text-anchor="middle" font-family="Arial, sans-serif" font-size="${compact ? 12.5 : 18}" font-weight="760" fill="${theme.text}">${escapeXml(spec.title)}</text>`;
+  const titleX = theme.mode === "publication" ? margin.left : width / 2;
+  const titleAnchor = theme.mode === "publication" ? "start" : "middle";
+  const titleClass = `plot-title${theme.mode === "publication" ? " plot-journal-title" : ""}`;
+  const titleFontSize = theme.mode === "publication" ? (compact ? 11.2 : 14.6) : (compact ? 12.5 : 18);
+  const titleFontWeight = theme.mode === "publication" ? 720 : 760;
+  const title = `<text class="${titleClass}" x="${fmt(titleX)}" y="${compact ? 18 : 24}" text-anchor="${titleAnchor}" font-family="Arial, sans-serif" font-size="${fmt(titleFontSize)}" font-weight="${titleFontWeight}" fill="${theme.text}">${escapeXml(spec.title)}</text>`;
   const frameRadius = theme.mode === "publication" ? 0 : 10;
-  const frame = `<rect class="plot-frame${compact ? " plot-compact-frame" : ""}${theme.mode === "publication" ? " plot-journal-frame" : ""}" x="0" y="0" width="${fmt(width)}" height="${fmt(height)}" rx="${fmt(frameRadius)}" fill="${theme.frameFill}" stroke="${theme.frameStroke}"/>`;
+  const frameStroke = theme.mode === "publication" ? "#6b7280" : theme.frameStroke;
+  const frameStrokeWidth = theme.mode === "publication" ? 0.8 : 1;
+  const frame = `<rect class="plot-frame${compact ? " plot-compact-frame" : ""}${theme.mode === "publication" ? " plot-journal-frame" : ""}" x="0" y="0" width="${fmt(width)}" height="${fmt(height)}" rx="${fmt(frameRadius)}" fill="${theme.frameFill}" stroke="${frameStroke}" stroke-width="${fmt(frameStrokeWidth)}"/>`;
   const axes = `<path d="M${margin.left},${height - margin.bottom} H${width - margin.right} M${margin.left},${height - margin.bottom} V${margin.top}" stroke="${theme.axis}" stroke-width="${compact ? 1 : 1.5}" fill="none"/>`;
   const labels = compact
     ? `<text class="plot-axis-label-y" transform="translate(15 ${fmt(margin.top + plotHeight / 2)}) rotate(-90)" text-anchor="middle" font-family="Arial, sans-serif" font-size="8.1" font-weight="700" fill="${theme.muted}">${escapeXml(shortPlotLabel(yAxisLabel, footerItems.length ? 40 : 12))}</text><text class="plot-axis-label-x" x="${fmt(margin.left + plotWidth / 2)}" y="${fmt(height - (footerItems.length ? footerItems.length * 7 + 12 : 8))}" text-anchor="middle" font-family="Arial, sans-serif" font-size="8.2" font-weight="700" fill="${theme.muted}">${escapeXml(shortPlotLabel(xAxisLabel, footerItems.length ? 52 : 14))}</text>${renderCompactPlotFooterItems(width, height, footerItems, theme)}`
     : `${renderPlotAxisLabels(xAxisLabel, yAxisLabel, width, height, margin, barPlot, footerItems.length, theme)}${renderPlotFooterItems(spec, width, height, footerItems, theme)}`;
   if (spec.plotType === "heatmap" && xColumn && yColumn && valueColumn) {
-    return `${frame}${title}${renderHeatmap(rows, xColumn, yColumn, valueColumn, margin.left, margin.top, plotWidth, plotHeight, theme)}${labels}`;
+    return `${frame}${title}${renderHeatmap(rows, xColumn, yColumn, valueColumn, margin.left, margin.top, plotWidth, plotHeight, theme, journalValueScaleLabel(spec))}${labels}`;
   }
   if (["bar", "box", "violin", "dot"].includes(spec.plotType) && xColumn && yColumn) {
     return `${frame}${title}${axes}${renderGroupedPlot(spec, margin.left, margin.top, plotWidth, plotHeight, theme)}${labels}`;
@@ -399,6 +406,16 @@ function journalAxisLabel(spec: PlotSpec, axis: "x" | "y", fallback: string): st
     if (typeof label === "string" && label.trim()) return label;
   }
   return fallback;
+}
+
+function journalValueScaleLabel(spec: PlotSpec): string {
+  const metadata = journalPlotMetadata(spec);
+  const units = metadata.units;
+  if (typeof units === "object" && units !== null) {
+    const valueUnit = (units as Record<string, unknown>).value;
+    if (typeof valueUnit === "string" && valueUnit.trim()) return valueUnit.trim();
+  }
+  return "";
 }
 
 function journalPlotFooterItems(spec: PlotSpec): { className: string; label: string; text: string }[] {
@@ -851,7 +868,7 @@ function renderBarCategoryLabel(label: string, x: number, y: number, fontSize: n
   return `<text class="plot-bar-category-label" data-lines="${lines.length}" x="${fmt(x)}" y="${fmt(y)}" text-anchor="middle" font-size="${fmt(fontSize)}" font-family="Arial" font-weight="760" fill="${theme.label}">${tspans}</text>`;
 }
 
-function renderHeatmap(rows: Record<string, string | number | null>[], xColumn: string, yColumn: string, valueColumn: string, x: number, y: number, width: number, height: number, theme: PlotTheme): string {
+function renderHeatmap(rows: Record<string, string | number | null>[], xColumn: string, yColumn: string, valueColumn: string, x: number, y: number, width: number, height: number, theme: PlotTheme, valueScaleLabel = ""): string {
   const xs = [...new Set(rows.map((row) => String(row[xColumn] ?? "")))].filter(Boolean);
   const ys = [...new Set(rows.map((row) => String(row[yColumn] ?? "")))].filter(Boolean);
   const values = rows.map((row) => Number(row[valueColumn])).filter(Number.isFinite);
@@ -881,8 +898,17 @@ function renderHeatmap(rows: Record<string, string | number | null>[], xColumn: 
       return `<rect class="plot-heatmap-cell" data-x="${escapeXml(String(row[xColumn] ?? ""))}" data-y="${escapeXml(String(row[yColumn] ?? ""))}" x="${fmt(x + xi * cellWidth)}" y="${fmt(y + yi * cellHeight)}" width="${fmt(Math.max(1, cellWidth))}" height="${fmt(Math.max(1, cellHeight))}" rx="${fmt(cellRadius)}" fill="${theme.heat(t)}"/>`;
     })
     .join("");
-  const xLabels = xs.map((label, index) => `<text class="plot-heatmap-column-label" x="${fmt(x + index * cellWidth + cellWidth / 2)}" y="${fmt(y + height + 15)}" text-anchor="middle" font-size="${fmt(labelFont)}" font-family="Arial" font-weight="700" fill="${theme.muted}">${escapeXml(label.slice(0, 9))}</text>`).join("");
-  const yLabels = ys.map((label, index) => `<text class="plot-heatmap-row-label" x="${fmt(x - 9)}" y="${fmt(y + index * cellHeight + cellHeight / 2 + labelFont / 3)}" text-anchor="end" font-size="${fmt(labelFont)}" font-family="Arial" font-weight="700" fill="${theme.muted}">${escapeXml(label.slice(0, 9))}</text>`).join("");
+  const xLabels = xs.map((label, index) => {
+    const labelX = x + index * cellWidth + cellWidth / 2;
+    const labelY = y + height + (theme.mode === "publication" ? 13 : 15);
+    const className = `plot-heatmap-column-label${theme.mode === "publication" ? " plot-journal-heatmap-column-label" : ""}`;
+    const text = shortPlotLabel(label, theme.mode === "publication" ? 13 : 9);
+    if (theme.mode === "publication") {
+      return `<text class="${className}" transform="rotate(-24 ${fmt(labelX)} ${fmt(labelY)})" x="${fmt(labelX)}" y="${fmt(labelY)}" text-anchor="end" font-size="${fmt(labelFont)}" font-family="Arial" font-weight="650" fill="${theme.muted}">${escapeXml(text)}</text>`;
+    }
+    return `<text class="${className}" x="${fmt(labelX)}" y="${fmt(labelY)}" text-anchor="middle" font-size="${fmt(labelFont)}" font-family="Arial" font-weight="700" fill="${theme.muted}">${escapeXml(text)}</text>`;
+  }).join("");
+  const yLabels = ys.map((label, index) => `<text class="plot-heatmap-row-label${theme.mode === "publication" ? " plot-journal-heatmap-row-label" : ""}" x="${fmt(x - 9)}" y="${fmt(y + index * cellHeight + cellHeight / 2 + labelFont / 3)}" text-anchor="end" font-size="${fmt(labelFont)}" font-family="Arial" font-weight="${theme.mode === "publication" ? "650" : "700"}" fill="${theme.muted}">${escapeXml(shortPlotLabel(label, theme.mode === "publication" ? 12 : 9))}</text>`).join("");
   const colorbarX = x + width + 13;
   const colorbarH = Math.max(42, Math.min(height, 78));
   const colorbarY = y + Math.max(0, (height - colorbarH) / 2);
@@ -892,7 +918,15 @@ function renderHeatmap(rows: Record<string, string | number | null>[], xColumn: 
     return `<rect class="plot-heatmap-colorbar-stop" x="${fmt(colorbarX)}" y="${fmt(barY)}" width="8" height="${fmt(Math.ceil(colorbarH / 17) + 0.6)}" fill="${theme.heat(t)}"/>`;
   }).join("");
   const colorbarClass = `plot-heatmap-colorbar-frame${theme.mode === "publication" ? " plot-journal-colorbar-frame" : ""}`;
-  const colorbar = `<g class="plot-heatmap-colorbar"><rect class="${colorbarClass}" x="${fmt(colorbarX - 1)}" y="${fmt(colorbarY - 1)}" width="10" height="${fmt(colorbarH + 2)}" rx="${fmt(colorbarRadius)}" fill="${theme.frameFill}" stroke="${theme.frameStroke}"/>${colorbarStops}<text x="${fmt(colorbarX + 15)}" y="${fmt(colorbarY + 3)}" font-size="7.4" font-family="Arial" font-weight="700" fill="${theme.muted}">${escapeXml(fmt(max))}</text><text x="${fmt(colorbarX + 15)}" y="${fmt(colorbarY + colorbarH)}" font-size="7.4" font-family="Arial" font-weight="700" fill="${theme.muted}">${escapeXml(fmt(min))}</text></g>`;
+  const colorbarStroke = theme.mode === "publication" ? theme.grid : theme.frameStroke;
+  const colorbarTicks = theme.mode === "publication"
+    ? `<path class="plot-heatmap-colorbar-tick plot-journal-colorbar-tick" d="M${fmt(colorbarX + 9)},${fmt(colorbarY)} h5 M${fmt(colorbarX + 9)},${fmt(colorbarY + colorbarH)} h5" fill="none" stroke="${theme.muted}" stroke-width="0.55" opacity="0.8"/>`
+    : "";
+  const colorbarDataLabel = valueScaleLabel ? ` data-scale-label="${escapeXml(valueScaleLabel)}"` : "";
+  const colorbarLabel = theme.mode === "publication" && valueScaleLabel
+    ? `<text class="plot-heatmap-colorbar-label plot-journal-colorbar-label" x="${fmt(colorbarX + 4)}" y="${fmt(colorbarY - 4)}" text-anchor="middle" font-size="6.7" font-family="Arial" font-weight="650" fill="${theme.muted}">${escapeXml(shortPlotLabel(valueScaleLabel.replace(/\s*\([^)]*\)/g, ""), 12))}</text>`
+    : "";
+  const colorbar = `<g class="plot-heatmap-colorbar"${colorbarDataLabel}><rect class="${colorbarClass}" x="${fmt(colorbarX - 1)}" y="${fmt(colorbarY - 1)}" width="10" height="${fmt(colorbarH + 2)}" rx="${fmt(colorbarRadius)}" fill="${theme.frameFill}" stroke="${colorbarStroke}"/>${colorbarStops}${colorbarTicks}<text x="${fmt(colorbarX + 15)}" y="${fmt(colorbarY + 3)}" font-size="7.4" font-family="Arial" font-weight="650" fill="${theme.muted}">${escapeXml(fmt(max))}</text><text x="${fmt(colorbarX + 15)}" y="${fmt(colorbarY + colorbarH)}" font-size="7.4" font-family="Arial" font-weight="650" fill="${theme.muted}">${escapeXml(fmt(min))}</text>${colorbarLabel}</g>`;
   return `<g class="plot-heatmap-layer"><rect class="plot-heatmap-matrix-frame" x="${fmt(x)}" y="${fmt(y)}" width="${fmt(width)}" height="${fmt(height)}" rx="${fmt(matrixRadius)}" fill="${theme.fieldFill}" stroke="${theme.grid}"/>${cells}${rowLines}${columnLines}${xLabels}${yLabels}${colorbar}</g>`;
 }
 

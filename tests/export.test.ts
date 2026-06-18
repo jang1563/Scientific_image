@@ -135,12 +135,14 @@ test("publication results template exports line and dark style plot themes", () 
 
   assert.match(lineSvg, /fill="#ffffff" stroke="#111827"/);
   assert.match(lineSvg, /plot-embedding-layer/);
+  assert.match(lineSvg, /plot-journal-title/);
   assert.match(lineSvg, /plot-journal-embedding-field"[^>]*rx="0"/);
   assert.match(lineSvg, /plot-journal-embedding-label/);
   assert.match(lineSvg, /plot-journal-embedding-label-rule/);
   assert.match(lineSvg, /plot-heatmap-colorbar/);
+  assert.match(lineSvg, /plot-journal-heatmap-column-label/);
   assert.match(lineSvg, /data-style-profile="publication-line"/);
-  assert.match(lineSvg, /plot-journal-frame/);
+  assert.match(lineSvg, /plot-journal-frame"[^>]*stroke="#6b7280"/);
   assert.match(lineSvg, /plot-journal-colorbar-frame"[^>]*rx="0"/);
   assert.doesNotMatch(lineSvg, /fill="#fff7ed"/);
   assert.doesNotMatch(lineSvg, /plot-embedding-cluster-rim/);
@@ -229,7 +231,13 @@ test("spatial transcriptomics journal template exports manuscript-safe line figu
   assert.match(svg, /source-spatial-expression-table.tsv/);
   assert.match(svg, /Source and integrity checklist/);
   assert.match(svg, /source-spatial-expression-table.tsv/);
-  assert.match(svg, /plot-journal-frame/);
+  assert.match(svg, /plot-journal-title/);
+  assert.match(svg, /plot-journal-frame"[^>]*stroke="#6b7280"/);
+  assert.match(svg, /plot-journal-heatmap-column-label/);
+  assert.match(svg, /plot-journal-heatmap-row-label/);
+  assert.match(svg, /plot-journal-colorbar-tick/);
+  assert.match(svg, /plot-journal-colorbar-label/);
+  assert.match(svg, /scaled expression \(a\.u\.\)/);
   assert.match(svg, /class="journal-panel-frame"[^>]*rx="0"/);
   assert.match(svg, /class="journal-divider-rule"/);
   assert.match(svg, /plot-heatmap-cell"[^>]*rx="0"/);
