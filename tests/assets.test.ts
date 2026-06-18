@@ -412,6 +412,34 @@ test("commercial signature and hero assets have v2 recipes and quality metadata"
   }
 });
 
+test("publication-line data and AI assets avoid rounded UI-card internals", () => {
+  const squaredMarkers: Record<string, string[]> = {
+    dataset: ["asset-dataset-layer"],
+    benchmark: ["asset-benchmark-score-sheet", "asset-benchmark-matrix-cell"],
+    "metric-card": ["asset-metric-evidence-slate"],
+    calibration: ["asset-calibration-curve-frame"],
+    "permission-tier": ["asset-permission-tier-frame"],
+    "human-review": ["asset-human-review-frame", "asset-human-review-queue-row"],
+    "audit-log": ["asset-audit-log-ledger"],
+    "bio-classifier": ["asset-bio-classifier-chip-body", "asset-bio-classifier-model-core"],
+    "model-block": ["asset-model-block-frame", "asset-model-block-layer"],
+    "foundation-model": ["asset-foundation-model-frame", "asset-foundation-model-layer"],
+    "expression-matrix": ["asset-expression-matrix-frame", "asset-expression-matrix-cell"]
+  };
+
+  for (const [assetId, markers] of Object.entries(squaredMarkers)) {
+    const lineSvg = renderPremiumAssetSvg(assetId, { styleProfile: "publication-line", width: 180, height: 140 });
+    assert.match(lineSvg, /data-style-profile="publication-line"/);
+    assert.match(lineSvg, /class="asset-label asset-label-fit asset-journal-label"/);
+    assert.match(lineSvg, /class="asset-journal-label-rule"/);
+    assert.doesNotMatch(lineSvg, /class="asset-label-pill"/);
+    assert.doesNotMatch(lineSvg, /filter="url\(#asset-/);
+    for (const marker of markers) {
+      assert.match(lineSvg, new RegExp(`<rect[^>]*class="[^"]*${marker}[^"]*"[^>]*rx="0"`), `${assetId} should square ${marker} in publication-line`);
+    }
+  }
+});
+
 test("single-cell multiomics assets expose editable biological and omics markers", () => {
   const expectedMarkers: Record<string, RegExp[]> = {
     "cell-b": [/asset-cell-b/, /asset-bcell-bcr-receptor/, /asset-bcell-nucleus/, /asset-bcell-lineage-badge/],

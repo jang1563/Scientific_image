@@ -3709,6 +3709,7 @@ function renderLabel(text, width, height, palette) {
   const lineGap = fontSize + 1.4;
   const baselineY = height - Math.max(6, Math.min(9, height * 0.075));
   const firstY = lines.length === 1 ? baselineY : baselineY - lineGap;
+  if (palette.styleProfile === "publication-line") return renderPublicationLineLabel(lines, width, fontSize, lineGap, firstY, maxChars, palette);
   const pillPadY = 2.2;
   const pillHeight = fontSize + (lines.length - 1) * lineGap + pillPadY * 2;
   const pillY = Math.max(2, firstY - fontSize + 1.2 - pillPadY);
@@ -3719,6 +3720,15 @@ function renderLabel(text, width, height, palette) {
     ? `<tspan x="${fmt(width / 2)}" y="${fmt(firstY)}">${escapeXml(line)}</tspan>`
     : `<tspan x="${fmt(width / 2)}" dy="${fmt(lineGap)}">${escapeXml(line)}</tspan>`).join("");
   return `<g class="asset-label asset-label-fit" data-label-lines="${lines.length}" data-label-max-chars="${maxChars}"><rect class="asset-label-pill" x="${fmt(5)}" y="${fmt(pillY)}" width="${fmt(width - 10)}" height="${fmt(pillHeight)}" rx="${fmt(Math.min(8, pillHeight / 2))}" fill="${pillFill}" stroke="${pillStroke}" stroke-width="${fmt(0.8)}" opacity="0.92"/><text x="${fmt(width / 2)}" text-anchor="middle" fill="${palette.text}" font-family="Inter, Arial, sans-serif" font-size="${fmt(fontSize)}" font-weight="760">${tspans}</text></g>`;
+}
+
+function renderPublicationLineLabel(lines, width, fontSize, lineGap, firstY, maxChars, palette) {
+  const labelWidth = Math.min(width - 12, Math.max(28, Math.max(...lines.map((line) => line.length)) * fontSize * 0.52 + 8));
+  const ruleY = firstY - fontSize - 2.2;
+  const tspans = lines.map((line, index) => index === 0
+    ? `<tspan x="${fmt(width / 2)}" y="${fmt(firstY)}">${escapeXml(line)}</tspan>`
+    : `<tspan x="${fmt(width / 2)}" dy="${fmt(lineGap)}">${escapeXml(line)}</tspan>`).join("");
+  return `<g class="asset-label asset-label-fit asset-journal-label" data-label-lines="${lines.length}" data-label-max-chars="${maxChars}"><path class="asset-journal-label-rule" d="M${fmt((width - labelWidth) / 2)},${fmt(ruleY)} H${fmt((width + labelWidth) / 2)}" fill="none" stroke="${palette.stroke}" stroke-width="${fmt(0.7)}" opacity="0.62"/><text class="asset-journal-label-text" x="${fmt(width / 2)}" text-anchor="middle" fill="${palette.text}" font-family="Inter, Arial, sans-serif" font-size="${fmt(fontSize)}" font-weight="690">${tspans}</text></g>`;
 }
 
 function renderAnchors(width, height) {
@@ -3792,6 +3802,7 @@ function finishRenderedAssetMarkup(markup, palette) {
       .replace(/<(?:path|ellipse|circle|rect)[^>]*class="[^"]*(?:asset-(?:contact-shadow|soft-body-gradient|body-depth-overlay|inner-highlight|warning-glow|rim-highlight)|asset-(?:tcell|bcell|immune-cell|macrophage|tumor-cell|protein|receptor-membrane|scrna-oil|cell-barcode|metabolite|enzyme|tissue)[\w-]*-rim\b)[^"]*"[^>]*>/g, "")
       .replace(/<(?:path|ellipse|circle|rect)[^>]*fill="url\(#asset-(?:glass-highlight|body-depth)\)"[^>]*>/g, "")
       .replace(/stroke="#ffffff"/g, `stroke="${palette.stroke}"`);
+    next = squarePublicationLineUiRects(next);
   }
   if (palette.styleProfile === "minimal-flat" || palette.detailLevel === "low") {
     next = next
@@ -3803,6 +3814,12 @@ function finishRenderedAssetMarkup(markup, palette) {
     next = next.replace(/stroke="#ffffff"/g, 'stroke="#e2e8f0"');
   }
   return next;
+}
+
+function squarePublicationLineUiRects(markup) {
+  const uiClassPattern = "asset-(?:dataset|benchmark|metric|calibration|permission|human-review|audit-log|bio-classifier|model-block|foundation-model|classifier|context-window|memory|planner|executor|function-schema|tool-call|mcp-server|agent-loop|expression-matrix|gene-track|gene-exon|policy-stack|review|blocked-output|approval-stamp|bio-protocol|protocol-risk|safety-classifier|gene-synthesis|dual-use|escalation)[\\w-]*";
+  const uiRect = new RegExp(`(<rect\\b[^>]*\\bclass="[^"]*(?:${uiClassPattern})[^"]*"[^>]*?)\\s+rx="[^"]+"`, "g");
+  return markup.replace(uiRect, "$1 rx=\"0\"");
 }
 
 function inferFamily(assetId = "") {
