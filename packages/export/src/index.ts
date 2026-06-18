@@ -248,14 +248,28 @@ function renderSymbol(payload: SymbolPayload, node: SceneNode): string {
     glyph = `<circle cx="${fmt(width / 2)}" cy="${fmt((height - 24) * 0.42)}" r="${fmt(Math.min(width, height) * 0.22)}" fill="#ffffff" stroke="#0f172a" stroke-width="3"/>`;
   }
   const profile = payload.styleProfile ?? payload.appearance?.styleProfile;
-  const labelFill = profile === "dark-talk" ? "#0f172a" : "#ffffff";
-  const labelStroke = profile === "publication-line" ? "#111827" : profile === "dark-talk" ? "#334155" : "none";
-  const labelOpacity = profile === "publication-line" ? "0.96" : profile === "dark-talk" ? "0.78" : "0.58";
   if (!showLabel) return glyph;
+  if (profile === "publication-line") return renderJournalSymbolLabel(glyph, labelMetrics, width, height, style);
+  const labelFill = profile === "dark-talk" ? "#0f172a" : "#ffffff";
+  const labelStroke = profile === "dark-talk" ? "#334155" : "none";
+  const labelOpacity = profile === "dark-talk" ? "0.78" : "0.58";
   return [
     glyph,
-    `<rect x="${fmt((width - labelMetrics.boxWidth) / 2)}" y="${fmt(height - 22)}" width="${fmt(labelMetrics.boxWidth)}" height="${fmt(17)}" rx="${fmt(8.5)}" fill="${labelFill}" stroke="${labelStroke}" stroke-width="${labelStroke === "none" ? "0" : "0.8"}" opacity="${labelOpacity}"/>`,
-    `<text x="${fmt(width / 2)}" y="${fmt(height - 9)}" text-anchor="middle" fill="${escapeXml(style.color ?? "#0f172a")}" font-family="${escapeXml(style.fontFamily ?? "Arial, sans-serif")}" font-size="${fmt(labelMetrics.fontSize)}" font-weight="680">${escapeXml(labelMetrics.text)}</text>`
+    `<rect class="symbol-label-pill" x="${fmt((width - labelMetrics.boxWidth) / 2)}" y="${fmt(height - 22)}" width="${fmt(labelMetrics.boxWidth)}" height="${fmt(17)}" rx="${fmt(8.5)}" fill="${labelFill}" stroke="${labelStroke}" stroke-width="${labelStroke === "none" ? "0" : "0.8"}" opacity="${labelOpacity}"/>`,
+    `<text class="symbol-label-text" x="${fmt(width / 2)}" y="${fmt(height - 9)}" text-anchor="middle" fill="${escapeXml(style.color ?? "#0f172a")}" font-family="${escapeXml(style.fontFamily ?? "Arial, sans-serif")}" font-size="${fmt(labelMetrics.fontSize)}" font-weight="680">${escapeXml(labelMetrics.text)}</text>`
+  ].join("");
+}
+
+function renderJournalSymbolLabel(glyph: string, labelMetrics: { text: string; fontSize: number; boxWidth: number }, width: number, height: number, style: Style): string {
+  const labelWidth = Math.max(24, labelMetrics.boxWidth - 12);
+  const x1 = (width - labelWidth) / 2;
+  const x2 = (width + labelWidth) / 2;
+  const ruleY = height - 22;
+  const textY = height - 8.5;
+  return [
+    glyph,
+    `<path class="symbol-journal-label-rule" d="M${fmt(x1)},${fmt(ruleY)} H${fmt(x2)}" fill="none" stroke="#111827" stroke-width="0.65" opacity="0.58"/>`,
+    `<text class="symbol-journal-label" x="${fmt(width / 2)}" y="${fmt(textY)}" text-anchor="middle" fill="${escapeXml(style.color ?? "#111827")}" font-family="${escapeXml(style.fontFamily ?? "Arial, sans-serif")}" font-size="${fmt(labelMetrics.fontSize)}" font-weight="620">${escapeXml(labelMetrics.text)}</text>`
   ].join("");
 }
 

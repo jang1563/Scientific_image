@@ -14,6 +14,7 @@ function assertJournalSafeSvgDefs(svg: string): void {
   assert.match(svg, /id="arrow-end"/);
   assert.doesNotMatch(svg, /id="(?:contact-shadow|raised-panel-shadow|soft-object-shadow|hero-shadow|warning-object-shadow|danger-object-shadow|focus-glow|soft-shadow|asset-contact-shadow|asset-soft-shadow|asset-warning-glow|asset-body-depth|asset-glass-highlight|realistic-editorial-shadow|realistic-frame-highlight)"/);
   assert.doesNotMatch(svg, /filter="url\(#(?:soft-object-shadow|raised-panel-shadow|hero-shadow|warning-object-shadow|danger-object-shadow|asset-soft-shadow|asset-contact-shadow)\)"/);
+  assert.doesNotMatch(svg, /class="symbol-label-pill"/);
 }
 
 test("exports SVG, PDF, PPTX, and DOCX from the same scene graph", () => {
@@ -288,7 +289,7 @@ test("priority flagship templates honor publication-line and dark-talk style the
   }
 });
 
-test("symbol labels fit long scientific names in export-safe pills", () => {
+test("symbol labels use manuscript-safe annotations in publication-line exports", () => {
   let project = createProject("Long symbol label fixture");
   project = addNode(project, createCuratedSymbolNode({
     assetId: "scrna-droplet",
@@ -301,8 +302,11 @@ test("symbol labels fit long scientific names in export-safe pills", () => {
   }));
   const svg = String(exportProject(project, { format: "svg" }).data);
 
-  assert.match(svg, /<rect x="5" y="76" width="114" height="17"/);
+  assert.match(svg, /class="symbol-journal-label-rule"/);
+  assert.match(svg, /class="symbol-journal-label"/);
   assert.match(svg, /font-size="9\.[0-9]+"[^>]*>Cell x guide cap\.\.\.<\/text>/);
+  assert.doesNotMatch(svg, /class="symbol-label-pill"/);
+  assert.doesNotMatch(svg, /rx="8\.5" fill="#ffffff" stroke="#111827"/);
 });
 
 test("SVG export renders bar plots with premium axis and value affordances", () => {
