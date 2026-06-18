@@ -439,17 +439,26 @@ function renderPlotFooterItems(spec: PlotSpec, width: number, height: number, it
     : [{ className: "plot-footer", label: "Plot", text: `${spec.table.rows.length} rows / editable PlotSpec` }];
   const fontSize = items.length ? 8.2 : 9.2;
   const startY = height - (footerItems.length - 1) * 10 - 7;
-  return footerItems
-    .map((item, index) => `<text class="${item.className}" x="${fmt(width / 2)}" y="${fmt(startY + index * 10)}" text-anchor="middle" font-family="Arial, sans-serif" font-size="${fmt(fontSize)}" font-weight="${item.className === "plot-footer" ? "700" : "650"}" fill="${theme.muted}">${escapeXml(`${item.label}: ${shortPlotLabel(item.text, 92)}`)}</text>`)
-    .join("");
+  const footerRule = theme.mode === "publication" && items.length
+    ? `<path class="plot-journal-footer-rule" d="M${fmt(18)},${fmt(startY - 8)} H${fmt(width - 18)}" fill="none" stroke="${theme.grid}" stroke-width="0.65" opacity="0.85"/>`
+    : "";
+  return `${footerRule}${footerItems
+    .map((item, index) => {
+      const className = `${item.className}${theme.mode === "publication" && items.length ? " plot-journal-metadata-footer" : ""}`;
+      return `<text class="${className}" x="${fmt(width / 2)}" y="${fmt(startY + index * 10)}" text-anchor="middle" font-family="Arial, sans-serif" font-size="${fmt(fontSize)}" font-weight="${item.className === "plot-footer" ? "700" : "650"}" fill="${theme.muted}">${escapeXml(`${item.label}: ${shortPlotLabel(item.text, 92)}`)}</text>`;
+    })
+    .join("")}`;
 }
 
 function renderCompactPlotFooterItems(width: number, height: number, items: { className: string; label: string; text: string }[], theme: PlotTheme): string {
   if (!items.length) return "";
   const startY = height - (items.length - 1) * 7 - 5;
-  return items
-    .map((item, index) => `<text class="${item.className} plot-compact-footer" data-compact-footer="true" x="${fmt(width / 2)}" y="${fmt(startY + index * 7)}" text-anchor="middle" font-family="Arial, sans-serif" font-size="6.4" font-weight="650" fill="${theme.muted}">${escapeXml(compactFooterText(item))}</text>`)
-    .join("");
+  const footerRule = theme.mode === "publication"
+    ? `<path class="plot-journal-footer-rule" d="M${fmt(16)},${fmt(startY - 5.5)} H${fmt(width - 16)}" fill="none" stroke="${theme.grid}" stroke-width="0.6" opacity="0.82"/>`
+    : "";
+  return `${footerRule}${items
+    .map((item, index) => `<text class="${item.className} plot-compact-footer${theme.mode === "publication" ? " plot-journal-metadata-footer" : ""}" data-compact-footer="true" x="${fmt(width / 2)}" y="${fmt(startY + index * 7)}" text-anchor="middle" font-family="Arial, sans-serif" font-size="6.4" font-weight="650" fill="${theme.muted}">${escapeXml(compactFooterText(item))}</text>`)
+    .join("")}`;
 }
 
 function compactFooterText(item: { className: string; label: string; text: string }): string {
@@ -865,7 +874,8 @@ function renderHeatmap(rows: Record<string, string | number | null>[], xColumn: 
     const barY = colorbarY + (1 - t) * colorbarH;
     return `<rect class="plot-heatmap-colorbar-stop" x="${fmt(colorbarX)}" y="${fmt(barY)}" width="8" height="${fmt(Math.ceil(colorbarH / 17) + 0.6)}" fill="${theme.heat(t)}"/>`;
   }).join("");
-  const colorbar = `<g class="plot-heatmap-colorbar"><rect x="${fmt(colorbarX - 1)}" y="${fmt(colorbarY - 1)}" width="10" height="${fmt(colorbarH + 2)}" rx="${fmt(colorbarRadius)}" fill="${theme.frameFill}" stroke="${theme.frameStroke}"/>${colorbarStops}<text x="${fmt(colorbarX + 15)}" y="${fmt(colorbarY + 3)}" font-size="7.4" font-family="Arial" font-weight="700" fill="${theme.muted}">${escapeXml(fmt(max))}</text><text x="${fmt(colorbarX + 15)}" y="${fmt(colorbarY + colorbarH)}" font-size="7.4" font-family="Arial" font-weight="700" fill="${theme.muted}">${escapeXml(fmt(min))}</text></g>`;
+  const colorbarClass = `plot-heatmap-colorbar-frame${theme.mode === "publication" ? " plot-journal-colorbar-frame" : ""}`;
+  const colorbar = `<g class="plot-heatmap-colorbar"><rect class="${colorbarClass}" x="${fmt(colorbarX - 1)}" y="${fmt(colorbarY - 1)}" width="10" height="${fmt(colorbarH + 2)}" rx="${fmt(colorbarRadius)}" fill="${theme.frameFill}" stroke="${theme.frameStroke}"/>${colorbarStops}<text x="${fmt(colorbarX + 15)}" y="${fmt(colorbarY + 3)}" font-size="7.4" font-family="Arial" font-weight="700" fill="${theme.muted}">${escapeXml(fmt(max))}</text><text x="${fmt(colorbarX + 15)}" y="${fmt(colorbarY + colorbarH)}" font-size="7.4" font-family="Arial" font-weight="700" fill="${theme.muted}">${escapeXml(fmt(min))}</text></g>`;
   return `<g class="plot-heatmap-layer"><rect class="plot-heatmap-matrix-frame" x="${fmt(x)}" y="${fmt(y)}" width="${fmt(width)}" height="${fmt(height)}" rx="${fmt(matrixRadius)}" fill="${theme.fieldFill}" stroke="${theme.grid}"/>${cells}${rowLines}${columnLines}${xLabels}${yLabels}${colorbar}</g>`;
 }
 

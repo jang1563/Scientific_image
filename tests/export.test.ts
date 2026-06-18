@@ -138,6 +138,7 @@ test("publication results template exports line and dark style plot themes", () 
   assert.match(lineSvg, /plot-heatmap-colorbar/);
   assert.match(lineSvg, /data-style-profile="publication-line"/);
   assert.match(lineSvg, /plot-journal-frame/);
+  assert.match(lineSvg, /plot-journal-colorbar-frame"[^>]*rx="0"/);
   assert.doesNotMatch(lineSvg, /fill="#fff7ed"/);
   assert.doesNotMatch(lineSvg, /plot-embedding-cluster-rim/);
   assert.doesNotMatch(lineSvg, /plot-volcano-hit-halo/);
@@ -178,6 +179,8 @@ test("perturb-seq journal template exports manuscript-safe line figure", () => {
   assert.match(svg, /Gene program \/ hit direction/);
   assert.match(svg, /plot-source-data-note/);
   assert.match(svg, /plot-compact-footer/);
+  assert.match(svg, /plot-journal-footer-rule/);
+  assert.match(svg, /plot-journal-metadata-footer/);
   assert.match(svg, /source-perturb-seq-results.tsv/);
   assert.match(svg, /Source data/);
   assert.match(svg, /plot-journal-frame/);
@@ -211,6 +214,8 @@ test("spatial transcriptomics journal template exports manuscript-safe line figu
   assert.match(svg, /Scaled expression by annotated region/);
   assert.match(svg, /plot-source-data-note/);
   assert.match(svg, /plot-compact-footer/);
+  assert.match(svg, /plot-journal-footer-rule/);
+  assert.match(svg, /plot-journal-metadata-footer/);
   assert.match(svg, /source-spatial-expression-table.tsv/);
   assert.match(svg, /Source and integrity checklist/);
   assert.match(svg, /source-spatial-expression-table.tsv/);
@@ -219,6 +224,7 @@ test("spatial transcriptomics journal template exports manuscript-safe line figu
   assert.match(svg, /class="journal-divider-rule"/);
   assert.match(svg, /plot-heatmap-cell"[^>]*rx="0"/);
   assert.match(svg, /plot-heatmap-matrix-frame"[^>]*rx="0"/);
+  assert.match(svg, /plot-journal-colorbar-frame"[^>]*rx="0"/);
   assert.doesNotMatch(svg, /data-depth="(?:raised|floating|hero)"/);
   assert.doesNotMatch(svg, /stroke="#(?:bfdbfe|e9d5ff|fecaca|d8b4fe)"/);
   assertJournalSafeSvgDefs(svg);
