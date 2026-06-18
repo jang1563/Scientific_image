@@ -604,7 +604,9 @@ function renderEmbeddingScatter(points: { rawX: number; rawY: number; group: str
     .map((group, index) => renderEmbeddingClusterLabel(group, screenPoints.filter((point) => point.group === group), x, y, width, height, compact, index, theme))
     .join("");
   const summary = `<text class="plot-embedding-summary" x="${fmt(x + width - 4)}" y="${fmt(y + height - 5)}" text-anchor="end" font-family="Arial, sans-serif" font-size="${compact ? "7.4" : "8.8"}" font-weight="760" fill="${theme.muted}">${groups.length} clusters / n=${points.length}</text>`;
-  return `<g class="plot-embedding-layer"><rect class="plot-embedding-field" x="${fmt(x)}" y="${fmt(y)}" width="${fmt(width)}" height="${fmt(height)}" rx="7" fill="${theme.fieldFill}" stroke="${theme.grid}" opacity="${theme.mode === "dark" ? "0.95" : "0.82"}"/>${grid}${hulls}${marks}${centroidMarks}${labels}${summary}</g>`;
+  const fieldClass = `plot-embedding-field${theme.mode === "publication" ? " plot-journal-embedding-field" : ""}`;
+  const fieldRadius = theme.mode === "publication" ? 0 : 7;
+  return `<g class="plot-embedding-layer"><rect class="${fieldClass}" x="${fmt(x)}" y="${fmt(y)}" width="${fmt(width)}" height="${fmt(height)}" rx="${fmt(fieldRadius)}" fill="${theme.fieldFill}" stroke="${theme.grid}" opacity="${theme.mode === "dark" ? "0.95" : "0.82"}"/>${grid}${hulls}${marks}${centroidMarks}${labels}${summary}</g>`;
 }
 
 function renderEmbeddingHull(group: string, points: { x: number; y: number }[], compact: boolean, theme: PlotTheme): string {
@@ -649,6 +651,10 @@ function renderEmbeddingClusterLabel(group: string, points: { x: number; y: numb
   const labelHeight = compact ? 14 : 17;
   const labelX = clamp(centroid.x, x + labelWidth / 2 + 2, x + width - labelWidth / 2 - 2);
   const labelY = clamp(centroid.y - (compact ? 13 : 16) + (index % 2) * (compact ? 5 : 7), y + labelHeight / 2 + 2, y + height - labelHeight / 2 - 12);
+  if (theme.mode === "publication") {
+    const ruleWidth = Math.max(18, Math.min(labelWidth - 8, label.length * (compact ? 4.4 : 5.1)));
+    return `<g class="plot-embedding-cluster-label plot-journal-embedding-label" data-group="${escapeXml(group)}"><path class="plot-journal-embedding-label-rule" d="M${fmt(labelX - ruleWidth / 2)},${fmt(labelY - fontSize * 0.72)} H${fmt(labelX + ruleWidth / 2)}" fill="none" stroke="${theme.color(group)}" stroke-width="0.65" opacity="0.78"/><text x="${fmt(labelX)}" y="${fmt(labelY + fontSize * 0.33)}" text-anchor="middle" font-family="Arial, sans-serif" font-size="${fmt(fontSize)}" font-weight="760" fill="${theme.label}">${escapeXml(label)}</text></g>`;
+  }
   return `<g class="plot-embedding-cluster-label" data-group="${escapeXml(group)}"><rect class="plot-embedding-label-bg" x="${fmt(labelX - labelWidth / 2)}" y="${fmt(labelY - labelHeight / 2)}" width="${fmt(labelWidth)}" height="${fmt(labelHeight)}" rx="${fmt(labelHeight / 2)}" fill="${theme.mode === "dark" ? "#1e293b" : "#ffffff"}" stroke="${theme.color(group)}" stroke-width="0.8" opacity="0.92"/><text x="${fmt(labelX)}" y="${fmt(labelY + fontSize * 0.33)}" text-anchor="middle" font-family="Arial, sans-serif" font-size="${fmt(fontSize)}" font-weight="800" fill="${theme.label}">${escapeXml(label)}</text></g>`;
 }
 
@@ -689,14 +695,17 @@ function renderVolcanoPlot(points: { rawX: number; rawY: number; group: string; 
     .filter((point) => point.label && Math.abs(point.rawX) >= fcThreshold && point.rawY >= pThreshold)
     .sort((a, b) => b.rawY - a.rawY)
     .slice(0, compact ? 3 : 4);
+  const significanceZones = theme.mode === "publication" ? [] : [
+    `<rect class="plot-volcano-significance-zone" x="${fmt(x)}" y="${fmt(y)}" width="${fmt(Math.max(0, leftThresholdX - x))}" height="${fmt(Math.max(0, thresholdY - y))}" fill="#ede9fe" opacity="0.18"/>`,
+    `<rect class="plot-volcano-significance-zone" x="${fmt(rightThresholdX)}" y="${fmt(y)}" width="${fmt(Math.max(0, x + width - rightThresholdX))}" height="${fmt(Math.max(0, thresholdY - y))}" fill="#ccfbf1" opacity="0.18"/>`
+  ];
   const guides = [
-    `<rect class="plot-volcano-significance-zone" x="${fmt(x)}" y="${fmt(y)}" width="${fmt(Math.max(0, leftThresholdX - x))}" height="${fmt(Math.max(0, thresholdY - y))}" fill="${theme.mode === "publication" ? "#111827" : "#ede9fe"}" opacity="${theme.mode === "publication" ? "0.04" : "0.18"}"/>`,
-    `<rect class="plot-volcano-significance-zone" x="${fmt(rightThresholdX)}" y="${fmt(y)}" width="${fmt(Math.max(0, x + width - rightThresholdX))}" height="${fmt(Math.max(0, thresholdY - y))}" fill="${theme.mode === "publication" ? "#111827" : "#ccfbf1"}" opacity="${theme.mode === "publication" ? "0.04" : "0.18"}"/>`,
+    ...significanceZones,
     `<path class="plot-volcano-threshold-line" d="M${fmt(leftThresholdX)},${fmt(y)} V${fmt(y + height)} M${fmt(rightThresholdX)},${fmt(y)} V${fmt(y + height)}" stroke="${theme.muted}" stroke-width="0.8" stroke-dasharray="4 5" opacity="0.62"/>`,
     `<path class="plot-volcano-threshold-line" d="M${fmt(x)},${fmt(thresholdY)} H${fmt(x + width)}" stroke="${theme.mode === "publication" ? "#111827" : "#f59e0b"}" stroke-width="0.9" stroke-dasharray="4 5" opacity="0.78"/>`,
     `<path class="plot-volcano-zero-line" d="M${fmt(sx(0))},${fmt(y)} V${fmt(y + height)}" stroke="${theme.grid}" stroke-width="0.8" opacity="0.72"/>`,
-    `<text class="plot-volcano-threshold-label" x="${fmt(x + 5)}" y="${fmt(Math.max(y + 10, thresholdY - 4))}" font-family="Arial, sans-serif" font-size="7.6" font-weight="700" fill="${theme.label}">adj. P &lt; 1e-4</text>`,
-    `<text class="plot-volcano-effect-threshold-label" x="${fmt(sx(0))}" y="${fmt(y + 10)}" text-anchor="middle" font-family="Arial, sans-serif" font-size="7.2" font-weight="700" fill="${theme.muted}">|log2FC| = 1</text>`,
+    `<text class="plot-volcano-threshold-label${theme.mode === "publication" ? " plot-journal-threshold-label" : ""}" x="${fmt(x + 5)}" y="${fmt(Math.max(y + 10, thresholdY - 4))}" font-family="Arial, sans-serif" font-size="7.6" font-weight="${theme.mode === "publication" ? "650" : "700"}" fill="${theme.label}">adj. P &lt; 1e-4</text>`,
+    `<text class="plot-volcano-effect-threshold-label${theme.mode === "publication" ? " plot-journal-threshold-label" : ""}" x="${fmt(sx(0))}" y="${fmt(y + 10)}" text-anchor="middle" font-family="Arial, sans-serif" font-size="7.2" font-weight="${theme.mode === "publication" ? "650" : "700"}" fill="${theme.muted}">|log2FC| = 1</text>`,
     compact ? "" : `<text class="plot-volcano-direction-label" x="${fmt(x + 7)}" y="${fmt(y + height - 6)}" font-family="Arial, sans-serif" font-size="7.6" font-weight="800" fill="${theme.color("down")}">depleted</text><text class="plot-volcano-direction-label" x="${fmt(x + width - 7)}" y="${fmt(y + height - 6)}" text-anchor="end" font-family="Arial, sans-serif" font-size="7.6" font-weight="800" fill="${theme.color("up")}">enriched</text>`
   ].join("");
   const marks = points
@@ -725,12 +734,20 @@ function renderVolcanoPlot(points: { rawX: number; rawY: number; group: string; 
       const labelY = compact
         ? Math.min(y + height - 8, y + 13 + stackIndex * 10)
         : Math.max(y + 12, Math.min(y + height - 8, pointY + (index % 2 ? 12 : -8)));
-      return `<path class="plot-volcano-label-leader" d="M${fmt(pointX)},${fmt(pointY)} L${fmt(labelX + (placeLeft ? 4 : -4))},${fmt(labelY - 3)}" stroke="${theme.muted}" stroke-width="0.65" opacity="0.62"/><text class="plot-volcano-label" x="${fmt(labelX)}" y="${fmt(labelY)}" text-anchor="${placeLeft ? "end" : "start"}" font-family="Arial, sans-serif" font-size="8.4" font-weight="760" fill="${theme.label}">${escapeXml(shortPlotLabel(point.label, 8))}</text>`;
+      const leader = theme.mode === "publication" ? "" : `<path class="plot-volcano-label-leader" d="M${fmt(pointX)},${fmt(pointY)} L${fmt(labelX + (placeLeft ? 4 : -4))},${fmt(labelY - 3)}" stroke="${theme.muted}" stroke-width="0.65" opacity="0.62"/>`;
+      return `${leader}<text class="plot-volcano-label${theme.mode === "publication" ? " plot-journal-volcano-label" : ""}" x="${fmt(labelX)}" y="${fmt(labelY)}" text-anchor="${placeLeft ? "end" : "start"}" font-family="Arial, sans-serif" font-size="8.4" font-weight="${theme.mode === "publication" ? "690" : "760"}" fill="${theme.label}">${escapeXml(shortPlotLabel(point.label, 8))}</text>`;
     })
     .join("");
   const legendX = x + width - 92;
   const legendY = y + 9;
-  const legend = `<g class="plot-volcano-legend" transform="translate(${fmt(legendX)} ${fmt(legendY)})"><circle cx="0" cy="0" r="3.4" fill="${theme.color("up")}"/><text x="8" y="3" font-family="Arial, sans-serif" font-size="7.8" font-weight="700" fill="${theme.muted}">up hit</text><circle cx="45" cy="0" r="3.4" fill="${theme.color("down")}"/><text x="53" y="3" font-family="Arial, sans-serif" font-size="7.8" font-weight="700" fill="${theme.muted}">down</text></g>`;
+  const legendClass = `plot-volcano-legend${theme.mode === "publication" ? " plot-journal-volcano-legend" : ""}`;
+  const upMarker = theme.mode === "publication"
+    ? `<circle cx="0" cy="0" r="3.2" fill="none" stroke="${theme.color("up")}" stroke-width="0.9"/>`
+    : `<circle cx="0" cy="0" r="3.4" fill="${theme.color("up")}"/>`;
+  const downMarker = theme.mode === "publication"
+    ? `<circle cx="45" cy="0" r="3.2" fill="none" stroke="${theme.color("down")}" stroke-width="0.9"/>`
+    : `<circle cx="45" cy="0" r="3.4" fill="${theme.color("down")}"/>`;
+  const legend = `<g class="${legendClass}" transform="translate(${fmt(legendX)} ${fmt(legendY)})">${upMarker}<text x="8" y="3" font-family="Arial, sans-serif" font-size="7.8" font-weight="${theme.mode === "publication" ? "650" : "700"}" fill="${theme.muted}">up hit</text>${downMarker}<text x="53" y="3" font-family="Arial, sans-serif" font-size="7.8" font-weight="${theme.mode === "publication" ? "650" : "700"}" fill="${theme.muted}">down</text></g>`;
   return `<g class="plot-volcano-layer">${grid}${guides}${marks}${labels}${legend}</g>`;
 }
 

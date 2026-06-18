@@ -135,13 +135,18 @@ test("publication results template exports line and dark style plot themes", () 
 
   assert.match(lineSvg, /fill="#ffffff" stroke="#111827"/);
   assert.match(lineSvg, /plot-embedding-layer/);
+  assert.match(lineSvg, /plot-journal-embedding-field"[^>]*rx="0"/);
+  assert.match(lineSvg, /plot-journal-embedding-label/);
+  assert.match(lineSvg, /plot-journal-embedding-label-rule/);
   assert.match(lineSvg, /plot-heatmap-colorbar/);
   assert.match(lineSvg, /data-style-profile="publication-line"/);
   assert.match(lineSvg, /plot-journal-frame/);
   assert.match(lineSvg, /plot-journal-colorbar-frame"[^>]*rx="0"/);
   assert.doesNotMatch(lineSvg, /fill="#fff7ed"/);
   assert.doesNotMatch(lineSvg, /plot-embedding-cluster-rim/);
+  assert.doesNotMatch(lineSvg, /plot-embedding-label-bg/);
   assert.doesNotMatch(lineSvg, /plot-volcano-hit-halo/);
+  assert.doesNotMatch(lineSvg, /plot-volcano-significance-zone/);
   assert.match(lineSvg, /plot-heatmap-cell"[^>]*rx="0"/);
   assertJournalSafeSvgDefs(lineSvg);
 
@@ -174,6 +179,9 @@ test("perturb-seq journal template exports manuscript-safe line figure", () => {
   assert.match(svg, /log2 fold-change vs non-targeting control/);
   assert.match(svg, /-log10 adjusted P value/);
   assert.match(svg, /plot-volcano-effect-threshold-label/);
+  assert.match(svg, /plot-journal-threshold-label/);
+  assert.match(svg, /plot-journal-volcano-label/);
+  assert.match(svg, /plot-journal-volcano-legend/);
   assert.match(svg, /adj\. P &lt; 1e-4/);
   assert.match(svg, /plot-journal-legend/);
   assert.match(svg, /Gene program \/ hit direction/);
@@ -187,6 +195,8 @@ test("perturb-seq journal template exports manuscript-safe line figure", () => {
   assert.match(svg, /class="journal-panel-frame"[^>]*rx="0"/);
   assert.match(svg, /class="journal-divider-rule"/);
   assert.doesNotMatch(svg, /plot-volcano-hit-halo/);
+  assert.doesNotMatch(svg, /plot-volcano-label-leader/);
+  assert.doesNotMatch(svg, /plot-volcano-significance-zone/);
   assert.doesNotMatch(svg, /data-depth="(?:raised|floating|hero)"/);
   assert.doesNotMatch(svg, /stroke="#(?:bfdbfe|e9d5ff|fecaca)"/);
   assertJournalSafeSvgDefs(svg);
